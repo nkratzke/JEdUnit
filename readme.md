@@ -146,9 +146,9 @@ class Checks extends Evaluator {
 
 As you see, the `grading()` command is essential here. It takes the following parameters:
 
-- __points__ ($int$) that will be added if the check is successfull (evaluates to $true$)
-- __remark__ ($String$) that will be printed in comments. A remark should describe the testcase in a meaningful but short way.
-- __check__ ($Supplier<Boolean>$) that will be executed. If evaluated to $true$ points will be added, otherwise no points will be added.
+- __points__ (`int`) that will be added if the check is successfull (evaluates to `true`)
+- __remark__ (`String`) that will be printed in comments. A remark should describe the testcase in a meaningful but short way.
+- __check__ (`Supplier<Boolean>`) that will be executed. If evaluated to `true` points will be added, otherwise no points will be added.
 
 A VPL evaluation (triggered via the [vpl_evaluate.sh](vpl_evaluate.sh) script) will generate the following console output
 
