@@ -34,5 +34,5 @@ git clone https://github.com/nkratzke/VPL-java-template.git
 ```
 2. Import the following __required file__ (Main.java) via the Moodle web interface from this repository as starting point for your students.
 3. Import the following __executable files__ (Checks.java, Evaluator.java) via the Moodle web interface from this repository.
-4. Select __to be keeped files__ (Checks.java, Evaluator.java) via the Moodle web interface (otherwise these files will be deleted by VPL and your evaluation will not work).
+4. Select __to be keeped files__ ([Checks.java](Checks.java), Evaluator.java) via the Moodle web interface (otherwise these files will be deleted by VPL and your evaluation will not work).
 
