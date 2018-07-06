@@ -44,16 +44,14 @@ Then
 
 ### Writing an assignment
 
-Let us assume a small assignment example. Students should count (non case sensitive) all occurences of a given char _c_ in a String _s_ via a method
+Let us assume a small assignment example. Students have to develop a method to count all occurences of a given char _c_ in a String _s_ (non case sensitive). This method should be called like this:
 
-    int countChars(char c, String s)
+```Java
+System.out.println(countChars('o', "Hello World")); // => 2
+System.out.println(countChars('w', "Hello World")); // => 1
+```
 
-The following examples are provided to make the problem more clear.
-
-- So 'o' occurs in "Hello World" two times [countChars('o', "Hello Word") => 2]
-- 'w' occurs in "Hello World" one time [countChars('w', "Hello Word") => 1]
-
-The students are provided with the basic [Main](Main.java) class.
+The following basic [Main](Main.java) class is provided as starting point.
 
 ```Java
 class Main {
@@ -64,7 +62,7 @@ class Main {
 }
 ```
 
-and they will likely extend this file and upload a solution via Moodle like this.
+This class will be extended and uploaded via Moodle. A possible solution might look like that:
 
 ```Java
 class Main {
