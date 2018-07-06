@@ -27,10 +27,12 @@ Furthermore, we recommend to study at least the following VPL related documentat
 ### Basic configuration
 
 To make use of this template the following workflow is recommended to set up a basic configuration for a new programming assignment.
-Make use of git and __clone__ this repository to your local machine.
+First of all, clone this repository to your local machine.
 ```
 git clone https://github.com/nkratzke/VPL-java-template.git
 ```
+
+Then
 
 1. Import the following __required file__ ([Main.java](Main.java)) via the Moodle web interface from this repository as __starting point for your students__.
 2. Import the following __executable files__ ([Checks.java](Checks.java), [Evaluator.java](Evaluator.java) and [vpl_evaluate.sh](vpl_evaluate.sh), [vpl_run.sh](vpl_run.sh)) via the Moodle web interface from this repository. 
@@ -40,3 +42,10 @@ git clone https://github.com/nkratzke/VPL-java-template.git
     - [vpl_evaluate.sh](vpl_evaluate.sh) is the VPL evaluate script that compiles and executes all Java files and launches [Checks.java](Checks.java) to evaluate the student submission. It might be adapted for assignments that rely on more complex dependencies.
 3. Select __to be keeped files__ ([Checks.java](Checks.java), [Evaluator.java](Evaluator.java)) via the Moodle web interface (otherwise these files will be deleted by VPL and your evaluation will not work).
 
+### Writing an assignment
+
+- to be done
+
+### Writing checks for automatic evaluation of an assignment
+
+- to be done
