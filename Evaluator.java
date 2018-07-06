@@ -27,8 +27,10 @@ public class Evaluator {
 
     /**
      * Test case counter.
+     * Declared static to count testcases consecutively across
+     * different Check classes.
      */
-    private int testcase = 0;
+    private static int testcase = 0;
 
     /**
      * Adds a percentage to the maximum reachable points (grading)
@@ -36,16 +38,17 @@ public class Evaluator {
      * The reached points can be evaluated by VPL.
      */
     protected final void grading(int add, String remark, Supplier<Boolean> check) {
+        testcase++;
         try {
             if (check.get()) {
                 points += add;
                 points = points > MAX ? MAX : points;
                 points = points < 0 ? 0 : points;
-                System.out.println(comment("Testcase " + ++testcase + ": " + remark + " [OK]"));
+                System.out.println(comment("Testcase " + testcase + ": " + remark + " [OK]"));
                 System.out.println("Grade :=>> " + points); 
-            } else System.out.println(comment(remark + " [FAILED]"));
+            } else System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED]"));
         } catch (Exception ex) {
-            System.out.println(comment(remark + " [FAILED due to " + ex + "]"));
+            System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED due to " + ex + "]"));
         }
     }
 
