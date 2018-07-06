@@ -87,4 +87,37 @@ But is the solution correct, and how to check this automatically for grading?
 
 ### Writing checks for automatic evaluation of an assignment
 
-- to be done
+```Java
+class Checks extends Evaluator {
+
+    public void testExampleCases() {
+        // You can give less points for provided example cases
+        grading(5, "Counting 'o' in 'Hello World' must return 2.", () -> Main.countChars('o', "Hello World") == 2);
+        grading(5, "Counting 'w' in 'Hello World' must return 2.", () -> Main.countChars('w', "Hello World") == 1);
+    }
+
+    public void testAdditionalCases() {
+        // You can give more points for additional checks
+        grading(10, "Counting 'x' in 'xxx' must return 3.", () -> Main.countChars('x', "xxx") == 3);
+        grading(10, "Counting 'X' in 'XxX' must return 3.", () -> Main.countChars('X', "XxX") == 3);
+        grading(10, "Counting 'x' in 'YYX' must return 1.", () -> Main.countChars('x', "YYX") == 1);
+        grading(10, "Counting 'X' in 'Xyy' must return 1.", () -> Main.countChars('X', "Xyy") == 1);
+        grading(10, "Counting 'x' in 'Xyy' must return 1.", () -> Main.countChars('x', "Xyy") == 1);
+
+        // You can give less points for less problematic checks
+        grading(5, "Counting 'x' in 'X' must return 1.", () -> Main.countChars('x', "X") == 1);
+        grading(5, "Counting 'y' in 'X' must return 0.", () -> Main.countChars('y', "X") == 0);
+        grading(5, "Counting 'Y' in 'X' must return 0.", () -> Main.countChars('Y', "X") == 0);
+    }
+
+    public void testBoundaryCases() {
+        // You can give more points for problem sensibilizing checks
+        grading(15, "Counting chars in an empty string must return 0.", () -> Main.countChars('x', "") == 0);
+        grading(15, "Counting chars in a null string must return 0.", () -> Main.countChars('x', null) == 0);
+
+        // And a little bit less points for just potential problematic checks
+        String example = "Just  an example! ";
+        grading(10, "Counting ' ' in '" + example + "'", () -> Main.countChars(' ', example) == 4);
+    }
+}
+```

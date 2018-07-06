@@ -39,7 +39,7 @@ public class Evaluator {
                 System.out.println("Grade :=>> " + points); 
             } else System.out.println(comment(remark));
         } catch (Exception ex) {
-            System.out.println(comment(remark + " [" + ex + ", " + check + "]"));
+            System.out.println(comment(remark + " [" + ex + "]"));
         }
     }
 
