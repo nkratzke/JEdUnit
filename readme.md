@@ -34,8 +34,8 @@ git clone https://github.com/nkratzke/VPL-java-template.git
 
 Then
 
-1. Import the following __required file__ ([Main.java](Main.java)) via the Moodle web interface from this repository as __starting point for your students__.
-2. Import the following __executable files__ ([Checks.java](Checks.java), [Evaluator.java](Evaluator.java) and [vpl_evaluate.sh](vpl_evaluate.sh), [vpl_run.sh](vpl_run.sh)) via the Moodle web interface from this repository. 
+1. Import the following __requested files__ ([Main.java](Main.java)) via the Moodle web interface from this repository as __starting point for your students__.
+2. Import the following __execution files__ ([Checks.java](Checks.java), [Evaluator.java](Evaluator.java) and [vpl_evaluate.sh](vpl_evaluate.sh), [vpl_run.sh](vpl_run.sh)) via the Moodle web interface from this repository. 
     - [Checks.java](Checks.java) is where you place your grading test cases. 
     - [Evaluator.java](Evaluator.java) is a helper class needed for the execution of your [Checks](Checks.java).
     - [vpl_run.sh](vpl_run.sh) is the VPL run script that compiles and executes the [Main.java](Main.java). It must be adapted for assignments that need more than one source file.
@@ -44,7 +44,48 @@ Then
 
 ### Writing an assignment
 
-- to be done
+Let us assume a small assignment example. Students should count (non case sensitive) all occurences of a given char _c_ in a String _s_ via a method
+
+    int countChars(char c, String s)
+
+The following examples are provided to make the problem more clear.
+
+- So 'o' occurs in "Hello World" two times [countChars('o', "Hello Word") => 2]
+- 'w' occurs in "Hello World" one time [countChars('w', "Hello Word") => 1]
+
+The students are provided with the basic [Main](Main.java) class.
+
+```Java
+class Main {
+
+    public static void main(String[] args) {
+        System.out.println("Your solution is missing here.");
+    }
+}
+```
+
+and they will likely extend this file and upload a solution via Moodle like this.
+
+```Java
+class Main {
+
+    public static int countChars(char c, String s) {
+        int n = 0;
+        for (char process : s.toLowerCase().toCharArray()) {
+            if (process == c) n++;
+        }
+        return n++;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(countChars('o', "Hello World")); // => 2
+        System.out.println(countChars('w', "Hello World")); // => 1
+    }
+}
+```
+
+Students have the tendency to check their solution minimally by using the provided examples only.
+But is the solution correct, and how to check this automatically for grading?
 
 ### Writing checks for automatic evaluation of an assignment
 

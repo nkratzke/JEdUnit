@@ -7,7 +7,6 @@
  * @author Nane Kratzke
  */
 class Main {
-
     public static void main(String[] args) {
         System.out.println("Your solution is missing here.");
     }
