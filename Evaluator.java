@@ -6,6 +6,11 @@ import java.lang.reflect.*;
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
  * This evaluator is intended to be used with Moodle and VPL (Virtual Programming Lab).
+ * It provides basic capabilities to evaluate programming assignents.
+ * 
+ * !!! Normally there is no need to touch this file !!!
+ * !!! Keep it, unless your are perfectly knowing what you are doing !!!
+ * 
  * @author Nane Kratzke
  */
 public class Evaluator {
