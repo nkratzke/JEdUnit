@@ -62,7 +62,7 @@ class Main {
 }
 ```
 
-This class will be extended and uploaded via Moodle. A possible solution might look like that:
+This class will be extended and uploaded by your students via Moodle. A possible solution might look like that:
 
 ```Java
 class Main {
