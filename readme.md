@@ -40,7 +40,7 @@ Then
     - [Evaluator.java](Evaluator.java) is a helper class needed for the execution of your [Checks](Checks.java).
     - [vpl_run.sh](vpl_run.sh) is the VPL run script that compiles and executes the [Main.java](Main.java). It must be adapted for assignments that need more than one source file.
     - [vpl_evaluate.sh](vpl_evaluate.sh) is the VPL evaluate script that compiles and executes all Java files and launches [Checks.java](Checks.java) to evaluate the student submission. It might be adapted for assignments that rely on more complex dependencies.
-3. Select __to be keeped files__ ([Checks.java](Checks.java), [Evaluator.java](Evaluator.java)) via the Moodle web interface (otherwise these files will be deleted by VPL and your evaluation will not work).
+3. Select __to be keeped files__ ([Checks.java](Checks.java), [Evaluator.java](Evaluator.java)) via the Moodle web interface (otherwise these files will be deleted by the VPL jail server and your evaluation will not work).
 
 ### Writing an assignment
 
