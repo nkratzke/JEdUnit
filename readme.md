@@ -28,6 +28,7 @@ Furthermore, we recommend to study at least the following VPL related documentat
 
 To make use of this template the following workflow is recommended to set up a basic configuration for a new programming assignment.
 First of all, clone this repository to your local machine.
+
 ```
 git clone https://github.com/nkratzke/VPL-java-template.git
 ```
@@ -44,7 +45,7 @@ Then
 
 ### Writing an assignment
 
-Let us assume a small assignment example. Students have to develop a method to count all occurences of a given char _c_ in a String _s_ (non case sensitive). This method should be called like this:
+Let us assume a small assignment example. Students have to develop a method to count all occurences of a given char _c_ in a (possible null) String _s_ (non case sensitive). This method should be called like this:
 
 ```Java
 System.out.println(countChars('o', "Hello World")); // => 2
