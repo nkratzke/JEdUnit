@@ -44,11 +44,11 @@ public class Evaluator {
                 points += add;
                 points = points > MAX ? MAX : points;
                 points = points < 0 ? 0 : points;
-                System.out.println(comment("Testcase " + testcase + ": " + remark + " [OK]"));
+                System.out.println(comment("Testcase " + testcase + ": " + remark + " [OK] (" + add + " points)"));
                 System.out.println("Grade :=>> " + points); 
-            } else System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED]"));
+            } else System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED] (0 of " + add + " points)"));
         } catch (Exception ex) {
-            System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED due to " + ex + "]"));
+            System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED due to " + ex + "] (0 of " + add + " points)"));
         }
     }
 
