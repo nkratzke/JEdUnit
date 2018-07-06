@@ -9,7 +9,7 @@ import java.lang.reflect.*;
  * It provides basic capabilities to evaluate programming assignents.
  * 
  * !!! Normally there is no need to touch this file !!!
- * !!! Keep it, unless your are perfectly knowing what you are doing !!!
+ * !!! Keep it, unless you are perfectly knowing what you are doing !!!
  * 
  * @author Nane Kratzke
  */
