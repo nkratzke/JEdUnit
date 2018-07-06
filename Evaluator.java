@@ -26,6 +26,11 @@ public class Evaluator {
     private int points = 0;
 
     /**
+     * Test case counter.
+     */
+    private int testcase = 0;
+
+    /**
      * Adds a percentage to the maximum reachable points (grading)
      * if a check is passed. Otherwise a remark will be printed.
      * The reached points can be evaluated by VPL.
@@ -36,10 +41,11 @@ public class Evaluator {
                 points += add;
                 points = points > MAX ? MAX : points;
                 points = points < 0 ? 0 : points;
+                System.out.println(comment("Testcase " + ++testcase + ": " + remark + " [OK]"));
                 System.out.println("Grade :=>> " + points); 
-            } else System.out.println(comment(remark));
+            } else System.out.println(comment(remark + " [FAILED]"));
         } catch (Exception ex) {
-            System.out.println(comment(remark + " [" + ex + "]"));
+            System.out.println(comment(remark + " [FAILED due to " + ex + "]"));
         }
     }
 

@@ -9,7 +9,7 @@
  */
 class Checks extends Evaluator {
 
-    public void testCases() {
+    public void testSubmissions() {
         // Please add your checks and grading points here
         grading(10, "This will always fail.", () -> "hello".equals("Hello"));
     }

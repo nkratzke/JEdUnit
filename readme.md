@@ -122,3 +122,33 @@ class Checks extends Evaluator {
     }
 }
 ```
+
+This will generate the following console output
+
+```
+Comment :=>> Testcase 1: Counting 'o' in 'Hello World' must return 2. [OK]
+Grade :=>> 5
+Comment :=>> Testcase 2: Counting 'w' in 'Hello World' must return 2. [OK]
+Grade :=>> 10
+Comment :=>> Testcase 3: Counting 'x' in 'xxx' must return 3. [OK]
+Grade :=>> 20
+Comment :=>> Counting 'X' in 'XxX' must return 3. [FAILED]
+Comment :=>> Testcase 4: Counting 'x' in 'YYX' must return 1. [OK]
+Grade :=>> 30
+Comment :=>> Counting 'X' in 'Xyy' must return 1. [FAILED]
+Comment :=>> Testcase 5: Counting 'x' in 'Xyy' must return 1. [OK]
+Grade :=>> 40
+Comment :=>> Testcase 6: Counting 'x' in 'X' must return 1. [OK]
+Grade :=>> 45
+Comment :=>> Testcase 7: Counting 'y' in 'X' must return 0. [OK]
+Grade :=>> 50
+Comment :=>> Testcase 8: Counting 'Y' in 'X' must return 0. [OK]
+Grade :=>> 55
+Comment :=>> Testcase 9: Counting chars in an empty string must return 0. [OK]
+Grade :=>> 70
+Comment :=>> Counting chars in a null string must return 0. [FAILED due to java.lang.NullPointerException]
+Comment :=>> Testcase 10: Counting ' ' in 'Just  an example! ' [OK]
+Grade :=>> 80
+```
+
+that can be evaluated by VPL for automatic grading and commenting of student submissions.
