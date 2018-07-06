@@ -56,7 +56,6 @@ The following basic [Main](Main.java) class is provided as starting point.
 
 ```Java
 class Main {
-
     public static void main(String[] args) {
         System.out.println("Your solution is missing here.");
     }
@@ -87,6 +86,28 @@ Students have the tendency to check their solution minimally by using the provid
 But is the solution correct, and how to check this automatically for grading?
 
 ### Writing checks for automatic evaluation of an assignment
+
+To write checks one simply has to take the [Checks](Checks.java) class as a template
+
+```Java
+/**
+ * Please add your test cases for evaluation here.
+ * - Please provide meaningful remarks for your students in grading() calls.
+ * - All grading() calls should sum up to 100.
+ * - If you give more than 100 points it will be truncated. 
+ * - This enable bonus rules (e.g. giving 120 points instead of 100) to tolerate some errors worth 20 points. 
+ * - All methods that start with "test" will be executed automatically.
+ * - If this sounds similar to unit testing - this is intended ;-)
+ */
+class Checks extends Evaluator {
+    public void testSubmissions() {
+        // Please add your checks and grading points here
+        grading(10, "This will always fail.", () -> "hello".equals("Hello"));
+    }
+}
+```
+
+and extend it with assignment specific checks and grading points. This could be done like this:
 
 ```Java
 class Checks extends Evaluator {
@@ -123,7 +144,7 @@ class Checks extends Evaluator {
 }
 ```
 
-This will generate the following console output
+A VPL evaluation (triggered via the [vpl_evaluate.sh](vpl_evaluate.sh) script) will generate the following console output
 
 ```
 Comment :=>> Testcase 1: Counting 'o' in 'Hello World' must return 2. [OK]
@@ -152,3 +173,4 @@ Grade :=>> 80
 ```
 
 that can be evaluated by VPL for automatic grading and commenting of student submissions.
+Thats all the magic, basically.
