@@ -144,31 +144,37 @@ class Checks extends Evaluator {
 }
 ```
 
+As you see, the `grading()` command is essential here. It takes the following parameters:
+
+- __points__ ($int$) that will be added if the check is successfull (evaluates to $true$)
+- __remark__ ($String$) that will be printed in comments. A remark should describe the testcase in a meaningful but short way.
+- __check__ ($Supplier<Boolean>$) that will be executed. If evaluated to $true$ points will be added, otherwise no points will be added.
+
 A VPL evaluation (triggered via the [vpl_evaluate.sh](vpl_evaluate.sh) script) will generate the following console output
 
 ```
-Comment :=>> Testcase 1: Counting 'o' in 'Hello World' must return 2. [OK]
+Comment :=>> Testcase 1: Counting 'o' in 'Hello World' must return 2. [OK] (5 points)
 Grade :=>> 5
-Comment :=>> Testcase 2: Counting 'w' in 'Hello World' must return 2. [OK]
+Comment :=>> Testcase 2: Counting 'w' in 'Hello World' must return 2. [OK] (5 points)
 Grade :=>> 10
-Comment :=>> Testcase 3: Counting 'x' in 'xxx' must return 3. [OK]
+Comment :=>> Testcase 3: Counting 'x' in 'xxx' must return 3. [OK] (10 points)
 Grade :=>> 20
-Comment :=>> Testcase 4: Counting 'X' in 'XxX' must return 3. [FAILED]
-Comment :=>> Testcase 5: Counting 'x' in 'YYX' must return 1. [OK]
+Comment :=>> Testcase 4: Counting 'X' in 'XxX' must return 3. [FAILED] (0 of 10 points)
+Comment :=>> Testcase 5: Counting 'x' in 'YYX' must return 1. [OK] (10 points)
 Grade :=>> 30
-Comment :=>> Testcase 6: Counting 'X' in 'Xyy' must return 1. [FAILED]
-Comment :=>> Testcase 7: Counting 'x' in 'Xyy' must return 1. [OK]
+Comment :=>> Testcase 6: Counting 'X' in 'Xyy' must return 1. [FAILED] (0 of 10 points)
+Comment :=>> Testcase 7: Counting 'x' in 'Xyy' must return 1. [OK] (10 points)
 Grade :=>> 40
-Comment :=>> Testcase 8: Counting 'x' in 'X' must return 1. [OK]
+Comment :=>> Testcase 8: Counting 'x' in 'X' must return 1. [OK] (5 points)
 Grade :=>> 45
-Comment :=>> Testcase 9: Counting 'y' in 'X' must return 0. [OK]
+Comment :=>> Testcase 9: Counting 'y' in 'X' must return 0. [OK] (5 points)
 Grade :=>> 50
-Comment :=>> Testcase 10: Counting 'Y' in 'X' must return 0. [OK]
+Comment :=>> Testcase 10: Counting 'Y' in 'X' must return 0. [OK] (5 points)
 Grade :=>> 55
-Comment :=>> Testcase 11: Counting chars in an empty string must return 0. [OK]
+Comment :=>> Testcase 11: Counting chars in an empty string must return 0. [OK] (15 points)
 Grade :=>> 70
-Comment :=>> Testcase 12: Counting chars in a null string must return 0. [FAILED due to java.lang.NullPointerException]
-Comment :=>> Testcase 13: Counting ' ' in 'Just  an example! ' [OK]
+Comment :=>> Testcase 12: Counting chars in a null string must return 0. [FAILED due to java.lang.NullPointerException] (0 of 15 points)
+Comment :=>> Testcase 13: Counting ' ' in 'Just  an example! ' [OK] (10 points)
 Grade :=>> 80
 ```
 
