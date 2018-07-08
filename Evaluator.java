@@ -15,10 +15,41 @@ import java.lang.reflect.*;
  */
 public class Evaluator {
 
+    class Inspector {
+
+        private Class object;
+
+        public Inspector(String cname) throws ClassNotFoundException { this.object = Class.forName(cname); }
+
+        public String getName() { return object.getSimpleName(); }
+
+        public Stream<Field> fields() { 
+            return Stream.of(object.getDeclaredFields()).filter(f -> {
+                int m = ((Field)f).getModifiers();
+                return !(Modifier.isStatic(m) && Modifier.isFinal(m));
+            });
+        }
+        
+        public boolean hasNoFields() { return fields().count() == 0; }
+
+        public Stream<Field> constants() { 
+            return Stream.of(object.getDeclaredFields()).filter(f -> {
+                int m = ((Field)f).getModifiers();
+                return Modifier.isStatic(m) && Modifier.isFinal(m);
+            });
+        }
+
+        public boolean hasNoConstants() { return constants().count() == 0; }
+
+        public Stream<Method> methods() { return Stream.of(object.getDeclaredMethods()); }
+
+        public boolean hasNoMethods() { return methods().count() == 0; }
+    }
+
     /**
      * The maximum points for a VPL assignment.
      */
-    private int MAX = 100;
+    private static final int MAX = 100;
 
     /**
      * The currently reached points for a VPL assignment.
@@ -33,22 +64,42 @@ public class Evaluator {
     private static int testcase = 0;
 
     /**
-     * Adds a percentage to the maximum reachable points (grading)
-     * if a check is passed. Otherwise a remark will be printed.
-     * The reached points can be evaluated by VPL.
+     * Adds points for grading if a check is passed (wishful behavior).
+     * A comment is printed whether the check was successfull or not.
      */
     protected final void grading(int add, String remark, Supplier<Boolean> check) {
         testcase++;
         try {
             if (check.get()) {
-                points += add;
-                points = points > MAX ? MAX : points;
-                points = points < 0 ? 0 : points;
-                System.out.println(comment("Testcase " + testcase + ": " + remark + " [OK] (" + add + " points)"));
-                System.out.println("Grade :=>> " + points); 
-            } else System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED] (0 of " + add + " points)"));
+                this.points += add;
+                System.out.println(comment("Check " + testcase + ": " + remark + " [OK] (" + add + " points)"));
+            } else System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED] (0 of " + add + " points)"));
         } catch (Exception ex) {
-            System.out.println(comment("Testcase " + testcase + ": " + remark + " [FAILED due to " + ex + "] (0 of " + add + " points)"));
+            System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED due to " + ex + "] (0 of " + add + " points)"));
+        }
+    }
+
+    /**
+     * Deletes points for grading if a check is passed (unwishful behavior).
+     * A comment is printed whether the check was successfull or not.
+     */
+    protected final void degrading(int del, String remark, Supplier<Boolean> check) {
+        testcase++;
+        try {
+            if (check.get()) {
+                this.points -= del;
+                System.out.println(comment("Check " + testcase + ": " + remark + " [OK] (no subtraction)"));
+            } else System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED] (subtracted " + del + " points)"));
+        } catch (Exception ex) {
+            System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED due to " + ex + "] (subtracted " + del + " points)"));
+        }
+    }
+
+    protected final <T> boolean assure(String className, Predicate<Inspector> check) {
+        try {
+            return check.test(new Inspector(className));
+        } catch (Exception ex) {
+            return false;
         }
     }
 
@@ -67,6 +118,10 @@ public class Evaluator {
                 test.invoke(this);
             } catch (Exception ex) {
                 System.out.println("Test case " + test.getName() + " failed completely." + ex);
+            } finally {
+                points = points > MAX ? MAX : points;
+                points = points < 0 ? 0 : points;
+                System.out.println("Grade :=>> " + points);
             }
         }
     }

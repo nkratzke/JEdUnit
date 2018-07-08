@@ -31,6 +31,8 @@ First of all, clone this repository to your local machine.
 
 ```
 git clone https://github.com/nkratzke/VPL-java-template.git
+cd VPL-java-template
+clean.sh
 ```
 
 Then
@@ -153,28 +155,19 @@ As you see, the `grading()` command is essential here. It takes the following pa
 A VPL evaluation (triggered via the [vpl_evaluate.sh](vpl_evaluate.sh) script) will generate the following console output
 
 ```
-Comment :=>> Testcase 1: Counting 'o' in 'Hello World' must return 2. [OK] (5 points)
-Grade :=>> 5
-Comment :=>> Testcase 2: Counting 'w' in 'Hello World' must return 2. [OK] (5 points)
-Grade :=>> 10
-Comment :=>> Testcase 3: Counting 'x' in 'xxx' must return 3. [OK] (10 points)
-Grade :=>> 20
-Comment :=>> Testcase 4: Counting 'X' in 'XxX' must return 3. [FAILED] (0 of 10 points)
-Comment :=>> Testcase 5: Counting 'x' in 'YYX' must return 1. [OK] (10 points)
-Grade :=>> 30
-Comment :=>> Testcase 6: Counting 'X' in 'Xyy' must return 1. [FAILED] (0 of 10 points)
-Comment :=>> Testcase 7: Counting 'x' in 'Xyy' must return 1. [OK] (10 points)
-Grade :=>> 40
-Comment :=>> Testcase 8: Counting 'x' in 'X' must return 1. [OK] (5 points)
-Grade :=>> 45
-Comment :=>> Testcase 9: Counting 'y' in 'X' must return 0. [OK] (5 points)
-Grade :=>> 50
-Comment :=>> Testcase 10: Counting 'Y' in 'X' must return 0. [OK] (5 points)
-Grade :=>> 55
-Comment :=>> Testcase 11: Counting chars in an empty string must return 0. [OK] (15 points)
-Grade :=>> 70
-Comment :=>> Testcase 12: Counting chars in a null string must return 0. [FAILED due to java.lang.NullPointerException] (0 of 15 points)
-Comment :=>> Testcase 13: Counting ' ' in 'Just  an example! ' [OK] (10 points)
+Comment :=>> Check 1: Counting 'o' in 'Hello World' must return 2. [OK] (5 points)
+Comment :=>> Check 2: Counting 'w' in 'Hello World' must return 2. [OK] (5 points)
+Comment :=>> Check 3: Counting 'x' in 'xxx' must return 3. [OK] (10 points)
+Comment :=>> Check 4: Counting 'X' in 'XxX' must return 3. [FAILED] (0 of 10 points)
+Comment :=>> Check 5: Counting 'x' in 'YYX' must return 1. [OK] (10 points)
+Comment :=>> Check 6: Counting 'X' in 'Xyy' must return 1. [FAILED] (0 of 10 points)
+Comment :=>> Check 7: Counting 'x' in 'Xyy' must return 1. [OK] (10 points)
+Comment :=>> Check 8: Counting 'x' in 'X' must return 1. [OK] (5 points)
+Comment :=>> Check 9: Counting 'y' in 'X' must return 0. [OK] (5 points)
+Comment :=>> Check 10: Counting 'Y' in 'X' must return 0. [OK] (5 points)
+Comment :=>> Check 11: Counting chars in an empty string must return 0. [OK] (15 points)
+Comment :=>> Check 12: Counting chars in a null string must return 0. [FAILED due to java.lang.NullPointerException] (0 of 15 points)
+Comment :=>> Check 13: Counting ' ' in 'Just  an example! ' [OK] (10 points)
 Grade :=>> 80
 ```
 
@@ -183,6 +176,6 @@ that can be evaluated by VPL for automatic grading and commenting of student sub
 In this example case our student would have passed
 
 - 10 of 13 test cases and
-- and got 80 of 100 possible points.
+- and got 80 of 100 points.
 
 Thats all the magic, basically.

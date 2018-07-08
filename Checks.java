@@ -1,3 +1,6 @@
+import java.lang.reflect.*;
+import java.util.*;
+
 /**
  * Please add your test cases for evaluation here.
  * - Please provide meaningful remarks for your students in grading() calls.
@@ -9,9 +12,23 @@
  */
 class Checks extends Evaluator {
 
-    public void testSubmissions() {
-        // Please add your checks and grading points here
-        grading(10, "This will always fail.", () -> 42 / 0 == 0);
+    private static final String lowerCamelCase = "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
+    private static final String upperCamelCase = "((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
+    private static final String capitalCase = "[A-Z0-9]+";
+    
+    public void testNamingConventions() {
+        degrading(10, 
+            "Please, use lowerCamelCase notation for all datafields.", 
+            () -> assure("Main", c -> c.fields().allMatch(f -> ((Field)f).getName().matches(lowerCamelCase)))
+        );
+        degrading(10, 
+            "Please, use lowerCamelCase notation for all methods.", 
+            () -> assure("Main", c -> c.methods().allMatch(m -> ((Method)m).getName().matches(lowerCamelCase)))
+        );
+        degrading(10,
+            "Please, use CAPITAL notation for all constants.",
+            () -> assure("Main", c -> c.constants().allMatch(con -> ((Field)con).getName().matches(capitalCase)))
+        );
     }
- 
+
 }
