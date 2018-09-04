@@ -19,7 +19,7 @@ class Checks extends Evaluator {
     public void testCodingRestrictions() {
         degrading(10, 
             "Avoid global variables (datafields). They are not necessary to solve this excercise.", 
-            () -> assure("Main", c -> c.fields().count() == 0)
+            () -> assure("Main", c -> c.hasNoFields())
         );
     }
     
