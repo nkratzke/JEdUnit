@@ -15,6 +15,13 @@ class Checks extends Evaluator {
     private static final String lowerCamelCase = "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
     private static final String upperCamelCase = "((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
     private static final String capitalCase = "[A-Z0-9]+";
+
+    public void testCodingRestrictions() {
+        degrading(10, 
+            "Avoid global variables (datafields). They are not necessary to solve this excercise.", 
+            () -> assure("Main", c -> c.fields().count() == 0)
+        );
+    }
     
     public void testNamingConventions() {
         degrading(10, 
