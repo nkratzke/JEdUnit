@@ -80,17 +80,20 @@ public class Evaluator {
     }
 
     /**
-     * Deletes points for grading if a check is passed (unwishful behavior).
+     * Deletes points for grading if a check is not passed (unwishful behavior).
      * A comment is printed whether the check was successfull or not.
      */
     protected final void degrading(int del, String remark, Supplier<Boolean> check) {
         testcase++;
         try {
-            if (check.get()) {
-                this.points -= del;
+            if (check.get()) 
                 System.out.println(comment("Check " + testcase + ": " + remark + " [OK] (no subtraction)"));
-            } else System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED] (subtracted " + del + " points)"));
+            else {
+                this.points -= del;
+                System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED] (subtracted " + del + " points)"));
+            }
         } catch (Exception ex) {
+            this.points -= del;
             System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED due to " + ex + "] (subtracted " + del + " points)"));
         }
     }
@@ -119,9 +122,10 @@ public class Evaluator {
             } catch (Exception ex) {
                 System.out.println("Test case " + test.getName() + " failed completely." + ex);
             } finally {
-                points = points > MAX ? MAX : points;
-                points = points < 0 ? 0 : points;
-                System.out.println("Grade :=>> " + points);
+                int report = points;
+                report = report > MAX ? MAX : report;
+                report = report < 0 ? 0 : report;
+                System.out.println("Grade :=>> " + report);
             }
         }
     }
@@ -132,5 +136,6 @@ public class Evaluator {
     public static final void main(String[] args) {
         Checks checks = new Checks();
         checks.evaluate();
+        checks.comment("Finished");
     }
 }
