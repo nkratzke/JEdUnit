@@ -66,7 +66,9 @@ public class Evaluator {
 
         public boolean hasNoConstants() { return constants().count() == 0; }
 
-        public Stream<Method> methods() { return Stream.of(object.getDeclaredMethods()); }
+        public Stream<Method> methods() { 
+            return Stream.of(object.getDeclaredMethods()).filter(m -> !((Method)m).getName().startsWith("lambda$")); 
+        }
 
         public boolean hasNoMethods() { return methods().count() == 0; }
     }
