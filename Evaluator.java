@@ -41,15 +41,18 @@ public class Evaluator {
             });
         }
 
-        public boolean hasNoLoops() {
+        public boolean hasNo(String... keywords) {
             Path path = Paths.get(object.getSimpleName() + ".java");
             try {
                 int i = 0;
                 for (String line : Files.readAllLines(path)) {
                     i++;
-                    if (line.contains("while") || line.contains("for")) {
-                        System.out.println(comment("Line " + i + " in file " + path + " seem to have a for or a while loop."));
-                        return false;
+                    for (String keyword : keywords) {
+                        if (line.contains(" " + keyword + " ") || line.contains(" " + keyword + "(")) {
+                            System.out.println(comment("Line " + i + ": " + line));
+                            System.out.println(comment("Line " + i + " in file " + path + " seem to have a " + keyword + " statement"));
+                            return false;
+                        }
                     }
                 }
                 return true;    
@@ -58,6 +61,8 @@ public class Evaluator {
                 return false;
             }
         }
+
+        public boolean hasNoLoops() { return hasNo("while", "for"); }
 
         public boolean hasNoConstants() { return constants().count() == 0; }
 
