@@ -2,6 +2,8 @@ import java.util.function.*;
 import java.util.stream.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.nio.file.*;
+import java.io.*;
 
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
@@ -37,6 +39,24 @@ public class Evaluator {
                 int m = ((Field)f).getModifiers();
                 return Modifier.isStatic(m) && Modifier.isFinal(m);
             });
+        }
+
+        public boolean hasNoLoops() {
+            Path path = Paths.get(object.getSimpleName() + ".java");
+            try {
+                int i = 0;
+                for (String line : Files.readAllLines(path)) {
+                    i++;
+                    if (line.contains("while") || line.contains("for")) {
+                        System.out.println(comment("Line " + i + " in file " + path + " seem to have a for or a while loop."));
+                        return false;
+                    }
+                }
+                return true;    
+            } catch (IOException ex) {
+                System.out.println(comment("Could not inspect file " + path + " due to exception " + ex.getMessage()));
+                return false;
+            }
         }
 
         public boolean hasNoConstants() { return constants().count() == 0; }
