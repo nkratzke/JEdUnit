@@ -99,10 +99,10 @@ public class Evaluator {
         try {
             if (check.get()) {
                 this.points += add;
-                System.out.println(comment("Check " + testcase + ": " + remark + " [OK] (" + add + " points)"));
-            } else System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED] (0 of " + add + " points)"));
+                System.out.println(comment("Check " + testcase + ": [OK] " + remark + " (" + add + " points)"));
+            } else System.out.println(comment("Check " + testcase + ": [FAILED] " + remark + " (0 of " + add + " points)"));
         } catch (Exception ex) {
-            System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED due to " + ex + "] (0 of " + add + " points)"));
+            System.out.println(comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (0 of " + add + " points)"));
         }
     }
 
@@ -114,14 +114,14 @@ public class Evaluator {
         testcase++;
         try {
             if (check.get()) 
-                System.out.println(comment("Check " + testcase + ": " + remark + " [OK] (no subtraction)"));
+                System.out.println(comment("Check " + testcase + ": [OK] " + remark + " (no subtraction)"));
             else {
                 this.points -= del;
-                System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED] (subtracted " + del + " points)"));
+                System.out.println(comment("Check " + testcase + ": [FAILED] " + remark + " (subtracted " + del + " points)"));
             }
         } catch (Exception ex) {
             this.points -= del;
-            System.out.println(comment("Check " + testcase + ": " + remark + " [FAILED due to " + ex + "] (subtracted " + del + " points)"));
+            System.out.println(comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (subtracted " + del + " points)"));
         }
     }
 
