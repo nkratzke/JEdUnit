@@ -17,6 +17,10 @@ class Checks extends Evaluator {
     private static final String capitalCase = "[A-Z0-9]+";
 
     public void testCodingRestrictions() {
+        // Checks that submission does not access the reference solution.
+        // Adapt it accordingly, in cases you do not provide your reference solution in a Solution.java file.
+        degrading(100, "Cheat check", () -> assure("Main", c -> c.hasNo("Solution")));
+        
         degrading(10, 
             "Avoid global variables (datafields). They are not necessary to solve this excercise.", 
             () -> assure("Main", c -> c.hasNoFields())
