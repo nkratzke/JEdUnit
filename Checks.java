@@ -34,7 +34,7 @@ class Checks extends Evaluator {
             "Do not use concrete collection classes like " + notAllowed + " as return types. Use the interfaces Map and List instead.",
             () -> assure("Main", c -> c
                 .methods()
-                .noneMatch(m -> notallowed.contains(((Method)m).getReturnType().getName()))
+                .noneMatch(m -> notAllowed.contains(((Method)m).getReturnType().getName()))
             )
         );
     }
