@@ -1,5 +1,6 @@
 cat > vpl_execution <<EEOOFF
 #! /bin/bash 
+rm *.class
 javac  Main.java
 java Main
 EEOOFF
