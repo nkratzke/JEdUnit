@@ -1,6 +1,6 @@
 cat > vpl_execution <<EEOOFF
 #! /bin/bash
-javac *.java
+javac Checks.java
 java Checks
 EEOOFF
 
