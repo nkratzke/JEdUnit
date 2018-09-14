@@ -15,6 +15,10 @@ class Checks extends Evaluator {
     private static final String lowerCamelCase = "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
     private static final String upperCamelCase = "((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
     private static final String capitalCase = "[A-Z0-9]+";
+    private static List<String> notAllowed = Arrays.asList(
+        "java.util.LinkedList", "java.util.ArrayList", "java.util.Stack", "java.util.Vector",
+        "java.util.TreeMap", "java.util.HashMap", "java.util.LinkedHashMap", "java.util.WeakHashMap"
+    );
 
     public void testCodingRestrictions() {
         // Checks that submission does not access the reference solution.
@@ -24,6 +28,14 @@ class Checks extends Evaluator {
         degrading(10, 
             "Avoid global variables (datafields). They are not necessary to solve this excercise.", 
             () -> assure("Main", c -> c.hasNoFields())
+        );
+
+        degrading(10,
+            "Do not use concrete collection classes like " + notAllowed + " as return types. Use the interfaces Map and List instead.",
+            () -> assure("Main", c -> c
+                .methods()
+                .noneMatch(m -> notallowed.contains(((Method)m).getReturnType().getName()))
+            )
         );
     }
     
