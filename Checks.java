@@ -25,12 +25,17 @@ class Checks extends Evaluator {
         // Adapt it accordingly, in cases you do not provide your reference solution in a Solution.java file.
         degrading(100, "Cheat check", () -> assure("Main", c -> c.hasNo("Solution")));
         
-        degrading(10, 
+        degrading(20, 
             "Avoid global variables (datafields). They are not necessary to solve this excercise.", 
             () -> assure("Main", c -> c.hasNoFields())
         );
 
-        degrading(10,
+        degrading(20, 
+            "Avoid inner 'ugly' classes. They are not necessary to solve this excercise.", 
+            () -> assure("Main", c -> c.hasNoInnerClasses())
+        );
+
+        degrading(20,
             "Do not use concrete collection classes like " + notAllowed + " as return types. Use the interfaces Map and List instead.",
             () -> assure("Main", c -> c
                 .methods()

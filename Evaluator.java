@@ -34,6 +34,12 @@ public class Evaluator {
         
         public boolean hasNoFields() { return fields().count() == 0; }
 
+        public Stream<Class> innerClasses() {
+            return Stream.of(object.getDeclaredClasses());
+        }
+
+        public boolean hasNoInnerClasses() { return innerClasses().count() == 0; }
+
         public Stream<Field> constants() { 
             return Stream.of(object.getDeclaredFields()).filter(f -> {
                 int m = ((Field)f).getModifiers();
