@@ -135,6 +135,8 @@ public class Evaluator {
         try {
             return check.test(new Inspector(className));
         } catch (Exception ex) {
+            System.out.println(comment("Check failed due to " + ex));
+            System.out.println(comment("This might be due to a syntax error in your submission."));
             return false;
         }
     }
