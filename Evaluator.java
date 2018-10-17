@@ -56,7 +56,12 @@ public class Evaluator {
                     for (String keyword : keywords) {
                         if (line.contains(keyword)) {
                             System.out.println(comment("Line " + i + ": " + line));
-                            System.out.println(comment("Line " + i + " in file " + path + " seem to have a " + keyword + " statement"));
+                            System.out.println(comment("Line " + i + " in file " + path + " seem to have a not allowed '" + keyword + "' phrase."));
+                            
+                            // No points if non allowed phrases are found in the submission.
+                            // Evaluation is stopped immediately to prevent point injection attacks.
+                            System.out.println("Grade :=>> 0");
+                            System.exit(1);
                             return false;
                         }
                     }
