@@ -54,7 +54,7 @@ public class Evaluator {
                 for (String line : Files.readAllLines(path)) {
                     i++;
                     for (String keyword : keywords) {
-                        if (line.contains(keyword + ".") || line.contains(" " + keyword + " ") || line.contains(" " + keyword + "(")) {
+                        if (line.contains(keyword)) {
                             System.out.println(comment("Line " + i + ": " + line));
                             System.out.println(comment("Line " + i + " in file " + path + " seem to have a " + keyword + " statement"));
                             return false;

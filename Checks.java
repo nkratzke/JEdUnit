@@ -14,16 +14,16 @@ class Checks extends Evaluator {
 
     private static final String lowerCamelCase = "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
     private static final String upperCamelCase = "((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?";
-    private static final String capitalCase = "[A-Z0-9]+";
+    private static final String capitalCase = "[A-Z0-9_]+";
     private static List<String> notAllowed = Arrays.asList(
         "java.util.LinkedList", "java.util.ArrayList", "java.util.Stack", "java.util.Vector",
         "java.util.TreeMap", "java.util.HashMap", "java.util.LinkedHashMap", "java.util.WeakHashMap"
     );
 
     public void testCodingRestrictions() {
-        // Checks that submission does not access the reference solution.
+        // Checks that submissions does not access the reference solution or try to run code injection attacks.
         // Adapt it accordingly, in cases you do not provide your reference solution in a Solution.java file.
-        degrading(100, "Cheat check", () -> assure("Main", c -> c.hasNo("Solution")));
+        degrading(100, "Cheat check", () -> assure("Main", c -> c.hasNo("Solution", "System.exit", "Grade :=>>")));
         
         degrading(20, 
             "Avoid global variables (datafields). They are not necessary to solve this excercise.", 
