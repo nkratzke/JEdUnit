@@ -171,10 +171,33 @@ public class Evaluator {
     }
 
     /**
+     * This method evaluates the checkstyle log file.
+     */
+    protected final void checkstyle() {
+        try {
+            Scanner in = new Scanner(new File("checkstyle.log"));
+            while (in.hasNextLine()) {
+                String result = in.nextLine();
+                if (result.contains("Main.java")) {
+                    String msg = result.substring(result.indexOf("Main.java"));
+                    System.out.println(comment("[CHECKSTYLE]: " + msg));
+                    this.points -= 5;
+                }
+            }
+            in.close();
+            System.out.println(comment("[CHECKSTYLE] All violations: " + this.points + " points"));
+        } catch (Exception ex) {
+            System.out.println(comment("You are so lucky! We had problems processing the checkstyle.log."));
+            System.out.println(comment("This was due to: " + ex));
+        }
+    }
+
+    /**
      * The main method calls the evaluation.
      */
     public static final void main(String[] args) {
         Checks checks = new Checks();
+        checks.checkstyle();
         checks.evaluate();
         checks.comment("Finished");
     }
