@@ -17,6 +17,23 @@ import java.io.*;
  */
 public class Evaluator {
 
+    /**
+     * List of Checkstyle checks that are ignored for evaluation.
+     * This list is set in the configure method().
+     */
+    public static final List<String> IGNORE_CHECKS = new LinkedList<String>();
+
+    /**
+     * List of file names that shall be considered by checkstyle.
+     * This list is set in the configure method().
+     */
+    public static final List<String> CHECK_FILES = new LinkedList<String>();
+
+    /**
+     * Downgrade for every found checkstyle error.
+     */
+    public static int CHECK_PENALTY = 5;
+
     class Inspector {
 
         private Class object;
@@ -178,10 +195,13 @@ public class Evaluator {
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
                 String result = in.nextLine();
-                if (result.contains("Main.java")) {
-                    String msg = result.substring(result.indexOf("Main.java"));
+                for (String file : Evaluator.CHECK_FILES) {
+                    if (!result.contains(file)) continue;
+                    if (Evaluator.IGNORE_CHECKS.stream().anyMatch(ignore -> result.contains(ignore))) continue;
+
+                    String msg = result.substring(result.indexOf(file));
                     System.out.println(comment("[CHECKSTYLE]: " + msg));
-                    this.points -= 5;
+                    this.points -= Evaluator.CHECK_PENALTY;
                 }
             }
             in.close();
@@ -193,10 +213,25 @@ public class Evaluator {
     }
 
     /**
+     * This method is a hook for the Checks class to configure the evaluation.
+     */
+    protected void configure() {
+        Evaluator.IGNORE_CHECKS.addAll(Arrays.asList(
+            "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
+            "[JavadocPackage]", "[AvoidInlineConditionals]"
+        ));
+
+        Evaluator.CHECK_FILES.add("Main.java");
+
+        Evaluator.CHECK_PENALTY = 5;
+    }
+
+    /**
      * The main method calls the evaluation.
      */
     public static final void main(String[] args) {
         Checks checks = new Checks();
+        checks.configure();
         checks.checkstyle();
         checks.evaluate();
         checks.comment("Finished");
