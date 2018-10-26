@@ -5,6 +5,16 @@ import java.lang.reflect.*;
 import java.nio.file.*;
 import java.io.*;
 
+import com.github.javaparser.*;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.ReceiverParameter;
+import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.printer.lexicalpreservation.*;
+
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
  * This evaluator is intended to be used with Moodle and VPL (Virtual Programming Lab).
@@ -35,25 +45,117 @@ public class Evaluator {
     public static int CHECK_PENALTY = 5;
 
     /**
-     * Wrapper class for a JavaParser CompilationUnit.
+     * Wrapper class for a JavaParser CompilationUnit
+     * with plenty of convenience methods.
      * TO BE DONE.
      */
     class Parser {
 
-        private String source = "";
+        private String file;
+
+        private CompilationUnit compilationUnit;
 
         public Parser(String file) throws FileNotFoundException {
-            Scanner in = new Scanner(new File(file));
-            while (in.hasNextLine()) this.source += in.nextLine() + "\n";
-            in.close();
+            this.file = file;
+            this.compilationUnit = JavaParser.parse(new File(this.file));
+            LexicalPreservingPrinter.setup(compilationUnit);
         }
 
-        public String getSource() { return this.source; }
+        public String[] getSource() {
+            return this.compilationUnit.toString().split("\n");
+        }
 
+        public List<FieldDeclaration> getDataFields() {
+            return this.compilationUnit.findAll(FieldDeclaration.class);
+        }
+
+        public List<MethodDeclaration> getMethods() {
+            return this.compilationUnit.findAll(MethodDeclaration.class);
+        }
+
+        public List<ClassOrInterfaceDeclaration> getClasses() {
+            return this.compilationUnit.findAll(ClassOrInterfaceDeclaration.class);
+        }
+
+        public boolean noContainOf(String... terms) {
+            boolean found = false;
+            int lineNo = 0;
+            for (String line : this.getSource()) {
+                lineNo++;
+                for (String term : terms) {
+                    if (!line.contains(term)) continue;
+                    comment(this.file, lineNo, String.format("Term '%s' not allowed.", term));
+                    found = true;
+                }
+            }
+            return !found;
+        }
+
+        public boolean noInnerClasses() {
+            Set<ClassOrInterfaceDeclaration> found = new HashSet<>();
+            for (ClassOrInterfaceDeclaration c : this.getClasses()) {
+                List<ClassOrInterfaceDeclaration> inners = c.findAll(ClassOrInterfaceDeclaration.class);
+                inners.remove(c);
+                if (inners.isEmpty()) continue;
+                found.addAll(inners);
+            }
+            for (ClassOrInterfaceDeclaration inner : found) {
+                comment(this.file, inner.getRange(), "Inner class " + inner.getName() + " not allowed.");
+            }
+            return found.isEmpty();
+        }
+
+        public boolean noStatementOf(Class<? extends Statement>... stmts) {
+            boolean found = false;
+            for (Class<? extends Statement> stmt : stmts) {
+                for (Node n : this.compilationUnit.findAll(stmt)) {
+                    found = true;
+                    comment(this.file, n.getRange(), stmt.getSimpleName() + " not allowed.");
+                }
+            }
+            return !found;
+        }
+
+        public boolean noDataFields() {
+            boolean found = false;
+            for (FieldDeclaration field : this.getDataFields()) {
+                found = true;
+                SimpleName n = field.getVariables().get(0).getName();
+                comment(this.file, field.getRange(), "Datafield " + n + " not allowed.");
+            }
+            return !found;
+        }
+
+        public boolean noParametersOf(Class<?>... types) {
+            boolean found = false;
+            for (com.github.javaparser.ast.body.Parameter p : this.compilationUnit.findAll(com.github.javaparser.ast.body.Parameter.class)) {
+                for (Class<?> type : types) {
+                    if (p.getType().asString().startsWith(type.getSimpleName())) {
+                        found = true;
+                        comment(this.file, p.getRange(), "Do not use " + type.getSimpleName() + " as a parameter type.");
+                    }
+                }
+            }
+            return !found;
+        }
+
+        public boolean noReturnTypesOf(Class<?>... types) {
+            boolean found = false;
+            for (MethodDeclaration m : this.getMethods()) {
+                String declaration = m.getDeclarationAsString(false, false);
+                for (Class<?> type : types) {
+                    if (declaration.startsWith(type.getSimpleName())) {
+                        found = true;
+                        comment(this.file, m.getRange(), "Do not use " + type.getSimpleName() + " as a return type.");
+                    }
+                }
+            }           
+            return !found;
+        }
     }
 
     /**
-     * @deprecated
+     * Deprecated
      */
     class Inspector {
 
@@ -175,7 +277,24 @@ public class Evaluator {
     }
 
     /**
-     * @deprecated
+     * Checks whether a severe condition is met. E.g. a cheating submission.
+     * In case the check is not passed the evaluation is aborted immediately.
+     */
+    protected final void abortOn(String comment, Supplier<Boolean> check) {
+        try {
+            if (check.get()) return;
+            comment("Evaluation aborted! " + comment);
+            grade(0);
+            System.exit(1);
+        } catch (Exception ex) {
+            comment(String.format("Evaluation aborted! %s (%s)", comment, ex));
+            grade(0);
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Deprecated
      */
     protected final <T> boolean assure(String className, Predicate<Inspector> check) {
         try {
@@ -206,6 +325,25 @@ public class Evaluator {
      */
     protected void comment(String c) { 
         System.out.println("Comment :=>> " + c); 
+    }
+
+    /**
+     * Adds a comment for VPL via console output.
+     * Marks file and line position.
+     */
+    protected void comment(String file, int line, String c) {
+        comment(String.format("%s:%d: %s", file, line, c));
+    }
+
+    /**
+     * Adds a comment for VPL via console output.
+     * Marks file and position via a JavaParser range.
+     */
+    protected void comment(String file, Optional<Range> range, String c) {
+        if (!range.isPresent()) comment(file + ": " + c);
+        int line = range.get().begin.line;
+        int col = range.get().begin.column;
+        comment(String.format("%s:%d:%d: %s", file, line, col, c));
     }
 
     /**
@@ -267,7 +405,7 @@ public class Evaluator {
     protected void configure() {
         Evaluator.IGNORE_CHECKS.addAll(Arrays.asList(
             "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
-            "[JavadocPackage]", "[AvoidInlineConditionals]"
+            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", "[NeedBraces]"
         ));
 
         Evaluator.CHECK_FILES.add("Main.java");
