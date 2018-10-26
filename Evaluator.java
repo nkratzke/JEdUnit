@@ -34,6 +34,27 @@ public class Evaluator {
      */
     public static int CHECK_PENALTY = 5;
 
+    /**
+     * Wrapper class for a JavaParser CompilationUnit.
+     * TO BE DONE.
+     */
+    class Parser {
+
+        private String source = "";
+
+        public Parser(String file) throws FileNotFoundException {
+            Scanner in = new Scanner(new File(file));
+            while (in.hasNextLine()) this.source += in.nextLine() + "\n";
+            in.close();
+        }
+
+        public String getSource() { return this.source; }
+
+    }
+
+    /**
+     * @deprecated
+     */
     class Inspector {
 
         private Class object;
@@ -72,8 +93,8 @@ public class Evaluator {
                     i++;
                     for (String keyword : keywords) {
                         if (line.contains(keyword)) {
-                            System.out.println(comment("Line " + i + ": " + line));
-                            System.out.println(comment("Line " + i + " in file " + path + " seem to have a not allowed '" + keyword + "' phrase."));
+                            comment("Line " + i + ": " + line);
+                            comment("Line " + i + " in file " + path + " seem to have a not allowed '" + keyword + "' phrase.");
                             
                             // No points if non allowed phrases are found in the submission.
                             // Evaluation is stopped immediately to prevent point injection attacks.
@@ -85,7 +106,7 @@ public class Evaluator {
                 }
                 return true;    
             } catch (IOException ex) {
-                System.out.println(comment("Could not inspect file " + path + " due to exception " + ex.getMessage()));
+                comment("Could not inspect file " + path + " due to exception " + ex.getMessage());
                 return false;
             }
         }
@@ -127,10 +148,10 @@ public class Evaluator {
         try {
             if (check.get()) {
                 this.points += add;
-                System.out.println(comment("Check " + testcase + ": [OK] " + remark + " (" + add + " points)"));
-            } else System.out.println(comment("Check " + testcase + ": [FAILED] " + remark + " (0 of " + add + " points)"));
+                comment("Check " + testcase + ": [OK] " + remark + " (" + add + " points)");
+            } else comment("Check " + testcase + ": [FAILED] " + remark + " (0 of " + add + " points)");
         } catch (Exception ex) {
-            System.out.println(comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (0 of " + add + " points)"));
+            comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (0 of " + add + " points)");
         }
     }
 
@@ -142,31 +163,60 @@ public class Evaluator {
         testcase++;
         try {
             if (check.get()) 
-                System.out.println(comment("Check " + testcase + ": [OK] " + remark + " (no subtraction)"));
+                comment("Check " + testcase + ": [OK] " + remark + " (no subtraction)");
             else {
                 this.points -= del;
-                System.out.println(comment("Check " + testcase + ": [FAILED] " + remark + " (subtracted " + del + " points)"));
+                comment("Check " + testcase + ": [FAILED] " + remark + " (subtracted " + del + " points)");
             }
         } catch (Exception ex) {
             this.points -= del;
-            System.out.println(comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (subtracted " + del + " points)"));
+            comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (subtracted " + del + " points)");
         }
     }
 
+    /**
+     * @deprecated
+     */
     protected final <T> boolean assure(String className, Predicate<Inspector> check) {
         try {
             return check.test(new Inspector(className));
         } catch (Exception ex) {
-            System.out.println(comment("Check failed due to " + ex));
-            System.out.println(comment("This might be due to a syntax error in your submission."));
+            comment("Check failed due to " + ex);
+            comment("This might be due to a syntax error in your submission.");
             return false;
         }
     }
 
     /**
-     * Adds a VPL comment.
+     * Can be used to formulate arbitrary checks on parsed source code.
+     * TO BE DONE.
      */
-    protected final String comment(String c) { return "Comment :=>> " + c; }
+    protected final boolean check(String file, Predicate<Parser> test) {
+        try {
+            return test.test(new Parser(file));
+        } catch (Exception ex) {
+            comment("Check failed due to " + ex);
+            comment("This might be due to a syntax error in your submission: " + file);
+            return false;
+        }
+    }
+
+    /**
+     * Adds a comment for VPL via console output.
+     */
+    protected void comment(String c) { 
+        System.out.println("Comment :=>> " + c); 
+    }
+
+    /**
+     * Reports a grade to VPL via console output (limited to [0, 100]).
+     */
+    protected void grade(int p) {
+        int report = p;
+        report = report > MAX ? MAX : report;
+        report = report < 0 ? 0 : report;
+        System.out.println("Grade :=>> " + report);
+    }
 
     /**
      * This method scans and invokes all methods starting with "test" to run the grading.
@@ -177,12 +227,9 @@ public class Evaluator {
             try {
                 test.invoke(this);
             } catch (Exception ex) {
-                System.out.println("Test case " + test.getName() + " failed completely." + ex);
+                comment("Test case " + test.getName() + " failed completely." + ex);
             } finally {
-                int report = points;
-                report = report > MAX ? MAX : report;
-                report = report < 0 ? 0 : report;
-                System.out.println("Grade :=>> " + report);
+                grade(points);
             }
         }
     }
@@ -200,15 +247,17 @@ public class Evaluator {
                     if (Evaluator.IGNORE_CHECKS.stream().anyMatch(ignore -> result.contains(ignore))) continue;
 
                     String msg = result.substring(result.indexOf(file));
-                    System.out.println(comment("[CHECKSTYLE]: " + msg));
+                    comment("[CHECKSTYLE]: " + msg);
                     this.points -= Evaluator.CHECK_PENALTY;
                 }
             }
             in.close();
-            System.out.println(comment("[CHECKSTYLE] All violations: " + this.points + " points"));
+            comment("");
+            comment("[CHECKSTYLE] Result: " + this.points + " points");
+            comment("");
         } catch (Exception ex) {
-            System.out.println(comment("You are so lucky! We had problems processing the checkstyle.log."));
-            System.out.println(comment("This was due to: " + ex));
+            comment("You are so lucky! We had problems processing the checkstyle.log.");
+            comment("This was due to: " + ex);
         }
     }
 
