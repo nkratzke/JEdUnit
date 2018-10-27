@@ -8,6 +8,7 @@ import java.io.*;
 import com.github.javaparser.*;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.ReceiverParameter;
@@ -45,6 +46,11 @@ public class Evaluator {
     public static int CHECK_PENALTY = 5;
 
     /**
+     * Cache that stores already parsed source files by the Parser.
+     */
+    private static final Map<String, CompilationUnit> CACHE = new HashMap<>();
+
+    /**
      * Wrapper class for a JavaParser CompilationUnit
      * with plenty of convenience methods.
      * TO BE DONE.
@@ -57,8 +63,10 @@ public class Evaluator {
 
         public Parser(String file) throws FileNotFoundException {
             this.file = file;
-            this.compilationUnit = JavaParser.parse(new File(this.file));
-            LexicalPreservingPrinter.setup(compilationUnit);
+            this.compilationUnit = Evaluator.CACHE.getOrDefault(
+                this.file, 
+                JavaParser.parse(new File(this.file))
+            );
         }
 
         public String[] getSource() {
@@ -75,6 +83,36 @@ public class Evaluator {
 
         public List<ClassOrInterfaceDeclaration> getClasses() {
             return this.compilationUnit.findAll(ClassOrInterfaceDeclaration.class);
+        }
+
+        public List<ImportDeclaration> getImports() {
+            return this.compilationUnit.findAll(ImportDeclaration.class);
+        }
+
+        public <T extends Expression> List<T> getExpressions(Class<T> expr) {
+            return this.compilationUnit.findAll(expr);
+        }
+
+        public boolean noImportsOf(String... libs) {
+            boolean found = false;
+            for (ImportDeclaration imp : this.getImports()) {
+                String lib = imp.getName().asString();
+                if (Stream.of(libs).allMatch(l -> !lib.startsWith(l))) continue;
+                comment(this.file, imp.getRange(), String.format("Import of '%s' not allowed.", lib));
+                found = true;
+            }
+            return !found;
+        }
+
+        public boolean onlyImportsOf(String... libs) {
+            boolean found = false;
+            for (ImportDeclaration imp : this.getImports()) {
+                String lib = imp.getName().asString();
+                if (Stream.of(libs).anyMatch(l -> lib.startsWith(l))) continue;
+                comment(this.file, imp.getRange(), String.format("Import of '%s' not allowed.", lib));
+                found = true;
+            }
+            return !found;
         }
 
         public boolean noContainOf(String... terms) {
@@ -151,6 +189,21 @@ public class Evaluator {
                 }
             }           
             return !found;
+        }
+
+        /**
+        * Adds a comment for VPL via console output if a condition mets.
+        * Marks file and position via a JavaParser range if the condition mets.
+        * @param node Node (Expression) to be marked
+        * @param msg Comment to be added
+        * @param check Test to be performed on node
+        * @return true if check on node is evaluated to true (in this case the message is printed to console fpr further VPL processing)
+        *         false, if check  on node evaluated to false (no message is printed in that case)
+        */
+        protected <T extends Expression> boolean report(T node, String msg, Predicate<T> check) {
+            boolean valid = check.test(node);
+            if (valid) comment(this.file, node.getRange(), msg + "(" + node + ")");
+            return valid;
         }
     }
 
@@ -259,20 +312,16 @@ public class Evaluator {
 
     /**
      * Deletes points for grading if a check is not passed (unwishful behavior).
-     * A comment is printed whether the check was successfull or not.
+     * A comment is printed if the check was not successfull.
      */
     protected final void degrading(int del, String remark, Supplier<Boolean> check) {
-        testcase++;
         try {
-            if (check.get()) 
-                comment("Check " + testcase + ": [OK] " + remark + " (no subtraction)");
-            else {
-                this.points -= del;
-                comment("Check " + testcase + ": [FAILED] " + remark + " (subtracted " + del + " points)");
-            }
+            if (check.get()) return;
+            this.points -= del;
+            comment("[FAILED] " + remark + " (subtracted " + del + " points)");
         } catch (Exception ex) {
             this.points -= del;
-            comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (subtracted " + del + " points)");
+            comment("[FAILED due to " + ex + "] " + remark + " (subtracted " + del + " points)");
         }
     }
 
@@ -287,7 +336,7 @@ public class Evaluator {
             grade(0);
             System.exit(1);
         } catch (Exception ex) {
-            comment(String.format("Evaluation aborted! %s (%s)", comment, ex));
+            comment(String.format("Evaluation aborted! %s (Exception %s)", comment, ex));
             grade(0);
             System.exit(1);
         }
