@@ -192,17 +192,17 @@ public class Evaluator {
         }
 
         /**
-        * Adds a comment for VPL via console output if a condition mets.
-        * Marks file and position via a JavaParser range if the condition mets.
-        * @param node Node (Expression) to be marked
-        * @param msg Comment to be added
+        * Triggers a comment console output for VPL if a specified check condition mets.
+        * Marks file and position of the respective node if the condition mets.
+        * @param node Node to be marked
+        * @param msg Explaining comment to be added
         * @param check Test to be performed on node
-        * @return true if check on node is evaluated to true (in this case the message is printed to console fpr further VPL processing)
-        *         false, if check  on node evaluated to false (no message is printed in that case)
+        * @return true if check on node is evaluated to true (in this case the message is printed to console for further VPL processing)
+        *         false, if check on node evaluated to false (no message is printed in that case)
         */
-        protected <T extends Expression> boolean report(T node, String msg, Predicate<T> check) {
+        protected <T extends Node> boolean report(T node, String msg, Predicate<T> check) {
             boolean valid = check.test(node);
-            if (valid) comment(this.file, node.getRange(), msg + "(" + node + ")");
+            if (valid) comment(this.file, node.getRange(), String.format("%s (%s)", msg, node));
             return valid;
         }
     }
