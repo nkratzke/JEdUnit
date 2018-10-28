@@ -1,7 +1,4 @@
-import java.lang.reflect.*;
-import java.util.*;
-import com.github.javaparser.ast.stmt.*;
-
+import java.util.Arrays;
 
 /**
  * Please add your test cases for evaluation here.
@@ -14,19 +11,24 @@ import com.github.javaparser.ast.stmt.*;
  */
 class Checks extends Evaluator {
 
-    public void testCodingRestrictions() {
-        // Checks that submissions does not access the reference solution or try to run code injection attacks.
-        // Adapt it accordingly, in cases you do not provide your reference solution in a Solution.java file.
-        
-        abortOn("Cheat detected", () -> check("Main.java", c -> c.noContainOf("Solution", "System.exit", "Grade :=>>")));
-        degrading(100, "Recursion check", () -> check("Main.java", c -> c.noStatementOf(WhileStmt.class, ForStmt.class, DoStmt.class)));
-        degrading(10, "Avoid global variables.", () -> check("Main.java", c -> c.noDataFields()));
-        degrading(10, "Avoid inner classes.", () -> check("Main.java", c -> c.noInnerClasses()));
+    @Override
+    protected void configure() {
+        super.configure();
+        Evaluator.ALLOW_LOOPS = false;
+    }
 
-        Class[] notAllowedCollectionImplementations = { HashMap.class, TreeMap.class, HashSet.class, LinkedList.class, ArrayList.class };
-        degrading(10, "Use Map, List, and Set interfaces.", () -> 
-            check("Main.java", c -> c.noParametersOf(notAllowedCollectionImplementations)) &
-            check("Main.java", c -> c.noReturnTypesOf(notAllowedCollectionImplementations))
-        );
+    @Check
+    void examples() {
+        comment("Known testcases from excercise");
+        for (int i : Arrays.asList(1, 10, 20, 27, 48)) {
+            String tc = String.format("Testcase test(%d)", i);
+            grading(20, tc, () -> Main.test(i) == Solution.test(i));
+        }
+    }
+
+    @Check
+    void futherTestcases() {
+        comment("Further testcases (unknown test cases)");
+        // To be done ...
     }
 }

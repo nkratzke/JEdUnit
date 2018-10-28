@@ -2,6 +2,7 @@ import java.util.function.*;
 import java.util.stream.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.lang.annotation.*;
 import java.nio.file.*;
 import java.io.*;
 
@@ -29,21 +30,18 @@ import com.github.javaparser.printer.lexicalpreservation.*;
 public class Evaluator {
 
     /**
-     * List of Checkstyle checks that are ignored for evaluation.
-     * This list is set in the configure method().
+     * Restriction annotation.
      */
-    public static final List<String> IGNORE_CHECKS = new LinkedList<String>();
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    @interface Restriction {}
 
     /**
-     * List of file names that shall be considered by checkstyle.
-     * This list is set in the configure method().
+     * Check annotation.
      */
-    public static final List<String> CHECK_FILES = new LinkedList<String>();
-
-    /**
-     * Downgrade for every found checkstyle error.
-     */
-    public static int CHECK_PENALTY = 5;
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    @interface Check {}
 
     /**
      * Cache that stores already parsed source files by the Parser.
@@ -93,26 +91,39 @@ public class Evaluator {
             return this.compilationUnit.findAll(expr);
         }
 
-        public boolean noImportsOf(String... libs) {
+        public boolean nonAllowedImports(String... libs) {
             boolean found = false;
             for (ImportDeclaration imp : this.getImports()) {
                 String lib = imp.getName().asString();
-                if (Stream.of(libs).allMatch(l -> !lib.startsWith(l))) continue;
+                if (Stream.of(libs).noneMatch(l -> lib.startsWith(l))) continue;
                 comment(this.file, imp.getRange(), String.format("Import of '%s' not allowed.", lib));
                 found = true;
             }
-            return !found;
+            return found;
         }
 
-        public boolean onlyImportsOf(String... libs) {
-            boolean found = false;
+        public boolean allowedImports(String... libs) {
+            boolean check = true;
             for (ImportDeclaration imp : this.getImports()) {
                 String lib = imp.getName().asString();
                 if (Stream.of(libs).anyMatch(l -> lib.startsWith(l))) continue;
                 comment(this.file, imp.getRange(), String.format("Import of '%s' not allowed.", lib));
-                found = true;
+                check = false;
             }
-            return !found;
+            return check;
+        }
+
+        public boolean accessOn(String... entities) {
+            boolean found = false;
+            for (String entity : entities) {
+                Stream<MethodCallExpr> calls = this.getExpressions(MethodCallExpr.class).stream();
+                Stream<ObjectCreationExpr> creations = this.getExpressions(ObjectCreationExpr.class).stream();
+                Stream<FieldAccessExpr> access = this.getExpressions(FieldAccessExpr.class).stream();
+                found |= calls.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().contains(entity + "("))) |
+                         creations.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().startsWith("new " + entity + "("))) |
+                         access.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().startsWith(entity)));
+            }
+            return found;
         }
 
         public boolean noContainOf(String... terms) {
@@ -157,6 +168,7 @@ public class Evaluator {
         public boolean noDataFields() {
             boolean found = false;
             for (FieldDeclaration field : this.getDataFields()) {
+                if (field.isStatic() && field.isFinal()) continue;
                 found = true;
                 SimpleName n = field.getVariables().get(0).getName();
                 comment(this.file, field.getRange(), "Datafield " + n + " not allowed.");
@@ -296,7 +308,7 @@ public class Evaluator {
 
     /**
      * Adds points for grading if a check is passed (wishful behavior).
-     * A comment is printed whether the check was successfull or not.
+     * A comment is always printed whether the check was successfull or not.
      */
     protected final void grading(int add, String remark, Supplier<Boolean> check) {
         testcase++;
@@ -311,8 +323,8 @@ public class Evaluator {
     }
 
     /**
-     * Deletes points for grading if a check is not passed (unwishful behavior).
-     * A comment is printed if the check was not successfull.
+     * Deletes points (penalzing) if a check is not passed (unwishful behavior).
+     * A comment is only printed if the check was not successfull.
      */
     protected final void degrading(int del, String remark, Supplier<Boolean> check) {
         try {
@@ -327,11 +339,11 @@ public class Evaluator {
 
     /**
      * Checks whether a severe condition is met. E.g. a cheating submission.
-     * In case the check is not passed the evaluation is aborted immediately.
+     * In case the check is evaluated to true the evaluation is aborted immediately.
      */
     protected final void abortOn(String comment, Supplier<Boolean> check) {
         try {
-            if (check.get()) return;
+            if (!check.get()) return;
             comment("Evaluation aborted! " + comment);
             grade(0);
             System.exit(1);
@@ -357,14 +369,13 @@ public class Evaluator {
 
     /**
      * Can be used to formulate arbitrary checks on parsed source code.
-     * TO BE DONE.
      */
     protected final boolean check(String file, Predicate<Parser> test) {
         try {
             return test.test(new Parser(file));
         } catch (Exception ex) {
-            comment("Check failed due to " + ex);
-            comment("This might be due to a syntax error in your submission: " + file);
+            comment("Check failed: " + ex);
+            comment("Is there a syntax error in your submission? " + file);
             return false;
         }
     }
@@ -396,7 +407,7 @@ public class Evaluator {
     }
 
     /**
-     * Reports a grade to VPL via console output (limited to [0, 100]).
+     * Reports a grade to VPL via console output (truncated to [0, 100]).
      */
     protected void grade(int p) {
         int report = p;
@@ -405,8 +416,33 @@ public class Evaluator {
         System.out.println("Grade :=>> " + report);
     }
 
+    private List<Method> allMethodsOf(Class<?> clazz) {
+        if (clazz == null) return new LinkedList<>();
+        List<Method> methods = allMethodsOf(clazz.getSuperclass());
+        methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+        return methods;
+    }
+
+    /**
+     * Executes all methods annoted with a specified annotation.
+     * @param annotation Annotation, one of [@Restriction, @Check]
+     */
+    protected final void process(Class<? extends Annotation> annotation) {
+        for (Method test : allMethodsOf(this.getClass())) {
+            if (!test.isAnnotationPresent(annotation)) continue;
+            try {
+                test.invoke(this);
+            } catch (Exception ex) {
+                comment("Test case " + test.getName() + " failed completely." + ex);
+            } finally {
+                grade(points);
+            }
+        }
+    }
+
     /**
      * This method scans and invokes all methods starting with "test" to run the grading.
+     * Deprecated
      */
     protected final void evaluate() {
         for (Method test : this.getClass().getDeclaredMethods()) {
@@ -429,13 +465,13 @@ public class Evaluator {
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
                 String result = in.nextLine();
-                for (String file : Evaluator.CHECK_FILES) {
+                for (String file : Evaluator.EVALUATED_FILES) {
                     if (!result.contains(file)) continue;
-                    if (Evaluator.IGNORE_CHECKS.stream().anyMatch(ignore -> result.contains(ignore))) continue;
+                    if (Evaluator.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
 
                     String msg = result.substring(result.indexOf(file));
                     comment("[CHECKSTYLE]: " + msg);
-                    this.points -= Evaluator.CHECK_PENALTY;
+                    this.points -= Evaluator.CHECKSTYLE_PENALTY;
                 }
             }
             in.close();
@@ -448,28 +484,110 @@ public class Evaluator {
         }
     }
 
+    @Restriction
+    void cheatDetection() {
+        abortOn("Possible cheat detected", () -> check("Main.java", c -> 
+            c.nonAllowedImports("java.lang.reflect", "java.lang.invoke") |
+            c.accessOn("Solution", "System.exit")
+        ));
+    }
+
+    /**
+     * List of Checkstyle checks that are ignored for evaluation.
+     * This list is set in the configure method().
+     */
+    protected static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>();
+
+    /**
+     * List of file names that shall be considered by checkstyle and evaluation.
+     * This list is set in the configure method().
+     */
+    protected static List<String> EVALUATED_FILES = new LinkedList<String>();
+
+    /**
+     * Downgrade for every found checkstyle error.
+     */
+    protected static int CHECKSTYLE_PENALTY = 5;
+
+    protected static boolean CHECK_IMPORTS = true;
+
+    protected static List<String> ALLOWED_IMPORTS = new LinkedList<String>();
+
+    protected static int IMPORT_PENALTY = 25;
+
+    protected static boolean ALLOW_LOOPS = true;
+
+    protected static int LOOP_PENALTY = 100;
+
+    protected static boolean ALLOW_INNER_CLASSES = false;
+
+    protected static int INNER_CLASS_PENALTY = 100;
+
+    protected static boolean ALLOW_GLOBAL_VARIABLES = false;
+
+    protected static int GLOBAL_VARIABLE_PENALTY = 25;
+
+    protected static boolean CHECK_COLLECTION_INTERFACES = true;
+
+    protected static int COLLECTION_INTERFACE_PENALTY = 25;
+
     /**
      * This method is a hook for the Checks class to configure the evaluation.
      */
     protected void configure() {
-        Evaluator.IGNORE_CHECKS.addAll(Arrays.asList(
+        Evaluator.CHECKSTYLE_IGNORES.addAll(Arrays.asList(
             "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
-            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", "[NeedBraces]"
+            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", "[NeedBraces]",
+            "[MagicNumber]"
         ));
 
-        Evaluator.CHECK_FILES.add("Main.java");
+        Evaluator.EVALUATED_FILES.add("Main.java");
 
-        Evaluator.CHECK_PENALTY = 5;
+        Evaluator.ALLOWED_IMPORTS.add("java.util");
+        Evaluator.ALLOWED_IMPORTS.add("java.io");
+    }
+
+    @Restriction
+    protected void conventions() {
+        System.out.println("Checking conventions ...");
+        for (String file : EVALUATED_FILES) {
+            if (CHECK_IMPORTS) degrading(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c -> 
+                c.allowedImports(ALLOWED_IMPORTS.toArray(new String[0]))
+            ));
+            
+            if (!ALLOW_LOOPS) degrading(LOOP_PENALTY, "No loops", () -> check(file, c -> 
+                c.noStatementOf(WhileStmt.class, ForStmt.class, ForeachStmt.class, DoStmt.class) &
+                !c.accessOn("forEach")
+            ));
+            
+            if (!ALLOW_GLOBAL_VARIABLES) degrading(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, 
+                c -> c.noDataFields()
+            ));
+
+            if (!ALLOW_INNER_CLASSES) degrading(INNER_CLASS_PENALTY, "No inner classes", () -> check(file, 
+                c -> c.noInnerClasses()
+            ));
+
+            if (CHECK_COLLECTION_INTERFACES) {
+                Class[] notAllowedCollectionImplementations = { HashMap.class, TreeMap.class, HashSet.class, LinkedList.class, ArrayList.class };
+                degrading(COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces.", () -> 
+                    check(file, c -> c.noParametersOf(notAllowedCollectionImplementations)) &
+                    check(file, c -> c.noReturnTypesOf(notAllowedCollectionImplementations))
+                );    
+            }
+        }
     }
 
     /**
      * The main method calls the evaluation.
      */
     public static final void main(String[] args) {
-        Checks checks = new Checks();
-        checks.configure();
-        checks.checkstyle();
-        checks.evaluate();
-        checks.comment("Finished");
+        Checks check = new Checks();
+        check.configure();
+        check.checkstyle();
+        check.process(Restriction.class); // process restriction checks
+        check.process(Check.class);       // process functional tests
+        check.evaluate();                 // deprecated
+        check.comment("Finished");
     }
 }
