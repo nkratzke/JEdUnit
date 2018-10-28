@@ -140,6 +140,14 @@ public class Evaluator {
             return !found;
         }
 
+        public boolean noLambdas() {
+            List<LambdaExpr> lambdas = this.getExpressions(LambdaExpr.class);
+            for (LambdaExpr l : lambdas) {
+                comment(this.file, l.getRange(), "Lambda not allowed: " + l);
+            }
+            return lambdas.isEmpty();
+        }
+
         public boolean noInnerClasses() {
             Set<ClassOrInterfaceDeclaration> found = new HashSet<>();
             for (ClassOrInterfaceDeclaration c : this.getClasses()) {
@@ -520,6 +528,10 @@ public class Evaluator {
 
     protected static int LOOP_PENALTY = 100;
 
+    protected static boolean ALLOW_LAMBDAS = true;
+
+    protected static int LAMBDA_PENALITY = 25;
+
     protected static boolean ALLOW_INNER_CLASSES = false;
 
     protected static int INNER_CLASS_PENALTY = 100;
@@ -552,13 +564,17 @@ public class Evaluator {
     protected void conventions() {
         System.out.println("Checking conventions ...");
         for (String file : EVALUATED_FILES) {
-            if (CHECK_IMPORTS) degrading(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c -> 
+            if (CHECK_IMPORTS) degrading(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c ->
                 c.allowedImports(ALLOWED_IMPORTS.toArray(new String[0]))
             ));
             
             if (!ALLOW_LOOPS) degrading(LOOP_PENALTY, "No loops", () -> check(file, c -> 
                 c.noStatementOf(WhileStmt.class, ForStmt.class, ForeachStmt.class, DoStmt.class) &
                 !c.accessOn("forEach")
+            ));
+
+            if (!ALLOW_LAMBDAS) degrading(LAMBDA_PENALITY, "No lambdas", () -> check(file, c ->
+                c.noLambdas()
             ));
             
             if (!ALLOW_GLOBAL_VARIABLES) degrading(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, 

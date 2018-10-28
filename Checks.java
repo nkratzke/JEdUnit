@@ -14,7 +14,7 @@ class Checks extends Evaluator {
     @Override
     protected void configure() {
         super.configure();
-        Evaluator.ALLOW_LOOPS = false;
+        Evaluator.ALLOWED_IMPORTS = Arrays.asList("java.util");
     }
 
     @Check

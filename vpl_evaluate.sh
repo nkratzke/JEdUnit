@@ -7,7 +7,7 @@ wget --quiet http://central.maven.org/maven2/com/github/javaparser/javaparser-co
 wget --quiet https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.14/checkstyle-8.14-all.jar
 
 java  -jar checkstyle-8.14-all.jar -c style_checks.xml *.java > checkstyle.log
-javac -cp ".:*" -Xlint:none *.java
+javac -cp ".:*" -Xlint:none Checks.java
 java  -cp ".:*" Checks
 EEOOFF
 
