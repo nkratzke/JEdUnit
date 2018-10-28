@@ -19,7 +19,7 @@ class Checks extends Evaluator {
 
     @Check
     void examples() {
-        comment("Known testcases from excercise");
+        comment("Provided example calls");
         for (int i : Arrays.asList(1, 10, 20, 27, 48)) {
             String tc = String.format("Testcase test(%d)", i);
             grading(20, tc, () -> Main.test(i) == Solution.test(i));

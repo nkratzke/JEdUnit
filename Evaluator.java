@@ -34,14 +34,14 @@ public class Evaluator {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    @interface Restriction {}
+    @interface Restriction { }
 
     /**
      * Check annotation.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    @interface Check {}
+    @interface Check { }
 
     /**
      * Cache that stores already parsed source files by the Parser.
@@ -59,8 +59,8 @@ public class Evaluator {
 
         private CompilationUnit compilationUnit;
 
-        public Parser(String file) throws FileNotFoundException {
-            this.file = file;
+        Parser(String f) throws FileNotFoundException {
+            this.file = f;
             this.compilationUnit = Evaluator.CACHE.getOrDefault(
                 this.file, 
                 JavaParser.parse(new File(this.file))
@@ -432,6 +432,7 @@ public class Evaluator {
             if (!test.isAnnotationPresent(annotation)) continue;
             try {
                 test.invoke(this);
+                comment("");
             } catch (Exception ex) {
                 comment("Test case " + test.getName() + " failed completely." + ex);
             } finally {
