@@ -1,4 +1,10 @@
+import java.io.FileNotFoundException;
 import java.util.Arrays;
+
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.CompilationUnit;
 
 /**
  * Please add your test cases for evaluation here.
@@ -15,6 +21,26 @@ class Checks extends Evaluator {
     protected void configure() {
         super.configure();
         Evaluator.ALLOWED_IMPORTS = Arrays.asList("java.util");
+        Evaluator.ALLOW_LOOPS = false;
+        Evaluator.ALLOW_LAMBDAS = false;
+    }
+
+    @Restriction
+    void noPrintlns() throws FileNotFoundException {
+        /*
+        this.parse("Main.java")
+            .select(MethodDeclaration.class, (MethodDeclaration m) -> !m.getDeclarationAsString(false, false, false).equals("void main(String[])"))
+            .select(MethodCallExpr.class, (MethodCallExpr expr) -> expr.toString().contains("System.out.println"))
+            .annotate("Do not use System.out.println in methods, except main().")
+            .stream()
+            .forEach(System.out::println);
+            /*
+            .filter(m -> !((MethodDeclaration)m).getName().equals("main"))
+            .select(MethodCallExpr.class)
+            .map(call -> ((MethodCallExpr)call).getArguments())
+            .forEach(args -> System.out.println(args)
+        
+        );*/
     }
 
     @Check

@@ -48,6 +48,72 @@ public class Evaluator {
      */
     private static final Map<String, CompilationUnit> CACHE = new HashMap<>();
 
+    class Selected <T extends Node> {
+
+        private String file = "";
+
+        private List<T> nodes = new LinkedList<>();
+
+        Selected(T n, String f) { 
+            this.nodes.add(n); 
+            this.file = f;
+        }
+
+        Selected(Collection<T> ns, String f) { 
+            this.nodes.addAll(ns);
+            this.file = f;
+        }
+
+        public <R extends Node> Selected<R> select(Class<R> selector) {
+            List<R> selected = new LinkedList<>();
+            for (T n : this.nodes) {
+                List<R> hits = n.findAll(selector);
+                hits.remove(n);
+                for (R hit : hits) selected.add(hit);
+            }
+            return new Selected<R>(selected, this.file);
+        }
+
+        public <R extends Node> Selected<R> select(Class<R> selector, Predicate<R> pred) {
+            Selected<R> selected = this.select(selector);
+            return selected.filter(pred);
+        }
+
+        public Selected<T> filter(Predicate<T> fullfills) {
+            List<T> filtered = new LinkedList<>();
+            for (T n : this.nodes) {
+                if (fullfills.test(n)) filtered.add(n);
+            } 
+            return new Selected<T>(filtered, this.file);
+        }
+
+        public Selected<T> annotate(String msg) {
+            for(T node : this.nodes) {
+                comment(this.file, node.getRange(), msg);
+            }
+            return this;
+        }
+
+        public Selected<T> annotate(Function<T, String> msg) {
+            for (T node  : this.nodes) {
+                comment(this.file, node.getRange(), msg.apply(node));
+            }
+            return this;
+        }
+
+        public Selected<T> annotate(String msg, Predicate<T> pred) {
+            this.filter(pred).annotate(msg);
+            return this;
+        }
+
+        public boolean isEmpty() { return this.nodes.isEmpty(); }
+
+        public List<T> asList() { return this.nodes; }
+
+        public Stream<T> stream() { return this.nodes.stream(); }
+
+    }
+
     /**
      * Wrapper class for a JavaParser CompilationUnit
      * with plenty of convenience methods.
@@ -65,6 +131,16 @@ public class Evaluator {
                 this.file, 
                 JavaParser.parse(new File(this.file))
             );
+        }
+
+        public <T extends Node> Selected<T> select(Class<T> selector) {
+            Selected<CompilationUnit> s = new Selected<>(this.compilationUnit, this.file);
+            return s.select(selector);
+        }
+
+        public <T extends Node> Selected<T> select(Class<T> selector, Predicate<T> pred) {
+            Selected<CompilationUnit> s = new Selected<>(this.compilationUnit, this.file);
+            return s.select(selector, pred);
         }
 
         public String[] getSource() {
@@ -102,17 +178,6 @@ public class Evaluator {
             return found;
         }
 
-        public boolean allowedImports(String... libs) {
-            boolean check = true;
-            for (ImportDeclaration imp : this.getImports()) {
-                String lib = imp.getName().asString();
-                if (Stream.of(libs).anyMatch(l -> lib.startsWith(l))) continue;
-                comment(this.file, imp.getRange(), String.format("Import of '%s' not allowed.", lib));
-                check = false;
-            }
-            return check;
-        }
-
         public boolean accessOn(String... entities) {
             boolean found = false;
             for (String entity : entities) {
@@ -124,53 +189,6 @@ public class Evaluator {
                          access.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().startsWith(entity)));
             }
             return found;
-        }
-
-        public boolean noContainOf(String... terms) {
-            boolean found = false;
-            int lineNo = 0;
-            for (String line : this.getSource()) {
-                lineNo++;
-                for (String term : terms) {
-                    if (!line.contains(term)) continue;
-                    comment(this.file, lineNo, String.format("Term '%s' not allowed.", term));
-                    found = true;
-                }
-            }
-            return !found;
-        }
-
-        public boolean noLambdas() {
-            List<LambdaExpr> lambdas = this.getExpressions(LambdaExpr.class);
-            for (LambdaExpr l : lambdas) {
-                comment(this.file, l.getRange(), "Lambda not allowed: " + l);
-            }
-            return lambdas.isEmpty();
-        }
-
-        public boolean noInnerClasses() {
-            Set<ClassOrInterfaceDeclaration> found = new HashSet<>();
-            for (ClassOrInterfaceDeclaration c : this.getClasses()) {
-                List<ClassOrInterfaceDeclaration> inners = c.findAll(ClassOrInterfaceDeclaration.class);
-                inners.remove(c);
-                if (inners.isEmpty()) continue;
-                found.addAll(inners);
-            }
-            for (ClassOrInterfaceDeclaration inner : found) {
-                comment(this.file, inner.getRange(), "Inner class " + inner.getName() + " not allowed.");
-            }
-            return found.isEmpty();
-        }
-
-        public boolean noStatementOf(Class<? extends Statement>... stmts) {
-            boolean found = false;
-            for (Class<? extends Statement> stmt : stmts) {
-                for (Node n : this.compilationUnit.findAll(stmt)) {
-                    found = true;
-                    comment(this.file, n.getRange(), stmt.getSimpleName() + " not allowed.");
-                }
-            }
-            return !found;
         }
 
         public boolean noDataFields() {
@@ -228,76 +246,6 @@ public class Evaluator {
     }
 
     /**
-     * Deprecated
-     */
-    class Inspector {
-
-        private Class object;
-
-        public Inspector(String cname) throws ClassNotFoundException { this.object = Class.forName(cname); }
-
-        public String getName() { return object.getSimpleName(); }
-
-        public Stream<Field> fields() { 
-            return Stream.of(object.getDeclaredFields()).filter(f -> {
-                int m = ((Field)f).getModifiers();
-                return !(Modifier.isStatic(m) && Modifier.isFinal(m));
-            });
-        }
-        
-        public boolean hasNoFields() { return fields().count() == 0; }
-
-        public Stream<Class> innerClasses() {
-            return Stream.of(object.getDeclaredClasses());
-        }
-
-        public boolean hasNoInnerClasses() { return innerClasses().count() == 0; }
-
-        public Stream<Field> constants() { 
-            return Stream.of(object.getDeclaredFields()).filter(f -> {
-                int m = ((Field)f).getModifiers();
-                return Modifier.isStatic(m) && Modifier.isFinal(m);
-            });
-        }
-
-        public boolean hasNo(String... keywords) {
-            Path path = Paths.get(object.getSimpleName() + ".java");
-            try {
-                int i = 0;
-                for (String line : Files.readAllLines(path)) {
-                    i++;
-                    for (String keyword : keywords) {
-                        if (line.contains(keyword)) {
-                            comment("Line " + i + ": " + line);
-                            comment("Line " + i + " in file " + path + " seem to have a not allowed '" + keyword + "' phrase.");
-                            
-                            // No points if non allowed phrases are found in the submission.
-                            // Evaluation is stopped immediately to prevent point injection attacks.
-                            System.out.println("Grade :=>> 0");
-                            System.exit(1);
-                            return false;
-                        }
-                    }
-                }
-                return true;    
-            } catch (IOException ex) {
-                comment("Could not inspect file " + path + " due to exception " + ex.getMessage());
-                return false;
-            }
-        }
-
-        public boolean hasNoLoops() { return hasNo("while", "for"); }
-
-        public boolean hasNoConstants() { return constants().count() == 0; }
-
-        public Stream<Method> methods() { 
-            return Stream.of(object.getDeclaredMethods()).filter(m -> !((Method)m).getName().startsWith("lambda$")); 
-        }
-
-        public boolean hasNoMethods() { return methods().count() == 0; }
-    }
-
-    /**
      * The maximum points for a VPL assignment.
      */
     private static final int MAX = 100;
@@ -333,6 +281,7 @@ public class Evaluator {
     /**
      * Deletes points (penalzing) if a check is not passed (unwishful behavior).
      * A comment is only printed if the check was not successfull.
+     * @Deprecated (use penalize instead)
      */
     protected final void degrading(int del, String remark, Supplier<Boolean> check) {
         try {
@@ -346,12 +295,27 @@ public class Evaluator {
     }
 
     /**
+     * Deletes points (penalzing) if a check is passed (unwishful behavior).
+     * A comment is only printed if the check indicates a violation.
+     */
+    protected final void penalize(int penalty, String remark, Supplier<Boolean> violation) {
+        try {
+            if (!violation.get()) return;
+            this.points -= penalty;
+            comment("[FAILED] " + remark + " (-" + penalty + " points)");
+        } catch (Exception ex) {
+            this.points -= penalty;
+            comment("[FAILED due to " + ex + "] " + remark + " (-" + penalty + " points)");
+        }
+    }
+
+    /**
      * Checks whether a severe condition is met. E.g. a cheating submission.
      * In case the check is evaluated to true the evaluation is aborted immediately.
      */
-    protected final void abortOn(String comment, Supplier<Boolean> check) {
+    protected final void abortOn(String comment, Supplier<Boolean> violation) {
         try {
-            if (!check.get()) return;
+            if (!violation.get()) return;
             comment("Evaluation aborted! " + comment);
             grade(0);
             System.exit(1);
@@ -362,17 +326,8 @@ public class Evaluator {
         }
     }
 
-    /**
-     * Deprecated
-     */
-    protected final <T> boolean assure(String className, Predicate<Inspector> check) {
-        try {
-            return check.test(new Inspector(className));
-        } catch (Exception ex) {
-            comment("Check failed due to " + ex);
-            comment("This might be due to a syntax error in your submission.");
-            return false;
-        }
+    protected final Parser parse(String file) throws FileNotFoundException {
+        return new Parser(file);
     }
 
     /**
@@ -450,23 +405,6 @@ public class Evaluator {
     }
 
     /**
-     * This method scans and invokes all methods starting with "test" to run the grading.
-     * Deprecated
-     */
-    protected final void evaluate() {
-        for (Method test : this.getClass().getDeclaredMethods()) {
-            if (!test.getName().startsWith("test")) continue;
-            try {
-                test.invoke(this);
-            } catch (Exception ex) {
-                comment("Test case " + test.getName() + " failed completely." + ex);
-            } finally {
-                grade(points);
-            }
-        }
-    }
-
-    /**
      * This method evaluates the checkstyle log file.
      */
     protected final void checkstyle() {
@@ -491,14 +429,6 @@ public class Evaluator {
             comment("You are so lucky! We had problems processing the checkstyle.log.");
             comment("This was due to: " + ex);
         }
-    }
-
-    @Restriction
-    void cheatDetection() {
-        abortOn("Possible cheat detected", () -> check("Main.java", c -> 
-            c.nonAllowedImports("java.lang.reflect", "java.lang.invoke") |
-            c.accessOn("Solution", "System.exit")
-        ));
     }
 
     /**
@@ -561,28 +491,45 @@ public class Evaluator {
     }
 
     @Restriction
+    void cheatDetection() {
+        abortOn("Possible cheat detected", () -> check("Main.java", c -> 
+            c.nonAllowedImports("java.lang.reflect", "java.lang.invoke") |
+            c.accessOn("Solution", "System.exit")
+        ));
+    }
+
+    @Restriction
     protected void conventions() {
         System.out.println("Checking conventions ...");
         for (String file : EVALUATED_FILES) {
-            if (CHECK_IMPORTS) degrading(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c ->
-                c.allowedImports(ALLOWED_IMPORTS.toArray(new String[0]))
-            ));
-            
-            if (!ALLOW_LOOPS) degrading(LOOP_PENALTY, "No loops", () -> check(file, c -> 
-                c.noStatementOf(WhileStmt.class, ForStmt.class, ForeachStmt.class, DoStmt.class) &
-                !c.accessOn("forEach")
+
+            if (CHECK_IMPORTS) penalize(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c ->
+                !c.select(ImportDeclaration.class)
+                  .filter(imp -> !ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
+                  .annotate(imp -> "Import of " + imp.getName() + " not allowed")
+                  .isEmpty()
             ));
 
-            if (!ALLOW_LAMBDAS) degrading(LAMBDA_PENALITY, "No lambdas", () -> check(file, c ->
-                c.noLambdas()
+            if (!ALLOW_LOOPS) penalize(LOOP_PENALTY, "No loops", () -> check(file, c ->
+                !c.select(WhileStmt.class).annotate("while loop not allowed").isEmpty() |
+                !c.select(ForStmt.class).annotate("for loop not allowed").isEmpty() |
+                !c.select(ForeachStmt.class).annotate("for loop not allowed").isEmpty() |
+                !c.select(DoStmt.class).annotate("do while loop not allowed").isEmpty() 
+            ));
+
+            if (!ALLOW_LAMBDAS) penalize(LAMBDA_PENALITY, "No lambdas", () -> check(file, c ->
+                !c.select(LambdaExpr.class).annotate("lambda expressions not allowed").isEmpty()
             ));
             
             if (!ALLOW_GLOBAL_VARIABLES) degrading(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, 
                 c -> c.noDataFields()
             ));
 
-            if (!ALLOW_INNER_CLASSES) degrading(INNER_CLASS_PENALTY, "No inner classes", () -> check(file, 
-                c -> c.noInnerClasses()
+            if (!ALLOW_INNER_CLASSES) penalize(INNER_CLASS_PENALTY, "No inner classes", () -> check(file, c -> 
+                !c.select(ClassOrInterfaceDeclaration.class)
+                  .select(ClassOrInterfaceDeclaration.class)
+                  .annotate("inner classes not allowed")
+                  .isEmpty()
             ));
 
             if (CHECK_COLLECTION_INTERFACES) {
@@ -604,7 +551,6 @@ public class Evaluator {
         check.checkstyle();
         check.process(Restriction.class); // process restriction checks
         check.process(Check.class);       // process functional tests
-        check.evaluate();                 // deprecated
         check.comment("Finished");
     }
 }
