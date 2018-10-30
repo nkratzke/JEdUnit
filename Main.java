@@ -11,6 +11,8 @@ import java.awt.*;
  */
 class Main {
 
+    private int myLittleTinyHelper = 42;
+
     class InnerClass {
 
         class InnerInnerClass {

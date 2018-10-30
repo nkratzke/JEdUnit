@@ -108,6 +108,8 @@ public class Evaluator {
 
         public boolean isEmpty() { return this.nodes.isEmpty(); }
 
+        public boolean exists() { return !this.isEmpty(); }
+
         public List<T> asList() { return this.nodes; }
 
         public Stream<T> stream() { return this.nodes.stream(); }
@@ -189,17 +191,6 @@ public class Evaluator {
                          access.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().startsWith(entity)));
             }
             return found;
-        }
-
-        public boolean noDataFields() {
-            boolean found = false;
-            for (FieldDeclaration field : this.getDataFields()) {
-                if (field.isStatic() && field.isFinal()) continue;
-                found = true;
-                SimpleName n = field.getVariables().get(0).getName();
-                comment(this.file, field.getRange(), "Datafield " + n + " not allowed.");
-            }
-            return !found;
         }
 
         public boolean noParametersOf(Class<?>... types) {
@@ -492,44 +483,49 @@ public class Evaluator {
 
     @Restriction
     void cheatDetection() {
-        abortOn("Possible cheat detected", () -> check("Main.java", c -> 
-            c.nonAllowedImports("java.lang.reflect", "java.lang.invoke") |
-            c.accessOn("Solution", "System.exit")
-        ));
+        for (String file : EVALUATED_FILES) {
+            abortOn("Possible cheat detected", () -> check(file, c -> 
+                c.nonAllowedImports("java.lang.reflect", "java.lang.invoke") |
+                c.accessOn("Solution", "System.exit")
+            ));
+        }
     }
 
     @Restriction
     protected void conventions() {
-        System.out.println("Checking conventions ...");
         for (String file : EVALUATED_FILES) {
 
             if (CHECK_IMPORTS) penalize(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c ->
-                !c.select(ImportDeclaration.class)
-                  .filter(imp -> !ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
-                  .annotate(imp -> "Import of " + imp.getName() + " not allowed")
-                  .isEmpty()
+                c.select(ImportDeclaration.class)
+                 .filter(imp -> !ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
+                 .annotate(imp -> "Import of " + imp.getName() + " not allowed")
+                 .exists()
             ));
 
             if (!ALLOW_LOOPS) penalize(LOOP_PENALTY, "No loops", () -> check(file, c ->
-                !c.select(WhileStmt.class).annotate("while loop not allowed").isEmpty() |
-                !c.select(ForStmt.class).annotate("for loop not allowed").isEmpty() |
-                !c.select(ForeachStmt.class).annotate("for loop not allowed").isEmpty() |
-                !c.select(DoStmt.class).annotate("do while loop not allowed").isEmpty() 
+                c.select(WhileStmt.class).annotate("while loop not allowed").exists() |
+                c.select(ForStmt.class).annotate("for loop not allowed").exists() |
+                c.select(ForeachStmt.class).annotate("for loop not allowed").exists() |
+                c.select(DoStmt.class).annotate("do while loop not allowed").exists() |
+                c.select(MethodCallExpr.class).filter(m -> m.toString().contains(".forEach(")).annotate("forEach not allowed").exists()
             ));
 
             if (!ALLOW_LAMBDAS) penalize(LAMBDA_PENALITY, "No lambdas", () -> check(file, c ->
-                !c.select(LambdaExpr.class).annotate("lambda expressions not allowed").isEmpty()
+                c.select(LambdaExpr.class).annotate(l -> "lambda expression " + l + " not allowed").exists()
             ));
             
-            if (!ALLOW_GLOBAL_VARIABLES) degrading(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, 
-                c -> c.noDataFields()
+            if (!ALLOW_GLOBAL_VARIABLES) penalize(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, c ->
+                c.select(FieldDeclaration.class)
+                 .filter(field -> !(field.isStatic() && field.isFinal()))
+                 .annotate("No datafields allowed. Add the final static modifier to make it a constant value.")
+                 .exists()
             ));
 
             if (!ALLOW_INNER_CLASSES) penalize(INNER_CLASS_PENALTY, "No inner classes", () -> check(file, c -> 
-                !c.select(ClassOrInterfaceDeclaration.class)
-                  .select(ClassOrInterfaceDeclaration.class)
-                  .annotate("inner classes not allowed")
-                  .isEmpty()
+                c.select(ClassOrInterfaceDeclaration.class)
+                 .select(ClassOrInterfaceDeclaration.class)
+                 .annotate("Inner classes not allowed. So ugly.")
+                 .exists()
             ));
 
             if (CHECK_COLLECTION_INTERFACES) {
