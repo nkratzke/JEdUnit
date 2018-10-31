@@ -5,8 +5,6 @@
  */
 public class Solution {
 
-    public static int field = 42;
-
     /**
      * Just a demonstration method.
      * @param i Input parameter (is ignored)
