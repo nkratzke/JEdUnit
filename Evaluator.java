@@ -1,21 +1,35 @@
-import java.util.function.*;
-import java.util.stream.*;
-import java.util.*;
-import java.lang.reflect.*;
-import java.lang.annotation.*;
-import java.nio.file.*;
-import java.io.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Optional;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import com.github.javaparser.*;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.*;
-import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.body.ReceiverParameter;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.printer.lexicalpreservation.*;
 
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
@@ -79,6 +93,11 @@ public class Evaluator {
             return selected.filter(pred);
         }
 
+        /**
+         * Filters all nodes from the selected nodes that match a criteria.
+         * @param fulfills Predicate that expresses a selection criteria
+         * @return Reference to filtered nodes (for method chaining)
+         */
         public Selected<T> filter(Predicate<T> fullfills) {
             List<T> filtered = new LinkedList<>();
             for (T n : this.nodes) {
@@ -87,6 +106,23 @@ public class Evaluator {
             return new Selected<T>(filtered, this.file);
         }
 
+        /**
+         * Eliminates all nodes that occure more than once in the selected nodes.
+         * @return Reference to selected nodes (for method chaining)
+         */
+        public Selected<T> distinct() {
+            return new Selected<T>(
+                this.nodes.stream().distinct().collect(Collectors.toList()), 
+                this.file
+            );
+        }
+
+        /**
+         * Annotates each selected node with a message for VPL.
+         * Triggers a VPL comment for each node.
+         * @param msg Annotating remark
+         * @return Self reference (for method chaining)
+         */
         public Selected<T> annotate(String msg) {
             for(T node : this.nodes) {
                 comment(this.file, node.getRange(), msg);
@@ -94,6 +130,12 @@ public class Evaluator {
             return this;
         }
 
+        /**
+         * Annotates each selected node with a message for VPL.
+         * Triggers a VPL comment for each node.
+         * @param msg Lambda function to create a message for each selected node individually
+         * @return Self reference (for method chaining)
+         */
         public Selected<T> annotate(Function<T, String> msg) {
             for (T node  : this.nodes) {
                 comment(this.file, node.getRange(), msg.apply(node));
@@ -101,6 +143,13 @@ public class Evaluator {
             return this;
         }
 
+        /**
+         * Annotates each selected node matching a predicate with a message for VPL.
+         * Triggers a VPL comment for each matching node.
+         * @param msg Annotating remark
+         * @param pred Predicate used to select a subset of selected nodes for annotation
+         * @return Self reference (for method chaining)
+         */
         public Selected<T> annotate(String msg, Predicate<T> pred) {
             this.filter(pred).annotate(msg);
             return this;
@@ -149,91 +198,6 @@ public class Evaluator {
             return this.compilationUnit.toString().split("\n");
         }
 
-        public List<FieldDeclaration> getDataFields() {
-            return this.compilationUnit.findAll(FieldDeclaration.class);
-        }
-
-        public List<MethodDeclaration> getMethods() {
-            return this.compilationUnit.findAll(MethodDeclaration.class);
-        }
-
-        public List<ClassOrInterfaceDeclaration> getClasses() {
-            return this.compilationUnit.findAll(ClassOrInterfaceDeclaration.class);
-        }
-
-        public List<ImportDeclaration> getImports() {
-            return this.compilationUnit.findAll(ImportDeclaration.class);
-        }
-
-        public <T extends Expression> List<T> getExpressions(Class<T> expr) {
-            return this.compilationUnit.findAll(expr);
-        }
-
-        public boolean nonAllowedImports(String... libs) {
-            boolean found = false;
-            for (ImportDeclaration imp : this.getImports()) {
-                String lib = imp.getName().asString();
-                if (Stream.of(libs).noneMatch(l -> lib.startsWith(l))) continue;
-                comment(this.file, imp.getRange(), String.format("Import of '%s' not allowed.", lib));
-                found = true;
-            }
-            return found;
-        }
-
-        public boolean accessOn(String... entities) {
-            boolean found = false;
-            for (String entity : entities) {
-                Stream<MethodCallExpr> calls = this.getExpressions(MethodCallExpr.class).stream();
-                Stream<ObjectCreationExpr> creations = this.getExpressions(ObjectCreationExpr.class).stream();
-                Stream<FieldAccessExpr> access = this.getExpressions(FieldAccessExpr.class).stream();
-                found |= calls.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().contains(entity + "("))) |
-                         creations.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().startsWith("new " + entity + "("))) |
-                         access.anyMatch(e -> report(e, "Forbidden call", n -> n.toString().startsWith(entity)));
-            }
-            return found;
-        }
-
-        public boolean noParametersOf(Class<?>... types) {
-            boolean found = false;
-            for (com.github.javaparser.ast.body.Parameter p : this.compilationUnit.findAll(com.github.javaparser.ast.body.Parameter.class)) {
-                for (Class<?> type : types) {
-                    if (p.getType().asString().startsWith(type.getSimpleName())) {
-                        found = true;
-                        comment(this.file, p.getRange(), "Do not use " + type.getSimpleName() + " as a parameter type.");
-                    }
-                }
-            }
-            return !found;
-        }
-
-        public boolean noReturnTypesOf(Class<?>... types) {
-            boolean found = false;
-            for (MethodDeclaration m : this.getMethods()) {
-                String declaration = m.getDeclarationAsString(false, false);
-                for (Class<?> type : types) {
-                    if (declaration.startsWith(type.getSimpleName())) {
-                        found = true;
-                        comment(this.file, m.getRange(), "Do not use " + type.getSimpleName() + " as a return type.");
-                    }
-                }
-            }           
-            return !found;
-        }
-
-        /**
-        * Triggers a comment console output for VPL if a specified check condition mets.
-        * Marks file and position of the respective node if the condition mets.
-        * @param node Node to be marked
-        * @param msg Explaining comment to be added
-        * @param check Test to be performed on node
-        * @return true if check on node is evaluated to true (in this case the message is printed to console for further VPL processing)
-        *         false, if check on node evaluated to false (no message is printed in that case)
-        */
-        protected <T extends Node> boolean report(T node, String msg, Predicate<T> check) {
-            boolean valid = check.test(node);
-            if (valid) comment(this.file, node.getRange(), String.format("%s (%s)", msg, node));
-            return valid;
-        }
     }
 
     /**
@@ -266,22 +230,6 @@ public class Evaluator {
             } else comment("Check " + testcase + ": [FAILED] " + remark + " (0 of " + add + " points)");
         } catch (Exception ex) {
             comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (0 of " + add + " points)");
-        }
-    }
-
-    /**
-     * Deletes points (penalzing) if a check is not passed (unwishful behavior).
-     * A comment is only printed if the check was not successfull.
-     * @Deprecated (use penalize instead)
-     */
-    protected final void degrading(int del, String remark, Supplier<Boolean> check) {
-        try {
-            if (check.get()) return;
-            this.points -= del;
-            comment("[FAILED] " + remark + " (subtracted " + del + " points)");
-        } catch (Exception ex) {
-            this.points -= del;
-            comment("[FAILED due to " + ex + "] " + remark + " (subtracted " + del + " points)");
         }
     }
 
@@ -465,6 +413,10 @@ public class Evaluator {
 
     protected static int COLLECTION_INTERFACE_PENALTY = 25;
 
+    protected static boolean ALLOW_CONSOLE_OUTPUT = false;
+
+    protected static int CONSOLE_OUTPUT_PENALTY = 25;
+
     /**
      * This method is a hook for the Checks class to configure the evaluation.
      */
@@ -483,10 +435,29 @@ public class Evaluator {
 
     @Restriction
     void cheatDetection() {
+
+        List<String> imports = Arrays.asList("java.lang.reflect", "java.lang.invoke");
+        List<String> classes = Arrays.asList("Solution");
+        List<String> calls   = Arrays.asList("System.exit", "Solution.");
+
         for (String file : EVALUATED_FILES) {
-            abortOn("Possible cheat detected", () -> check(file, c -> 
-                c.nonAllowedImports("java.lang.reflect", "java.lang.invoke") |
-                c.accessOn("Solution", "System.exit")
+            abortOn("Possible cheat detected", () -> check(file, ast -> 
+                ast.select(ImportDeclaration.class)
+                   .filter(imp -> imports.stream().anyMatch(danger -> imp.getName().asString().startsWith(danger)))
+                   .annotate(imp -> "[CHEAT] Forbidden import: " + imp.getName())
+                   .exists() |
+                ast.select(MethodCallExpr.class)
+                   .filter(call -> calls.stream().anyMatch(danger -> call.toString().startsWith(danger)))
+                   .annotate(call -> "[CHEAT] Forbidden call: " + call)
+                   .exists() |
+                ast.select(ObjectCreationExpr.class)
+                   .filter(obj -> classes.stream().anyMatch(danger -> obj.toString().contains(danger)))
+                   .annotate(obj -> "[CHEAT] Forbidden object creation: " + obj)
+                   .exists() |
+                ast.select(FieldAccessExpr.class)
+                   .filter(field -> classes.stream().anyMatch(danger -> field.toString().startsWith(danger)))
+                   .annotate(field -> "[CHEAT] Forbidden field access: " + field)
+                   .exists()
             ));
         }
     }
@@ -495,45 +466,66 @@ public class Evaluator {
     protected void conventions() {
         for (String file : EVALUATED_FILES) {
 
-            if (CHECK_IMPORTS) penalize(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, c ->
-                c.select(ImportDeclaration.class)
-                 .filter(imp -> !ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
-                 .annotate(imp -> "Import of " + imp.getName() + " not allowed")
-                 .exists()
+            if (CHECK_IMPORTS) penalize(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, ast ->
+                ast.select(ImportDeclaration.class)
+                   .filter(imp -> !ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
+                   .annotate(imp -> "Import of " + imp.getName() + " not allowed")
+                   .exists()
             ));
 
-            if (!ALLOW_LOOPS) penalize(LOOP_PENALTY, "No loops", () -> check(file, c ->
-                c.select(WhileStmt.class).annotate("while loop not allowed").exists() |
-                c.select(ForStmt.class).annotate("for loop not allowed").exists() |
-                c.select(ForeachStmt.class).annotate("for loop not allowed").exists() |
-                c.select(DoStmt.class).annotate("do while loop not allowed").exists() |
-                c.select(MethodCallExpr.class).filter(m -> m.toString().contains(".forEach(")).annotate("forEach not allowed").exists()
+            if (!ALLOW_LOOPS) penalize(LOOP_PENALTY, "No loops", () -> check(file, ast ->
+                ast.select(WhileStmt.class).annotate("while loop not allowed").exists() |
+                ast.select(ForStmt.class).annotate("for loop not allowed").exists() |
+                ast.select(ForeachStmt.class).annotate("for loop not allowed").exists() |
+                ast.select(DoStmt.class).annotate("do while loop not allowed").exists() |
+                ast.select(MethodCallExpr.class).filter(m -> m.toString().contains(".forEach(")).annotate("forEach not allowed").exists()
             ));
 
-            if (!ALLOW_LAMBDAS) penalize(LAMBDA_PENALITY, "No lambdas", () -> check(file, c ->
-                c.select(LambdaExpr.class).annotate(l -> "lambda expression " + l + " not allowed").exists()
+            if (!ALLOW_LAMBDAS) penalize(LAMBDA_PENALITY, "No lambdas", () -> check(file, ast ->
+                ast.select(LambdaExpr.class).annotate(l -> "lambda expression " + l + " not allowed").exists()
             ));
             
-            if (!ALLOW_GLOBAL_VARIABLES) penalize(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, c ->
-                c.select(FieldDeclaration.class)
-                 .filter(field -> !(field.isStatic() && field.isFinal()))
-                 .annotate("No datafields allowed. Add the final static modifier to make it a constant value.")
-                 .exists()
+            if (!ALLOW_GLOBAL_VARIABLES) penalize(GLOBAL_VARIABLE_PENALTY, "No global variables", () -> check(file, ast ->
+                ast.select(FieldDeclaration.class)
+                   .filter(field -> !(field.isStatic() && field.isFinal()))
+                   .annotate("No datafields allowed. Add the final static modifier to make it a constant value.")
+                   .exists()
             ));
 
-            if (!ALLOW_INNER_CLASSES) penalize(INNER_CLASS_PENALTY, "No inner classes", () -> check(file, c -> 
-                c.select(ClassOrInterfaceDeclaration.class)
-                 .select(ClassOrInterfaceDeclaration.class)
-                 .annotate("Inner classes not allowed. So ugly.")
-                 .exists()
+            if (!ALLOW_INNER_CLASSES) penalize(INNER_CLASS_PENALTY, "No inner classes", () -> check(file, ast -> 
+                ast.select(ClassOrInterfaceDeclaration.class)
+                   .select(ClassOrInterfaceDeclaration.class)
+                   .distinct()
+                   .annotate("Inner classes not allowed. So ugly.")
+                   .exists()
+            ));
+
+            if (!ALLOW_CONSOLE_OUTPUT) penalize(CONSOLE_OUTPUT_PENALTY, "No console output in methods (except main)", () -> check(file, ast ->
+                ast.select(MethodDeclaration.class)
+                   .filter(m -> !m.getDeclarationAsString(false, false, false).equals("void main(String[])"))
+                   .select(MethodCallExpr.class, expr -> expr.toString().startsWith("System.out.print"))
+                   .annotate(call -> "Console output not allowed here")
+                   .exists()
             ));
 
             if (CHECK_COLLECTION_INTERFACES) {
-                Class[] notAllowedCollectionImplementations = { HashMap.class, TreeMap.class, HashSet.class, LinkedList.class, ArrayList.class };
-                degrading(COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces.", () -> 
-                    check(file, c -> c.noParametersOf(notAllowedCollectionImplementations)) &
-                    check(file, c -> c.noReturnTypesOf(notAllowedCollectionImplementations))
-                );    
+                List<Class> collections = Arrays.asList(
+                    HashMap.class, TreeMap.class, HashSet.class, LinkedList.class, ArrayList.class
+                );
+
+                penalize(COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for return types", () -> check(file, ast ->
+                    ast.select(MethodDeclaration.class)
+                       .filter(m -> collections.stream().anyMatch(type -> m.getType().asString().startsWith(type.getSimpleName())))
+                       .annotate(m -> "Do not use " + m.getType() + " as return type")
+                       .exists()
+                ));
+
+                penalize(COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for parameters", () -> check(file, ast ->
+                    ast.select(Parameter.class)
+                       .filter(param -> collections.stream().anyMatch(type -> param.getType().asString().startsWith(type.getSimpleName())))
+                       .annotate(p -> "Do not use " + p.getType() + " as parameter type")
+                       .exists()
+                ));
             }
         }
     }
