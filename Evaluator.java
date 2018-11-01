@@ -44,6 +44,11 @@ import com.github.javaparser.ast.expr.*;
 public class Evaluator {
 
     /**
+     * Version (Semantic Versioning).
+     */
+    public static final String VERSION = "0.1.6";
+
+    /**
      * Restriction annotation.
      */
     @Retention(RetentionPolicy.RUNTIME)
@@ -168,15 +173,14 @@ public class Evaluator {
     /**
      * Wrapper class for a JavaParser CompilationUnit
      * with plenty of convenience methods.
-     * TO BE DONE.
      */
-    class Parser {
+    class SyntaxTree {
 
         private String file;
 
         private CompilationUnit compilationUnit;
 
-        Parser(String f) throws FileNotFoundException {
+        SyntaxTree(String f) throws FileNotFoundException {
             this.file = f;
             this.compilationUnit = Evaluator.CACHE.getOrDefault(
                 this.file, 
@@ -265,16 +269,16 @@ public class Evaluator {
         }
     }
 
-    protected final Parser parse(String file) throws FileNotFoundException {
-        return new Parser(file);
+    protected final SyntaxTree parse(String file) throws FileNotFoundException {
+        return new SyntaxTree(file);
     }
 
     /**
      * Can be used to formulate arbitrary checks on parsed source code.
      */
-    protected final boolean check(String file, Predicate<Parser> test) {
+    protected final boolean check(String file, Predicate<SyntaxTree> test) {
         try {
-            return test.test(new Parser(file));
+            return test.test(new SyntaxTree(file));
         } catch (Exception ex) {
             comment("Check failed: " + ex);
             comment("Is there a syntax error in your submission? " + file);
@@ -318,6 +322,13 @@ public class Evaluator {
         System.out.println("Grade :=>> " + report);
     }
 
+    /**
+     * Reports the current points to VPL via console output (truncated to [0, 100]).
+     */
+    public void grade() {
+        this.grade(this.points);
+    }
+
     private List<Method> allMethodsOf(Class<?> clazz) {
         if (clazz == null) return new LinkedList<>();
         List<Method> methods = allMethodsOf(clazz.getSuperclass());
@@ -337,8 +348,6 @@ public class Evaluator {
                 comment("");
             } catch (Exception ex) {
                 comment("Test case " + test.getName() + " failed completely." + ex);
-            } finally {
-                grade(points);
             }
         }
     }
@@ -348,6 +357,7 @@ public class Evaluator {
      */
     protected final void checkstyle() {
         try {
+            comment("Checkstyle");
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
                 String result = in.nextLine();
@@ -356,14 +366,13 @@ public class Evaluator {
                     if (Evaluator.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
 
                     String msg = result.substring(result.indexOf(file));
-                    comment("[CHECKSTYLE]: " + msg);
+                    comment(msg);
                     this.points -= Evaluator.CHECKSTYLE_PENALTY;
                 }
             }
             in.close();
-            comment("");
-            comment("[CHECKSTYLE] Result: " + this.points + " points");
-            comment("");
+            if (this.points >= 0) comment("Everything fine");
+            if (this.points < 0) comment("[CHECKSTYLE] Found violations: (" + this.points + " points)");
         } catch (Exception ex) {
             comment("You are so lucky! We had problems processing the checkstyle.log.");
             comment("This was due to: " + ex);
@@ -372,26 +381,42 @@ public class Evaluator {
 
     /**
      * List of Checkstyle checks that are ignored for evaluation.
-     * This list is set in the configure method().
+     * This list can be adapted in the configure method().
      */
-    protected static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>();
+    protected static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>(); { 
+        CHECKSTYLE_IGNORES.addAll(Arrays.asList(
+            "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
+            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", 
+            "[NeedBraces]", "[MagicNumber]"
+        ));
+    }
 
     /**
      * List of file names that shall be considered by checkstyle and evaluation.
-     * This list is set in the configure method().
+     * This list is set in the configure method() and might be adpated by
+     * the assignments Checks class.
      */
-    protected static List<String> EVALUATED_FILES = new LinkedList<String>();
+    protected static List<String> EVALUATED_FILES = Arrays.asList("Main.java");
 
     /**
      * Downgrade for every found checkstyle error.
      */
     protected static int CHECKSTYLE_PENALTY = 5;
 
+    /**
+     * The convention is to check imports (whitelist of libraries).
+     */
     protected static boolean CHECK_IMPORTS = true;
 
-    protected static List<String> ALLOWED_IMPORTS = new LinkedList<String>();
+    protected static List<String> ALLOWED_IMPORTS = Arrays.asList("java.util");
 
     protected static int IMPORT_PENALTY = 25;
+
+    /**
+     * The following imports are never allowed, because they could be used
+     * to do arbitrary harm (like to mask point injection attacks).
+     */
+    protected static List<String> CHEAT_IMPORTS = Arrays.asList("java.lang.reflect", "java.lang.invoke");
 
     protected static boolean ALLOW_LOOPS = true;
 
@@ -421,29 +446,19 @@ public class Evaluator {
      * This method is a hook for the Checks class to configure the evaluation.
      */
     protected void configure() {
-        Evaluator.CHECKSTYLE_IGNORES.addAll(Arrays.asList(
-            "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
-            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", "[NeedBraces]",
-            "[MagicNumber]"
-        ));
-
-        Evaluator.EVALUATED_FILES.add("Main.java");
-
-        Evaluator.ALLOWED_IMPORTS.add("java.util");
-        Evaluator.ALLOWED_IMPORTS.add("java.io");
     }
 
     @Restriction
     void cheatDetection() {
+        comment("Running pre-checks on " + EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
 
-        List<String> imports = Arrays.asList("java.lang.reflect", "java.lang.invoke");
         List<String> classes = Arrays.asList("Solution");
         List<String> calls   = Arrays.asList("System.exit", "Solution.");
 
         for (String file : EVALUATED_FILES) {
             abortOn("Possible cheat detected", () -> check(file, ast -> 
                 ast.select(ImportDeclaration.class)
-                   .filter(imp -> imports.stream().anyMatch(danger -> imp.getName().asString().startsWith(danger)))
+                   .filter(imp -> CHEAT_IMPORTS.stream().anyMatch(danger -> imp.getName().asString().startsWith(danger)))
                    .annotate(imp -> "[CHEAT] Forbidden import: " + imp.getName())
                    .exists() |
                 ast.select(MethodCallExpr.class)
@@ -460,10 +475,12 @@ public class Evaluator {
                    .exists()
             ));
         }
+        comment("Everything fine");
     }
 
     @Restriction
     protected void conventions() {
+        comment("Checking coding restrictions for " + EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
         for (String file : EVALUATED_FILES) {
 
             if (CHECK_IMPORTS) penalize(IMPORT_PENALTY, "Non allowed libraries", () -> check(file, ast ->
@@ -535,10 +552,14 @@ public class Evaluator {
      */
     public static final void main(String[] args) {
         Checks check = new Checks();
+        check.comment("JEdUnit " + Evaluator.VERSION);
+        check.comment("");
         check.configure();
         check.checkstyle();
+        check.comment("");
         check.process(Restriction.class); // process restriction checks
         check.process(Check.class);       // process functional tests
+        check.grade();
         check.comment("Finished");
     }
 }
