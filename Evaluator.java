@@ -46,14 +46,14 @@ public class Evaluator {
     /**
      * Version (Semantic Versioning).
      */
-    public static final String VERSION = "0.1.6";
+    public static final String VERSION = "0.1.7";
 
     /**
      * Restriction annotation.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    @interface Restriction { }
+    @interface Constraint { }
 
     /**
      * Check annotation.
@@ -341,15 +341,17 @@ public class Evaluator {
      * @param annotation Annotation, one of [@Restriction, @Check]
      */
     protected final void process(Class<? extends Annotation> annotation) {
-        for (Method test : allMethodsOf(this.getClass())) {
-            if (!test.isAnnotationPresent(annotation)) continue;
-            try {
-                test.invoke(this);
-                comment("");
-            } catch (Exception ex) {
-                comment("Test case " + test.getName() + " failed completely." + ex);
-            }
-        }
+        allMethodsOf(this.getClass())
+            .stream()
+            .filter(method -> method.isAnnotationPresent(annotation))
+            .forEach(method -> {
+                try {
+                    method.invoke(this);
+                    comment("");
+                } catch (Exception ex) {
+                    comment("Test method " + method.getName() + " failed completely." + ex);
+                }    
+            });
     }
 
     /**
@@ -448,7 +450,7 @@ public class Evaluator {
     protected void configure() {
     }
 
-    @Restriction
+    @Constraint
     void cheatDetection() {
         comment("Running pre-checks on " + EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
 
@@ -478,7 +480,7 @@ public class Evaluator {
         comment("Everything fine");
     }
 
-    @Restriction
+    @Constraint
     protected void conventions() {
         comment("Checking coding restrictions for " + EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
         for (String file : EVALUATED_FILES) {
@@ -557,8 +559,8 @@ public class Evaluator {
         check.configure();
         check.checkstyle();
         check.comment("");
-        check.process(Restriction.class); // process restriction checks
-        check.process(Check.class);       // process functional tests
+        check.process(Constraint.class); // process restriction checks
+        check.process(Check.class);      // process functional tests
         check.grade();
         check.comment("Finished");
     }
