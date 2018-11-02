@@ -1,6 +1,7 @@
-package de.thl.jedunit;
-
 import java.util.Arrays;
+
+import de.thl.jedunit.Check;
+import de.thl.jedunit.Constraints;
 
 /**
  * Please add your test cases for evaluation here.
@@ -11,7 +12,7 @@ import java.util.Arrays;
  * - All methods that start with "test" will be executed automatically.
  * - If this sounds similar to unit testing - this is intended ;-)
  */
-class Checks extends Constraints {
+public class Checks extends Constraints {
 
     @Override
     protected void configure() {

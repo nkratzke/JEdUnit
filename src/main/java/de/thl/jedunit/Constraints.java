@@ -30,7 +30,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
  * @author Nane Kratzke
  * 
  */
-class Constraints extends Evaluator {
+public class Constraints extends Evaluator {
 
     /**
      * The convention is to check imports (whitelist of libraries).

@@ -29,7 +29,7 @@ public class Evaluator {
     /**
      * Version (Semantic Versioning).
      */
-    public static final String VERSION = "0.1.7";
+    public static final String VERSION = "0.1.8";
 
     /**
      * The maximum points for a VPL assignment.
@@ -248,15 +248,19 @@ public class Evaluator {
      * @param args Command line parameters (not evaluated)
      */
     public static final void main(String[] args) {
-        Checks check = new Checks();
-        comment("JEdUnit " + Evaluator.VERSION);
-        comment("");
-        check.configure();
-        check.checkstyle();
-        comment("");
-        check.process(Constraint.class); // process restriction checks
-        check.process(Check.class);      // process functional tests
-        check.grade();
-        comment(String.format("Finished: %d points", check.getPoints()));
+        try {
+            Constraints check = (Constraints)Class.forName("Checks").getDeclaredConstructor().newInstance();
+            comment("JEdUnit " + Evaluator.VERSION);
+            comment("");
+            check.configure();
+            check.checkstyle();
+            comment("");
+            check.process(Constraint.class); // process restriction checks
+            check.process(Check.class);      // process functional tests
+            check.grade();
+            comment(String.format("Finished: %d points", check.getPoints()));
+        } catch (Exception ex) {
+            comment("Severe error: " + ex);
+        }
     }
 }
