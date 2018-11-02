@@ -249,14 +249,14 @@ public class Evaluator {
      */
     public static final void main(String[] args) {
         Checks check = new Checks();
-        Evaluator.comment("JEdUnit " + Evaluator.VERSION);
-        Evaluator.comment("");
+        comment("JEdUnit " + Evaluator.VERSION);
+        comment("");
         check.configure();
         check.checkstyle();
-        Evaluator.comment("");
+        comment("");
         check.process(Constraint.class); // process restriction checks
         check.process(Check.class);      // process functional tests
         check.grade();
-        Evaluator.comment(String.format("Finished: %d points", check.getPoints()));
+        comment(String.format("Finished: %d points", check.getPoints()));
     }
 }
