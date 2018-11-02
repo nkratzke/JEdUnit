@@ -1,4 +1,4 @@
-# Java Test Template for VPL
+# JEdUnit
 
 This is a basic test template to simplify automatic evaluation of (small) __Java__ programming assignments
 using [Moodle](https://moodle.org/) and [VPL](http://vpl.dis.ulpgc.es/) for programming instructors.

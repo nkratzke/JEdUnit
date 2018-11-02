@@ -10,7 +10,10 @@ plugins {
     id 'java-library'
 }
 
-version = '0.1.8'
+// version = 'latest'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
     api 'com.github.javaparser:javaparser-core:3.7.+'
@@ -25,7 +28,8 @@ jar {
     manifest {
         attributes(
             'Implementation-Title': project.name,
-            'Implementation-Version': project.version
+            'Implementation-Version': project.version,
+            'Main-Class': 'de.thl.jedunit.Init'
         )
     }
     from {

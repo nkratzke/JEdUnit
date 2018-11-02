@@ -13,6 +13,6 @@ class Main {
      * @param args Command line parameters (not evaluated)
      */
     public static void main(String[] args) {
-        System.out.println(Solution.wellBraced("))(("));
+        System.out.println("Your solution is missing here.");
     }
 }

@@ -244,8 +244,7 @@ public class Evaluator {
     }
 
     /**
-     * The main method calls the evaluation.
-     * @param args Command line parameters (not evaluated)
+     * Runs the evaluation.
      */
     public static final void main(String[] args) {
         try {

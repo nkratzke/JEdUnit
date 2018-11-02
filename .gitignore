@@ -1,8 +1,11 @@
 .gradle
 
 /bin/
-/build/
-!/build/libs/*.jar
+/build/classes/
+/build/reports/
+/build/resources/
+/build/test-results/
+/build/tmp/
 
 # Ignore Gradle GUI config
 gradle-app.setting
