@@ -1,14 +1,6 @@
-import java.io.FileNotFoundException;
+package de.thl.jedunit;
+
 import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import com.github.javaparser.ast.body.CallableDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.CompilationUnit;
 
 /**
  * Please add your test cases for evaluation here.
@@ -19,14 +11,14 @@ import com.github.javaparser.ast.CompilationUnit;
  * - All methods that start with "test" will be executed automatically.
  * - If this sounds similar to unit testing - this is intended ;-)
  */
-class Checks extends Evaluator {
+class Checks extends Constraints {
 
     @Override
     protected void configure() {
         super.configure();
-        Evaluator.ALLOWED_IMPORTS = Arrays.asList("java.util");
-        Evaluator.ALLOW_LOOPS = false;
-        Evaluator.ALLOW_LAMBDAS = false;
+        Constraints.ALLOWED_IMPORTS = Arrays.asList("java.util");
+        Constraints.ALLOW_LOOPS = false;
+        Constraints.ALLOW_LAMBDAS = false;
     }
 
     @Check
