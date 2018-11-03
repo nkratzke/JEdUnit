@@ -1,6 +1,3 @@
 #! /bin/bash 
-rm *.class
-rm *.jar
-rm vpl_execution LICENSE readme.md
-rm -rf .git
-rm .gitignore
+rm -f *.class
+rm -f vpl_execution
