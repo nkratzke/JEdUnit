@@ -18,6 +18,11 @@ public class Init {
     };
 
     public static void main(String[] args) {
+
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+
         for (String resource : RESOURCES) {
             try {
                 System.out.println("Preparing " + resource);
