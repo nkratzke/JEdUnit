@@ -40,7 +40,7 @@ Then
     - _`style_checks.xml` is a [checkstyle](http://checkstyle.sourceforge.net/index.html) file that is used to enforce coding standards. In most cases you do not need to touch this file._
     - _`vpl_run.sh` is the VPL run script that compiles and executes the `Main.java`. In most cases you do not need to touch this file._
     - _`vpl_evaluate.sh` is the VPL evaluate script that checks style, and compiles all Java files. Furthermore, it launches `Checks.java` to evaluate the student submission. In most cases you do not need to touch this file._
-3. Select __to be keeped files__ `Checks.java`, `Solution.java` via the Moodle web interface (otherwise these files will be deleted by the VPL jail server and your evaluation will not work).
+3. Select __to be keeped files__ `Checks.java`, `Solution.java`, and `style_checks.xml` via the Moodle web interface (otherwise these files will be deleted by the VPL jail server and your evaluation will not work).
 
 ### Writing an assignment
 
@@ -86,7 +86,7 @@ But is the solution correct, and how to check this automatically for grading?
 
 ### Writing checks for automatic evaluation of an assignment
 
-To write checks one simply has to take the [Checks](Checks.java) class as a template
+To write checks one simply has to take the `Checks.java` class as a template
 
 ```Java
 /**
