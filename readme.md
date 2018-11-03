@@ -98,7 +98,9 @@ To write checks one simply has to take the [Checks](Checks.java) class as a temp
  * - All methods that start with "test" will be executed automatically.
  * - If this sounds similar to unit testing - this is intended ;-)
  */
-class Checks extends Evaluator {
+class Checks extends Constraints {
+
+    @Check
     public void testSubmissions() {
         // Please add your checks and grading points here
         grading(10, "This will always fail.", () -> "hello".equals("Hello"));
@@ -109,14 +111,16 @@ class Checks extends Evaluator {
 and extend it with assignment specific checks and grading points. This could be done like this:
 
 ```Java
-class Checks extends Evaluator {
+class Checks extends Constraints {
 
+    @Check
     public void testExampleCases() {
         // You can give less points for provided example cases
         grading(5, "Counting 'o' in 'Hello World' must return 2.", () -> Main.countChars('o', "Hello World") == 2);
         grading(5, "Counting 'w' in 'Hello World' must return 2.", () -> Main.countChars('w', "Hello World") == 1);
     }
 
+    @Check
     public void testAdditionalCases() {
         // You can give more points for additional checks
         grading(10, "Counting 'x' in 'xxx' must return 3.", () -> Main.countChars('x', "xxx") == 3);
@@ -131,6 +135,7 @@ class Checks extends Evaluator {
         grading(5, "Counting 'Y' in 'X' must return 0.", () -> Main.countChars('Y', "X") == 0);
     }
 
+    @Check
     public void testBoundaryCases() {
         // You can give more points for problem sensibilizing checks
         grading(15, "Counting chars in an empty string must return 0.", () -> Main.countChars('x', "") == 0);
@@ -149,7 +154,7 @@ As you see, the `grading()` command is essential here. It takes the following pa
 - __remark__ (`String`) that will be printed in comments. A remark should describe the testcase in a meaningful but short way.
 - __check__ (`Supplier<Boolean>`) that will be executed. If evaluated to `true` points will be added, otherwise no points will be added.
 
-A VPL evaluation (triggered via the [vpl_evaluate.sh](vpl_evaluate.sh) script) will generate the following console output
+A VPL evaluation (triggered via the `vpl_evaluate.sh` script) will generate the following console output
 
 ```
 Comment :=>> Check 1: Counting 'o' in 'Hello World' must return 2. [OK] (5 points)

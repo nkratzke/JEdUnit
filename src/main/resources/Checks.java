@@ -23,17 +23,17 @@ public class Checks extends Constraints {
     }
 
     @Check
-    void examples() {
+    public void examples() {
         comment("Provided example calls");
     }
 
     @Check
-    void futherTestcases() {
+    public void futherTestcases() {
         comment("Boundary testcases (unknown test cases)");
     }
 
     @Check
-    void randomizedTestcases() {
+    public void randomizedTestcases() {
         comment("Randomized testcases");
     }
 }
