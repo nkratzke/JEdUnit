@@ -1,20 +1,18 @@
 # JEdUnit
 
-This is a basic test template to simplify automatic evaluation of (small) __Java__ programming assignments
-using [Moodle](https://moodle.org/) and [VPL](http://vpl.dis.ulpgc.es/) for programming instructors.
+This is a basic evaluation framework to simplify automatic evaluation of (small) __Java__ programming assignments
+using [Moodle](https://moodle.org/) and [VPL](http://vpl.dis.ulpgc.es/).
 
 Sadly, in some configurations
 necessary unit testing librarieres do work not frictionless with VPLs Jail server concept although they would be more than useful for
-automatic grading. That is why we provide a template that make use of the pure Java standard library only.
-There is no need to modify classpaths or to import additional libraries and JAR files.
+automatic grading. Therefore, we developed a framework mainly for our own purposes at the Lübeck University of Applied Sciences.
+However, this framework might be helpful for other programming instructors and that is why this framework is provided as open source.
 
 ## Intended audience
 
-This VPL template is written for programming instructors and teachers at schools, colleges, universities or further
-programming training facilities that want to automatically evaluate and grade (small)
+This VPL evaluation framework is written for programming instructors and teachers at schools, colleges, universities or further
+programming training facilities that want (or need) to automatically evaluate and grade (small)
 Java programming assignments typically at a "freshman" (1st/2nd semester) level.
-
-It might be not feasible for larger and more complex programming assignents.
 
 ## Usage
 
@@ -179,3 +177,22 @@ In this example case our student would have passed
 - and got 80 of 100 points.
 
 Thats all the magic, basically.
+
+## More features
+
+However, there are more features that will be explained in the Wiki (TO BE DONE).
+According to our experiences students tend to make use of the following kind of "cheats".
+
+- __Overfitting__ (e.g. to map simply the test values to expected results, outside the scope of the test values the solution is useless)
+- __Problem evasion__ (e.g. to solve a problem using loops instead of to solve it recursively)
+- __Redirection__ (e.g. to call the reference solution instead of implement it on their own)
+- __Injection__ (e.g. to write `System.out.println("Grade :=>> 100"); System.exit(0);` to get full points and prevent VPL to check the submission)
+
+So, and in addition to "normal" unit testing frameworks JEdUnit provides several addons to handle these
+special kinds of educational specifics that are hardly covered by current testing frameworks.
+
+- Checkstyle integration to foster "readable" code.
+- Parser integration and an easy to use selector model (comparable to CSS selectors for a DOM-tree) that enables to formulate
+- checks to detect the import of non allowed libraries,
+- checks to detect the use of non allowed programming constructs like loops, methods, lambda functions, and so on
+- checks to detect the import of non allowed reflection libraries or method calls that enable "Injection" attacks or the redirection to reference solutions
