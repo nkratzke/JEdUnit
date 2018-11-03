@@ -34,11 +34,11 @@ curl https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.s
 Then
 
 1. Import the following __requested files__ `Main.java` via the Moodle web interface from this repository as __starting point for your students__.
-2. Import the following __execution files__ `Checks.java`, `Solution.java`, and `vpl_evaluate.sh`, `vpl_run.sh` via the Moodle web interface from this repository.
+2. Import the following __execution files__ `Checks.java`, `Solution.java`, `vpl_evaluate.sh`, and `vpl_run.sh` via the Moodle web interface from this directory.
     - `Solution.java` is where you should place your reference solution.
     - `Checks.java` is where you place your grading test cases.
-    - _`vpl_run.sh` is the VPL run script that compiles and executes the [Main.java](Main.java). In most cases you do not need to touch this file._
-    - _`vpl_evaluate.sh` is the VPL evaluate script that compiles and executes all Java files and launches [Checks.java](Checks.java) to evaluate the student submission. In most cases you do not need to touch this file._
+    - _`vpl_run.sh` is the VPL run script that compiles and executes the `Main.java`. In most cases you do not need to touch this file._
+    - _`vpl_evaluate.sh` is the VPL evaluate script that compiles and executes all Java files and launches `Checks.java` to evaluate the student submission. In most cases you do not need to touch this file._
 3. Select __to be keeped files__ `Checks.java`, `Solution.java` via the Moodle web interface (otherwise these files will be deleted by the VPL jail server and your evaluation will not work).
 
 ### Writing an assignment
