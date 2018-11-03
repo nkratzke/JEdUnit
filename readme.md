@@ -24,13 +24,11 @@ Furthermore, we recommend to study at least the following VPL related documentat
 
 ### Basic configuration
 
-To make use of this template the following workflow is recommended to set up a basic configuration for a new programming assignment.
-First of all, clone this repository to your local machine.
+To make use of this framework, the following workflow is recommended to set up a basic configuration for a new programming assignment.
+First of all, initialize a directory on your local machine.
 
 ```
-git clone https://github.com/nkratzke/VPL-java-template.git
-cd VPL-java-template
-clean.sh
+curl https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh | sh
 ```
 
 Then
