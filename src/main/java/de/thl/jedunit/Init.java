@@ -1,23 +1,24 @@
 package de.thl.jedunit;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Scanner;
-import java.io.*;
 
 public class Init {
 
-    public static void main(String[] args) {
-        List<String> resources = Arrays.asList(
-            "style_checks.xml",
-            "vpl_evaluate.sh",
-            "vpl_run.sh",
-            "Main.java",
-            "Solution.java",
-            "Checks.java"
-        );
+    public static final String[] RESOURCES = {
+        "style_checks.xml",
+        "vpl_evaluate.sh",
+        "vpl_run.sh",
+        "clean.sh",
+        "Main.java",
+        "Solution.java",
+        "Checks.java"
+    };
 
-        for (String resource : resources) {
+    public static void main(String[] args) {
+        for (String resource : RESOURCES) {
             try {
                 System.out.println("Preparing " + resource);
                 Scanner read = new Scanner(Init.class.getResourceAsStream("/" + resource));
