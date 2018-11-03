@@ -5,13 +5,12 @@
  */
 public class Solution {
 
-    /**
-     * Just a demonstration method.
-     * @param i Input parameter (is ignored)
-     * @return 42 because this is the ultimate answer
-     */
-    public static int test(int i) { 
-        return 42; 
+    public static int countChars(char c, String s) {
+        int n = 0;
+        for (char x : s.toLowerCase().toCharArray()) {
+            if (x == Character.toLowerCase(c)) n++;
+        }
+        return n;
     }
 
 }

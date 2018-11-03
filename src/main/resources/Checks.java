@@ -17,7 +17,8 @@ public class Checks extends Constraints {
     @Override
     protected void configure() {
         super.configure();
-        Constraints.ALLOWED_IMPORTS = Arrays.asList("java.util");
+
+        // Constraints.ALLOWED_IMPORTS = Arrays.asList("java.util");
 
         // Constraints.ALLOW_LOOPS = false;                 // default: true
         // Constraints.LOOP_PENALTY = 100;
@@ -41,10 +42,16 @@ public class Checks extends Constraints {
     @Check
     public void examples() {
         comment("Provided example calls");
+        grading(5, "Counting 'o' in 'Hello World' must return 2.", 
+            () -> Main.countChars('o', "Hello World") == Solution.countChars('o', "Hello World")
+        );
+        grading(5, "Counting 'w' in 'Hello World' must return 2.", 
+            () -> Main.countChars('w', "Hello World") == Solution.countChars('w', "Hello World")
+        );
     }
 
     @Check
-    public void futherTestcases() {
+    public void furtherTestcases() {
         comment("Boundary testcases (unknown test cases)");
     }
 

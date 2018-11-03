@@ -8,11 +8,16 @@
  */
 class Main {
 
+    public static int countChars(char c, String s) {
+        return -1;
+    }
+
     /**
      * Here is where everything starts.
      * @param args Command line parameters (not evaluated)
      */
     public static void main(String[] args) {
-        System.out.println("Your solution is missing here.");
+        System.out.println(countChars('o', "Hello World")); // => 2
+        System.out.println(countChars('w', "Hello World")); // => 1
     }
 }
