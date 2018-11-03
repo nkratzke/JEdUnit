@@ -18,8 +18,24 @@ public class Checks extends Constraints {
     protected void configure() {
         super.configure();
         Constraints.ALLOWED_IMPORTS = Arrays.asList("java.util");
-        Constraints.ALLOW_LOOPS = false;
-        Constraints.ALLOW_LAMBDAS = false;
+
+        // Constraints.ALLOW_LOOPS = false;                 // default: true
+        // Constraints.LOOP_PENALTY = 100;
+    
+        // Constraints.ALLOW_LAMBDAS = false;               // default: true
+        // Constraints.LAMBDA_PENALITY = 25;
+    
+        // Constraints.ALLOW_INNER_CLASSES = true;          // default: false
+        // Constraints.INNER_CLASS_PENALTY = 100;
+    
+        // Constrainst.ALLOW_GLOBAL_VARIABLES = true;       // default: false
+        // Constraints.GLOBAL_VARIABLE_PENALTY = 25;
+    
+        // Constraints.CHECK_COLLECTION_INTERFACES = false; // default: true
+        // COLLECTION_INTERFACE_PENALTY = 25;
+    
+        // Constraints.ALLOW_CONSOLE_OUTPUT = true;         // default: false
+        // Constraints.CONSOLE_OUTPUT_PENALTY = 25;
     }
 
     @Check
