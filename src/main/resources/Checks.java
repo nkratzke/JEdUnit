@@ -45,7 +45,7 @@ public class Checks extends Constraints {
         grading(5, "Counting 'o' in \"Hello World\" must return 2.", 
             () -> Main.countChars('o', "Hello World") == Solution.countChars('o', "Hello World")
         );
-        grading(5, "Counting 'w' in 'Hello World' must return 2.", 
+        grading(5, "Counting 'w' in \"Hello World\" must return 2.", 
             () -> Main.countChars('w', "Hello World") == Solution.countChars('w', "Hello World")
         );
     }
