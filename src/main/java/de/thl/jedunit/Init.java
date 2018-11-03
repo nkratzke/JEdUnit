@@ -25,7 +25,7 @@ public class Init {
                 File f = new File(resource);
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));
                 while (read.hasNextLine()) {
-                    writer.write(read.nextLine() + " \n");
+                    writer.write(read.nextLine() + "\n");
                 }
                 read.close();
                 writer.close();
