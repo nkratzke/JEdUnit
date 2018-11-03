@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 
-public class Init {
+public class CLI {
 
     public static final String[] RESOURCES = {
         "style_checks.xml",
@@ -18,15 +18,10 @@ public class Init {
     };
 
     public static void main(String[] args) {
-
-        for (String arg : args) {
-            System.out.println(arg);
-        }
-
         for (String resource : RESOURCES) {
             try {
                 System.out.println("Preparing " + resource);
-                Scanner read = new Scanner(Init.class.getResourceAsStream("/" + resource));
+                Scanner read = new Scanner(CLI.class.getResourceAsStream("/" + resource));
                 File f = new File(resource);
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));
                 while (read.hasNextLine()) {

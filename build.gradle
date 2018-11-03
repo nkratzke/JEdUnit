@@ -29,7 +29,7 @@ jar {
         attributes(
             'Implementation-Title': project.name,
             'Implementation-Version': project.version,
-            'Main-Class': 'de.thl.jedunit.Init'
+            'Main-Class': 'de.thl.jedunit.CLI'
         )
     }
     from {
