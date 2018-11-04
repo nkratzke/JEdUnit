@@ -8,11 +8,13 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.javaparser.Range;
+import com.mifmif.common.regex.Generex;
 
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
@@ -29,7 +31,7 @@ public class Evaluator {
     /**
      * Version (Semantic Versioning).
      */
-    public static final String VERSION = "0.1.8";
+    public static final String VERSION = "0.1.9";
 
     /**
      * The maximum points for a VPL assignment.

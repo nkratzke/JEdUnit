@@ -17,6 +17,7 @@ targetCompatibility = 1.8
 
 dependencies {
     api 'com.github.javaparser:javaparser-core:3.7.+'
+    api 'com.github.mifmif:generex:1.0.+'
     testImplementation 'junit:junit:4.12'
 }
 

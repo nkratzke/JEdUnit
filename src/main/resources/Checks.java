@@ -1,4 +1,6 @@
-import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static de.thl.jedunit.Randomized.*;
 
 import de.thl.jedunit.Check;
 import de.thl.jedunit.Constraints;
@@ -53,10 +55,33 @@ public class Checks extends Constraints {
     @Check
     public void furtherTestcases() {
         comment("Boundary testcases (unknown test cases)");
+        Stream.of("", "x", "X", "ax", "Xa").forEach(s -> {
+            Stream.of('x', 'X').forEach(c -> {
+                grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", c, s), 
+                    () -> Main.countChars(c, s) == Solution.countChars(c, s)
+                );
+            });
+        });
     }
 
     @Check
     public void randomizedTestcases() {
         comment("Randomized testcases");
+        String r = "[a-zA-Z!?&%$§]{5,17}";
+        char c = c("[a-z]");
+        char C = Character.toUpperCase(c);
+        Stream.of(
+            s(c + "{1,7}", r, r),
+            s(r.toUpperCase(), r, C + "{1,7}"),
+            s(r, C + "{1,7}", r.toLowerCase()),
+            s(r, c + "{1,7}", r.toUpperCase())
+        ).forEach(s -> {
+            grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", c, s), 
+                () -> Main.countChars(c, s) == Solution.countChars(c, s)
+            );
+            grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", C, s), 
+                () -> Main.countChars(C, s) == Solution.countChars(C, s)
+            );
+        });
     }
 }
