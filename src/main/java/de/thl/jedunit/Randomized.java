@@ -11,6 +11,11 @@ public class Randomized {
     private static final Random RANDOM = new Random();
 
     /**
+     * Regular expression for default characters.
+     */
+    private static final String DEFAULT_CHARS = "[a-zA-Z]";
+
+    /**
      * Generates a String concatenated from random Strings where each String is generated from a regular expression.
      * @param regexps Build patterns (regular expressions) for String generation
      * @return concatenated random String
@@ -31,7 +36,7 @@ public class Randomized {
      * @return random String of length min <= length <= max
      */
     public static String s(int min, int max) {
-        return s(String.format(".{%d,%d}", min, max));
+        return s(String.format(DEFAULT_CHARS + "{%d,%d}", min, max));
     }
 
     public static boolean b() {
@@ -67,7 +72,7 @@ public class Randomized {
     }
 
     public static char c() {
-        return s(".").charAt(0);
+        return s(DEFAULT_CHARS).charAt(0);
     }
 
 }
