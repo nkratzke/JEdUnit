@@ -41,14 +41,5 @@ public class SyntaxTree {
         Selected<CompilationUnit> s = new Selected<>(this.compilationUnit, this.file);
         return s.select(selector);
     }
-
-    public <T extends Node> Selected<T> select(Class<T> selector, Predicate<T> pred) {
-        Selected<CompilationUnit> s = new Selected<>(this.compilationUnit, this.file);
-        return s.select(selector, pred);
-    }
-
-    public String[] getSource() {
-        return this.compilationUnit.toString().split("\n");
-    }
-
+    
 }

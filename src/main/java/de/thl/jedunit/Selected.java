@@ -96,24 +96,8 @@ public class Selected <T extends Node> {
         return this;
     }
 
-    /**
-     * Annotates each selected node matching a predicate with a message for VPL.
-     * Triggers a VPL comment for each matching node.
-     * @param msg Annotating remark
-     * @param pred Predicate used to select a subset of selected nodes for annotation
-     * @return Self reference (for method chaining)
-     */
-    public Selected<T> annotate(String msg, Predicate<T> pred) {
-        this.filter(pred).annotate(msg);
-        return this;
-    }
-
     public boolean isEmpty() { return this.nodes.isEmpty(); }
 
     public boolean exists() { return !this.isEmpty(); }
-
-    public List<T> asList() { return this.nodes; }
-
-    public Stream<T> stream() { return this.nodes.stream(); }
 
 }
