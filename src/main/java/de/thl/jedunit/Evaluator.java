@@ -8,13 +8,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.javaparser.Range;
-import com.mifmif.common.regex.Generex;
 
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
@@ -104,11 +102,11 @@ public class Evaluator {
             if (!violation.get()) return;
             comment("Evaluation aborted! " + comment);
             grade(0);
-            System.exit(1);
+            if (REALWORLD) System.exit(1);
         } catch (Exception ex) {
             comment(String.format("Evaluation aborted! %s (Exception %s)", comment, ex));
             grade(0);
-            System.exit(1);
+            if (REALWORLD) System.exit(1);
         }
     }
 
@@ -212,6 +210,12 @@ public class Evaluator {
      * the assignments Checks class.
      */
     protected static List<String> EVALUATED_FILES = Arrays.asList("Main.java");
+
+    /**
+     * Indicates whether JEdUnit runs in the real world (true)
+     * or under unit test conditions (false)
+     */
+    protected static boolean REALWORLD = true;
 
     /**
      * Downgrade for every found checkstyle error.

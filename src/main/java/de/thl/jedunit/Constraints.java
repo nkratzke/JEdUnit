@@ -14,6 +14,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -51,6 +52,10 @@ public class Constraints extends Evaluator {
 
     protected static int LOOP_PENALTY = 100;
 
+    protected static boolean ALLOW_METHODS = true;
+
+    protected static int METHOD_PENALTY = 100;
+
     protected static boolean ALLOW_LAMBDAS = true;
 
     protected static int LAMBDA_PENALITY = 25;
@@ -74,11 +79,11 @@ public class Constraints extends Evaluator {
     /**
      * This method is a hook for the Checks class to configure the evaluation.
      */
-    protected void configure() {
+    public void configure() {
     }
 
     @Constraint
-    void cheatDetection() {
+    public void cheatDetection() {
         comment("Running pre-checks on " + EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
 
         List<String> classes = Arrays.asList("Solution");
@@ -108,7 +113,7 @@ public class Constraints extends Evaluator {
     }
 
     @Constraint
-    protected void conventions() {
+    public void conventions() {
         comment("Checking coding restrictions for " + EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
         for (String file : EVALUATED_FILES) {
 
@@ -125,6 +130,13 @@ public class Constraints extends Evaluator {
                 ast.select(ForEachStmt.class).annotate("for loop not allowed").exists() |
                 ast.select(DoStmt.class).annotate("do while loop not allowed").exists() |
                 ast.select(MethodCallExpr.class).filter(m -> m.toString().contains(".forEach(")).annotate("forEach not allowed").exists()
+            ));
+
+            if (!ALLOW_METHODS) penalize(METHOD_PENALTY, "No methods (except main)", () -> check(file, ast ->
+                ast.select(MethodDeclaration.class)
+                   .filter(m -> !m.getNameAsString().equals("main"))
+                   .annotate("No methods except main() method allowed")
+                   .exists()
             ));
 
             if (!ALLOW_LAMBDAS) penalize(LAMBDA_PENALITY, "No lambdas", () -> check(file, ast ->
@@ -170,6 +182,13 @@ public class Constraints extends Evaluator {
                     ast.select(Parameter.class)
                        .filter(param -> collections.stream().anyMatch(type -> param.getType().asString().startsWith(type.getSimpleName())))
                        .annotate(p -> "Do not use " + p.getType() + " as parameter type")
+                       .exists()
+                ));
+
+                penalize(COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for variable declarators", () -> check(file, ast -> 
+                    ast.select(VariableDeclarator.class)
+                       .filter(v -> collections.stream().anyMatch(type -> v.getType().asString().startsWith(type.getSimpleName())))
+                       .annotate(v -> "Do not use " + v.getType() + " as variable declarator")
                        .exists()
                 ));
             }

@@ -24,6 +24,9 @@ public class Checks extends Constraints {
 
         // Constraints.ALLOW_LOOPS = false;                 // default: true
         // Constraints.LOOP_PENALTY = 100;
+
+        // Constraints.ALLOW_METHODS = false;               // default: true
+        // Constraints.METHOD_PENALTY = 100;
     
         // Constraints.ALLOW_LAMBDAS = false;               // default: true
         // Constraints.LAMBDA_PENALITY = 25;
