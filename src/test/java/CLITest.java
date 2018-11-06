@@ -2,7 +2,8 @@ import static de.thl.jedunit.Randomized.s;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.lang.ProcessBuilder.Redirect;
+import java.io.InputStream;
+import java.util.Scanner;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -34,7 +35,7 @@ public class CLITest {
 
     @After public void removeTestDir() {
         File d = new File(DIR);
-        // delete(d);
+        delete(d);
         System.setProperty("user.dir", CWD);
     }
 
@@ -51,22 +52,48 @@ public class CLITest {
         );
     }
 
+    private String asString(InputStream is) {
+        Scanner in = new Scanner(is);
+        String line = "";  
+        while (in.hasNextLine()) line += in.nextLine() + "\n";
+        in.close();
+        return line;
+    }
+
     @Test public void runBasicExample() throws Exception {
-
-        // TO BE DONE
-
         String URL = "https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh";
 
-        Process p = null;
         ProcessBuilder pb = new ProcessBuilder();
-        pb.directory(new File(DIR + File.separator));
-        pb.command("curl", "-s", URL, "|", "sh");
-        p = pb.start();
+        pb.directory(new File(DIR));
+        Process p = pb.command("sh", "-c", "curl -s " + URL + " | sh").start();
+        int exitCode = p.waitFor();
+        String console = asString(p.getInputStream());  
+        System.out.println(console);
+        assertTrue("init.sh executed without errors", exitCode == 0);
+        assertTrue("Installation worked", console.contains("Preparing Checks.java"));
+  
+        p = pb.command("sh", "vpl_evaluate.sh").start();
+        exitCode = p.waitFor();
+        File f = new File(DIR + File.separator + "vpl_execution");
+        assertTrue("vpl_evaluate.sh executed without errors", exitCode == 0);
+        assertTrue("vpl_execution script generated", f.isFile() && f.canExecute());
 
-        pb.command("sh", "vpl_evaluate.sh", ">", "evaluate.log");
-        p = pb.start();
+        p = pb.command("sh", "vpl_execution").start();
+        exitCode = p.waitFor();
+        console = asString(p.getInputStream());  
+        System.out.println(console);
+        assertTrue("Evaluation executed without errors", exitCode == 0);
+        assertTrue("Evaluation works", console.contains("JEdUnit"));
+        assertTrue("Evaluation works", console.contains("Check 20:"));
+        assertTrue("Evaluation works", console.contains("Finished: 0 points"));
 
-        pb.command("sh", "vpl_execution", ">", "execution.log");
-        p = pb.start();
+        exitCode = pb.command("sh", "vpl_run.sh").start().waitFor();
+        assertTrue("vpl_run executed without errors", exitCode == 0);
+
+        p = pb.command("sh", "vpl_execution").start();
+        exitCode = p.waitFor();
+        console = asString(p.getInputStream());
+        assertTrue("Run command executes without errors", exitCode == 0);
+        assertTrue("Run works", console.equals("-1\n-1\n"));
     }
 }

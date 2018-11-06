@@ -4,6 +4,7 @@
 
 - Randomized test data generators
 - URL callable init script
+- Self-contained JAR
 - Gradelized builds
 - Abort on suspect code patterns (Injection, Redirection)
 - Check of conformance with coding constraints
