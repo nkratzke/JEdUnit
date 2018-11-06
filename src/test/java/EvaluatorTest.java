@@ -67,7 +67,7 @@ public class EvaluatorTest {
         check.process(Check.class);      // process functional tests
 
         String console = system.toString();
-        redirected.println(console);
+        // redirected.println(console);
         assertTrue("Commenting", console.contains("Comment :=>>"));
         assertTrue("OK detection", console.contains("Check 1: [OK]"));
         assertTrue("FAILED detection", console.contains("Check 2: [FAILED]"));

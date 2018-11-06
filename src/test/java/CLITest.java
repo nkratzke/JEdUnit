@@ -2,6 +2,7 @@ import static de.thl.jedunit.Randomized.s;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -12,10 +13,12 @@ import de.thl.jedunit.CLI;
 
 public class CLITest {
 
-    public static final String DIR = s("/tmp/test-[a-z]{5}-[0-9]{3}");
-    public static final String CWD = System.setProperty("user.dir", DIR);
+    public static String DIR = null;
+    public static String CWD = null;
 
     @Before public void createTestDir() {
+        DIR = s("/tmp/test-[a-z]{5}-[0-9]{3}");
+        CWD = System.setProperty("user.dir", DIR);
         File d = new File(DIR);
         d.mkdirs();
     }
@@ -31,7 +34,7 @@ public class CLITest {
 
     @After public void removeTestDir() {
         File d = new File(DIR);
-        delete(d);
+        // delete(d);
         System.setProperty("user.dir", CWD);
     }
 
@@ -46,5 +49,24 @@ public class CLITest {
         assertTrue("Scripts should be executable", 
             Stream.of(files).filter(f -> f.getName().endsWith(".sh")).allMatch(f -> f.canExecute())
         );
+    }
+
+    @Test public void runBasicExample() throws Exception {
+
+        // TO BE DONE
+
+        String URL = "https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh";
+
+        Process p = null;
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.directory(new File(DIR + File.separator));
+        pb.command("curl", "-s", URL, "|", "sh");
+        p = pb.start();
+
+        pb.command("sh", "vpl_evaluate.sh", ">", "evaluate.log");
+        p = pb.start();
+
+        pb.command("sh", "vpl_execution", ">", "execution.log");
+        p = pb.start();
     }
 }
