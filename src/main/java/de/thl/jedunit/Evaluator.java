@@ -1,7 +1,6 @@
 package de.thl.jedunit;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
