@@ -17,7 +17,7 @@ import de.thl.jedunit.Constraints;
 public class Checks extends Constraints {
 
     @Override
-    protected void configure() {
+    public void configure() {
         super.configure();
 
         // Constraints.ALLOWED_IMPORTS = Arrays.asList("java.util");
