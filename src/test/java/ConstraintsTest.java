@@ -89,7 +89,8 @@ public class ConstraintsTest {
 
         String console = redirect.toString();
         System.setOut(redirected);
-        System.out.println(console);
+        
+        // System.out.println(console);
 
         assertTrue("Cheat detection", console.contains("Evil.java:1:1: [CHEAT] Forbidden import"));
         assertTrue("Cheat detection", console.contains("Evil.java:2:1: [CHEAT] Forbidden import"));

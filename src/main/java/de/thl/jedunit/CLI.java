@@ -22,14 +22,14 @@ public class CLI {
             try {
                 System.out.println("Preparing " + resource);
                 Scanner read = new Scanner(CLI.class.getResourceAsStream("/" + resource));
-                File f = new File(resource);
+                File f = new File(System.getProperty("user.dir") + File.separator + resource);
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));
                 while (read.hasNextLine()) {
                     writer.write(read.nextLine() + "\n");
                 }
                 read.close();
                 writer.close();
-                if (resource.endsWith(".sh")) f.setExecutable(true);    
+                if (resource.endsWith(".sh")) f.setExecutable(true, false);    
             } catch (Exception ex) {
                 System.out.println(ex);
                 System.exit(1);

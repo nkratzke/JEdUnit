@@ -52,7 +52,7 @@ public class Evaluator {
      * Current points (truncated to [0, 100])
      * @return points [0, 100]
      */
-    protected int getPoints() {
+    public int getPoints() {
         int report = this.points;
         report = report > MAX ? MAX : report;
         report = report < 0 ? 0 : report;
@@ -88,8 +88,7 @@ public class Evaluator {
             this.points -= penalty;
             comment("[FAILED] " + remark + " (-" + penalty + " points)");
         } catch (Exception ex) {
-            this.points -= penalty;
-            comment("[FAILED due to " + ex + "] " + remark + " (-" + penalty + " points)");
+            comment("[FAILED due to " + ex + "] " + remark);
         }
     }
 
@@ -101,17 +100,14 @@ public class Evaluator {
         try {
             if (!violation.get()) return;
             comment("Evaluation aborted! " + comment);
-            grade(0);
-            if (REALWORLD) System.exit(1);
+            this.points = 0;
+            if (REALWORLD) {
+                grade();
+                System.exit(1);
+            }
         } catch (Exception ex) {
-            comment(String.format("Evaluation aborted! %s (Exception %s)", comment, ex));
-            grade(0);
-            if (REALWORLD) System.exit(1);
+            comment("[FAILED due to " + ex + "] " + comment);
         }
-    }
-
-    protected final SyntaxTree parse(String file) throws FileNotFoundException {
-        return new SyntaxTree(file);
     }
 
     /**
@@ -136,14 +132,6 @@ public class Evaluator {
 
     /**
      * Adds a comment for VPL via console output.
-     * Marks file and line position.
-     */
-    public static void comment(String file, int line, String c) {
-        comment(String.format("%s:%d: %s", file, line, c));
-    }
-
-    /**
-     * Adds a comment for VPL via console output.
      * Marks file and position via a JavaParser range.
      */
     public static void comment(String file, Optional<Range> range, String c) {
@@ -154,17 +142,10 @@ public class Evaluator {
     }
 
     /**
-     * Reports a grade to VPL via console output (truncated to [0, 100]).
-     */
-    protected static void grade(int p) {
-        System.out.println("Grade :=>> " + p);
-    }
-
-    /**
      * Reports the current points to VPL via console output (truncated to [0, 100]).
      */
     public void grade() {
-        Evaluator.grade(this.getPoints());
+        System.out.println("Grade :=>> " + this.getPoints());
     }
 
     private List<Method> allMethodsOf(Class<?> clazz) {
@@ -176,18 +157,22 @@ public class Evaluator {
 
     /**
      * Executes all methods annoted with a specified annotation.
-     * @param annotation Annotation, one of [@Restriction, @Check]
+     * Methods are executed according to their alphabetical order.
+     * @param annotation Annotation, one of [@Constraint, @Check]
      */
-    protected final void process(Class<? extends Annotation> annotation) {
+    public final void process(Class<? extends Annotation> annotation) {
         allMethodsOf(this.getClass())
             .stream()
             .filter(method -> method.isAnnotationPresent(annotation))
+            .sorted((m1, m2) -> m1.getName().compareTo(m2.getName()))
             .forEach(method -> {
                 try {
                     method.invoke(this);
                     comment("");
+                    grade();
                 } catch (Exception ex) {
                     comment("Test method " + method.getName() + " failed completely." + ex);
+                    grade();
                 }    
             });
     }
@@ -215,7 +200,7 @@ public class Evaluator {
      * Indicates whether JEdUnit runs in the real world (true)
      * or under unit test conditions (false)
      */
-    protected static boolean REALWORLD = true;
+    public static boolean REALWORLD = true;
 
     /**
      * Downgrade for every found checkstyle error.
@@ -225,7 +210,7 @@ public class Evaluator {
     /**
      * This method evaluates the checkstyle log file.
      */
-    protected final void checkstyle() {
+    public final void checkstyle() {
         try {
             comment("Checkstyle");
             Scanner in = new Scanner(new File("checkstyle.log"));
@@ -262,7 +247,6 @@ public class Evaluator {
             comment("");
             check.process(Constraint.class); // process restriction checks
             check.process(Check.class);      // process functional tests
-            check.grade();
             comment(String.format("Finished: %d points", check.getPoints()));
         } catch (Exception ex) {
             comment("Severe error: " + ex);

@@ -4,6 +4,7 @@
 /build/classes/
 /build/reports/
 /build/resources/
+/build/jacoco/
 /build/test-results/
 /build/tmp/
 
