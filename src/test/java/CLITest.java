@@ -45,7 +45,8 @@ public class CLITest {
         File dir = new File(DIR);
         File[] files = dir.listFiles();
         Stream.of(CLI.RESOURCES).forEach(r -> {
-            assertTrue(r + " should be created", Stream.of(files).anyMatch(f -> f.getName().equals(r)));
+            String n = r.replace(".template", "");
+            assertTrue(n + " should be created", Stream.of(files).anyMatch(f -> f.getName().equals(n)));
         });
         assertTrue("Scripts should be executable", 
             Stream.of(files).filter(f -> f.getName().endsWith(".sh")).allMatch(f -> f.canExecute())

@@ -1,5 +1,3 @@
-import java.util.stream.Stream;
-
 import static de.thl.jedunit.Randomized.*;
 
 import de.thl.jedunit.Check;
@@ -47,23 +45,33 @@ public class Checks extends Constraints {
     @Check
     public void examples() {
         comment("Provided example calls");
-        grading(5, "Counting 'o' in \"Hello World\" must return 2.", 
-            () -> Main.countChars('o', "Hello World") == Solution.countChars('o', "Hello World")
-        );
-        grading(5, "Counting 'w' in \"Hello World\" must return 2.", 
-            () -> Main.countChars('w', "Hello World") == Solution.countChars('w', "Hello World")
-        );
+        testWith(
+            t('o', "Hello World", 5),
+            t('w', "Hello World", 5)
+        ).forEach(d -> {
+            int expected = Solution.countChars(d._1, d._2);
+            grading(d._3, String.format("Counting '%s' in \"%s\" must return %d.", d._1, d._2, expected), 
+                () -> Main.countChars(d._1, d._2) == expected
+            );            
+        });
     }
 
     @Check
     public void furtherTestcases() {
         comment("Boundary testcases (unknown test cases)");
-        Stream.of("", "x", "X", "ax", "Xa").forEach(s -> {
-            Stream.of('x', 'X').forEach(c -> {
-                grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", c, s), 
-                    () -> Main.countChars(c, s) == Solution.countChars(c, s)
-                );
-            });
+        testWith(
+            t('x', "", 10),
+            t('X', "", 10),
+            t('x', "x", 5),
+            t('X', "x", 5),
+            t('x', "X", 5),
+            t('X', "X", 5),
+            t('X', "ax", 5),
+            t('x', "Xa", 5)
+        ).forEach(d -> {
+            int expected = Solution.countChars(d._1, d._2);
+            String msg = String.format("countChars('%s', \"%s\") -> %d", d._1, d._2, expected);
+            grading(d._3, msg, () -> Main.countChars(d._1, d._2) == expected);
         });
     }
 
@@ -73,18 +81,20 @@ public class Checks extends Constraints {
         String r = "[a-zA-Z!?&%$§]{5,17}";
         char c = c("[a-z]");
         char C = Character.toUpperCase(c);
-        Stream.of(
-            s(c + "{1,7}", r, r),
-            s(r.toUpperCase(), r, C + "{1,7}"),
-            s(r, C + "{1,7}", r.toLowerCase()),
-            s(r, c + "{1,7}", r.toUpperCase())
-        ).forEach(s -> {
-            grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", c, s), 
-                () -> Main.countChars(c, s) == Solution.countChars(c, s)
-            );
-            grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", C, s), 
-                () -> Main.countChars(C, s) == Solution.countChars(C, s)
-            );
+
+        testWith(
+            t(c, s(c + "{1,7}", r, r), 5),
+            t(C, s(c + "{1,7}", r, r), 5),
+            t(c, s(r.toUpperCase(), r, C + "{1,7}"), 5),
+            t(C, s(r.toUpperCase(), r, C + "{1,7}"), 5),
+            t(c, s(r, C + "{1,7}", r.toLowerCase()), 5),
+            t(C, s(r, C + "{1,7}", r.toLowerCase()), 5),
+            t(c, s(r, c + "{1,7}", r.toUpperCase()), 5),
+            t(C, s(r, c + "{1,7}", r.toUpperCase()), 5)
+        ).forEach(d -> {
+            int expected = Solution.countChars(d._1, d._2);
+            String msg = String.format("countChars('%s', \"%s\") -> %d", d._1, d._2, expected);
+            grading(d._3, msg, () -> Main.countChars(d._1, d._2) == expected);
         });
     }
 }

@@ -12,9 +12,9 @@ public class CLI {
         "vpl_evaluate.sh",
         "vpl_run.sh",
         "clean.sh",
-        "Main.java",
-        "Solution.java",
-        "Checks.java"
+        "Main.java.template",
+        "Solution.java.template",
+        "Checks.java.template"
     };
 
     public static void main(String[] args) {
@@ -22,7 +22,7 @@ public class CLI {
             try {
                 System.out.println("Preparing " + resource);
                 Scanner read = new Scanner(CLI.class.getResourceAsStream("/" + resource));
-                File f = new File(System.getProperty("user.dir") + File.separator + resource);
+                File f = new File(System.getProperty("user.dir") + File.separator + resource.replace(".template", ""));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));
                 while (read.hasNextLine()) {
                     writer.write(read.nextLine() + "\n");

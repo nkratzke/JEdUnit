@@ -2,6 +2,7 @@
 
 ## Version 0.2.0 (JEdUnit)
 
+- vavr integration for better expressiveness to formulate tests (especially tuple support)
 - Randomized test data generators
 - URL callable init script
 - Self-contained JAR

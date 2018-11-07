@@ -1,7 +1,16 @@
 package de.thl.jedunit;
 
 import java.util.Random;
+
 import com.mifmif.common.regex.Generex;
+
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.Tuple3;
+import io.vavr.Tuple4;
+import io.vavr.Tuple5;
+
+import io.vavr.collection.*;
 
 public class Randomized {
 
@@ -73,6 +82,26 @@ public class Randomized {
 
     public static char c() {
         return s(DEFAULT_CHARS).charAt(0);
+    }
+
+    public static <A, B> Tuple2<A, B> t(A a, B b) {
+        return Tuple.of(a, b);
+    }
+
+    public static <A, B, C> Tuple3<A, B, C> t(A a, B b, C c) {
+        return Tuple.of(a, b, c);
+    }
+
+    public static <A, B, C, D> Tuple4<A, B, C, D> t(A a, B b, C c, D d) {
+        return Tuple.of(a, b, c, d);
+    }
+
+    public static <A, B, C, D, E> Tuple5<A, B, C, D, E> t(A a, B b, C c, D d, E e) {
+        return Tuple.of(a, b, c, d, e);
+    }
+
+    public static <T> List<T> testWith(T... ts) {
+        return List.of(ts);
     }
 
 }
