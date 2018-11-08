@@ -271,7 +271,10 @@ public class Evaluator {
             }
             in.close();
             if (this.percentage >= 0) comment("Everything fine");
-            if (this.percentage < 0) comment("[CHECKSTYLE] Found violations: (" + this.percentage + " points)");
+            if (this.percentage < 0) {
+                String msg = String.format("[CHECKSTYLE] Found violations (-%d%%)", Config.CHECKSTYLE_PENALTY);
+                comment(msg);
+            }
         } catch (Exception ex) {
             comment("You are so lucky! We had problems processing the checkstyle.log.");
             comment("This was due to: " + ex);

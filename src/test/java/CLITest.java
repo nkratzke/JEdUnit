@@ -61,7 +61,8 @@ public class CLITest {
         return line;
     }
 
-    @Test public void runBasicExample() throws Exception {
+    // @Test
+    public void runBasicExample() throws Exception {
         String URL = "https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh";
 
         ProcessBuilder pb = new ProcessBuilder();
