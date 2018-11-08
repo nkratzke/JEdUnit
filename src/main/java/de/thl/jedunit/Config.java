@@ -32,7 +32,8 @@ public class Config {
      * List of Checkstyle checks that are ignored for evaluation.
      * This list can be adapted in the configure method().
      */
-    public static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>(); { 
+    public static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>(); 
+    static { 
         CHECKSTYLE_IGNORES.addAll(Arrays.asList(
             "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
             "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", 

@@ -1,6 +1,6 @@
 import static de.thl.jedunit.Randomized.*;
 
-import de.thl.jedunit.Check;
+import de.thl.jedunit.Test;
 import de.thl.jedunit.Constraints;
 import de.thl.jedunit.Config;
 
