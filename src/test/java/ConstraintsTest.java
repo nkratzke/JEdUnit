@@ -24,6 +24,7 @@ public class ConstraintsTest {
                 super.configure();
                 String file = ClassLoader.getSystemClassLoader().getResource("Nightmare.java").getFile();
                 Config.EVALUATED_FILES = Arrays.asList(file);
+                Config.CHECK_IMPORTS = true;
                 Config.ALLOWED_IMPORTS = Arrays.asList("java.io");
                 Config.ALLOW_LOOPS = false;                 
                 Config.ALLOW_METHODS = false;               
@@ -70,6 +71,38 @@ public class ConstraintsTest {
         assertTrue("Import detection", console.contains("Nightmare.java:5:1: Import of"));
         assertTrue("Import detection", console.contains("Nightmare.java:6:1: Import of"));
     }
+
+    @Test 
+    public void testNoConstraintProcessing() {
+        ByteArrayOutputStream redirect = new ByteArrayOutputStream();
+        PrintStream redirected = System.out;
+        System.setOut(new PrintStream(redirect));
+
+        Constraints checks = new Constraints() {
+            @Override
+            public void configure() {
+                super.configure();
+                String file = ClassLoader.getSystemClassLoader().getResource("Nightmare.java").getFile();
+                Config.EVALUATED_FILES = Arrays.asList(file);
+                Config.CHECK_IMPORTS = false;
+                Config.ALLOW_LOOPS = true;                 
+                Config.ALLOW_METHODS = true;               
+                Config.ALLOW_LAMBDAS = true;               
+                Config.ALLOW_INNER_CLASSES = true;         
+                Config.ALLOW_GLOBAL_VARIABLES = true;      
+                Config.CHECK_COLLECTION_INTERFACES = false;  
+                Config.ALLOW_CONSOLE_OUTPUT = true;
+            }
+        };
+        checks.configure();
+        checks.conventions();
+
+        String console = redirect.toString();
+        System.setOut(redirected);
+        System.out.println(console);
+        assertTrue("No detections", console.trim().isEmpty());
+    }
+
 
     @Test
     public void testCheatDetectionProcessing() {
