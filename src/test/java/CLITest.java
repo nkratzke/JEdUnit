@@ -61,7 +61,7 @@ public class CLITest {
         return line;
     }
 
-    // @Test
+    @Test
     public void runBasicExample() throws Exception {
         String URL = "https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh";
 
@@ -86,7 +86,7 @@ public class CLITest {
         System.out.println(console);
         assertTrue("Evaluation executed without errors", exitCode == 0);
         assertTrue("Evaluation works", console.contains("JEdUnit"));
-        assertTrue("Evaluation works", console.contains("Check 20:"));
+        assertTrue("Evaluation works", console.contains("Check 18:"));
         assertTrue("Evaluation works", console.contains("Finished: 0 points"));
 
         exitCode = pb.command("sh", "vpl_run.sh").start().waitFor();
