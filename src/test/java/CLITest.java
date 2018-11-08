@@ -61,7 +61,7 @@ public class CLITest {
         return line;
     }
 
-    // @Test
+    @Test
     public void runBasicExample() throws Exception {
         String URL = "https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh";
 
