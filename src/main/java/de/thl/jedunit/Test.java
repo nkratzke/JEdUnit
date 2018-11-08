@@ -6,10 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Restriction annotation.
+ * Test annotation.
  * 
  * @author Nane Kratzke
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Constraint { }
+public @interface Test {
+    double weight();
+    String description();
+}

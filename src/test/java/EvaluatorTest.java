@@ -10,7 +10,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.thl.jedunit.Check;
 import de.thl.jedunit.Constraints;
 import de.thl.jedunit.Evaluator;
 
@@ -64,7 +63,7 @@ public class EvaluatorTest {
     @Test
     public void testEvaluationProcess() {
         Constraints check = new TestChecks();
-        check.process(Check.class);      // process functional tests
+        check.runTests(); // process functional tests
 
         String console = system.toString();
         // redirected.println(console);
@@ -76,11 +75,12 @@ public class EvaluatorTest {
         assertTrue("Handles failing tests", console.contains("failingTest failed"));
         assertTrue("Handles failing checks", console.contains("FileNotFoundException"));
         assertTrue("Handles failing checks", console.contains("ArrayIndexOutOfBoundsException"));
-        assertTrue("Penalizing messages occur if condition is met", console.contains("[FAILED] This should reduce points (-3 points)"));
+        assertTrue("Penalizing messages occur if condition is met", console.contains("[FAILED] This should reduce points (-3% on total result)"));
         assertFalse("Penalizing messages don't occur if condition is not met", console.contains("This message should not occur"));
         assertTrue("Failing penalizing conditions should not reduce points", console.contains("This should not reduce points"));
-        assertEquals(1, Stream.of(console.split("\n")).filter(line -> line.endsWith("Grade :=>> 5")).count());
+        assertEquals(1, Stream.of(console.split("\n")).filter(line -> line.endsWith("Grade :=>> 13")).count());
         assertEquals(4, Stream.of(console.split("\n")).filter(line -> line.endsWith("Grade :=>> 0")).count());
+        assertEquals(1, Stream.of(console.split("\n")).filter(line -> line.contains("Grade :=>> 12")).count());
         assertEquals(7, Stream.of(console.split("\n")).filter(line -> line.contains("Grade :=>>")).count());
         assertTrue("Runs all checks", console.contains("Check 22:"));
     }

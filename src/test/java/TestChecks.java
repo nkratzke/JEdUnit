@@ -6,9 +6,9 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import static de.thl.jedunit.Randomized.*;
 
 public class TestChecks extends Constraints {
-    @Check
+    
+    @Test(weight=0.25, description="Provided example calls")
     public void examples() {
-        comment("Provided example calls");
         grading(5, "Counting 'o' in \"Hello World\" must return 2.", 
             () -> Main.countChars('o', "Hello World") == Solution.countChars('o', "Hello World")
         );
@@ -17,9 +17,8 @@ public class TestChecks extends Constraints {
         );
     }
 
-    @Check
+    @Test(weight=0.25, description="Boundary testcases")
     public void furtherTestcases() {
-        comment("Boundary testcases (unknown test cases)");
         Stream.of("", "x", "X", "ax", "Xa").forEach(s -> {
             Stream.of('x', 'X').forEach(c -> {
                 grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", c, s), 
@@ -29,9 +28,8 @@ public class TestChecks extends Constraints {
         });
     }
 
-    @Check
+    @Test(weight=0.5, description="Randomized testcases")
     public void randomizedTestcases() {
-        comment("Randomized testcases");
         String r = "[a-zA-Z!?&%$§]{5,17}";
         char c = c("[a-z]");
         char C = Character.toUpperCase(c);
@@ -50,27 +48,27 @@ public class TestChecks extends Constraints {
         });
     }
 
-    @Check public void failingTest() {
-        comment("This test should fail completely");
+    @Test(weight=0.0, description="This test should fail completely")
+    public void failingTest() {
         double d[] = {};
         d[0] *= 2;
     }
 
-    @Check public void failingCheck() {
-        comment("Failing Checks test");
+    @Test(weight=0.0, description="Failing Checks test")
+    public void failingCheck() {
         grading(100, "This check will fail", () -> check("NotExisting.java", (ast) -> ast.select(ClassOrInterfaceDeclaration.class).exists()));
         grading(100, "This check will also fail", () -> { double[] d = {}; return d[0] == 0; });
     }
 
-    @Check public void examplesForPenalizing() {
-        comment("Penalizing checks");
+    @Test(weight=0.0, description="Penalizing checks")
+    public void examplesForPenalizing() {
         penalize(3, "This should reduce points", () -> true);
         penalize(3, "This message should not occur", () -> false);
         penalize(3, "This should not reduce points", () -> { double[] d = {}; return d[0] == 0; });
     }
 
-    @Check public void examplesForAbortOn() {
-        comment("Aborting checks");
+    @Test(weight=0.0, description="Aborting checks")
+    public void examplesForAbortOn() {
         abortOn("This kind of abort should not reduce points", () -> { int[] i = {}; return i[0] == 0; });
         abortOn("This message should not occur", () -> false);
         abortOn("This should result in zero points", () -> true);

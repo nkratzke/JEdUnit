@@ -39,7 +39,7 @@ public class Constraints extends Evaluator {
     public void configure() {
     }
 
-    @Constraint
+    @Inspection(description="Inspect source files for suspect code")
     public void cheatDetection() {
         comment("Running pre-checks on " + Config.EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
 
@@ -69,7 +69,7 @@ public class Constraints extends Evaluator {
         comment("Everything fine");
     }
 
-    @Constraint
+    @Inspection(description="Inspect source files for coding violations")
     public void conventions() {
         comment("Checking coding restrictions for " + Config.EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
         for (String file : Config.EVALUATED_FILES) {

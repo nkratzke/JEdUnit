@@ -35,7 +35,7 @@ public class ConstraintsTest {
             }
         };
         checks.configure();
-        checks.conventions();
+        checks.runInspections();
 
         String console = redirect.toString();
         System.setOut(redirected);

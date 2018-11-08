@@ -20,7 +20,7 @@ public class CLI {
     public static void main(String[] args) {
         for (String resource : RESOURCES) {
             try {
-                System.out.println("Preparing " + resource);
+                System.out.println("Preparing " + resource.replace(".template", ""));
                 Scanner read = new Scanner(CLI.class.getResourceAsStream("/" + resource));
                 File f = new File(System.getProperty("user.dir") + File.separator + resource.replace(".template", ""));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));

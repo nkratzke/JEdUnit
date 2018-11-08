@@ -48,9 +48,8 @@ public class Checks extends Constraints {
         // Config.CONSOLE_OUTPUT_PENALTY = 25;
     }
 
-    @Check
+    @Test(weight=0.25, description="Provided example calls")
     public void examples() {
-        comment("Provided example calls");
         testWith(
             t('o', "Hello World", 5),
             t('w', "Hello World", 5)
@@ -62,9 +61,8 @@ public class Checks extends Constraints {
         });
     }
 
-    @Check
+    @Test(weight=0.25, description="Boundary testcases (unknown test cases)")
     public void furtherTestcases() {
-        comment("Boundary testcases (unknown test cases)");
         testWith(
             t('x', "", 10),
             t('X', "", 10),
@@ -81,9 +79,8 @@ public class Checks extends Constraints {
         });
     }
 
-    @Check
+    @Test(weight=0.5, description="Randomized testcases")
     public void randomizedTestcases() {
-        comment("Randomized testcases");
         String r = "[a-zA-Z!?&%$§]{5,17}";
         char c = c("[a-z]");
         char C = Character.toUpperCase(c);

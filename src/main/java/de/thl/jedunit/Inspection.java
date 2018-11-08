@@ -6,10 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Check annotation.
+ * Inspection annotation.
  * 
  * @author Nane Kratzke
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Check { }
+public @interface Inspection {
+    String description();
+}

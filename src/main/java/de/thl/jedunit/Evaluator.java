@@ -1,7 +1,8 @@
 package de.thl.jedunit;
 
+import static de.thl.jedunit.Randomized.t;
+
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -12,6 +13,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.javaparser.Range;
+
+import io.vavr.Tuple2;
 
 /**
  * Basic evaluator for automatic evaluation of programming excercise assignments.
@@ -28,7 +31,7 @@ public class Evaluator {
     /**
      * Version (Semantic Versioning).
      */
-    public static final String VERSION = "0.1.11";
+    public static final String VERSION = "0.1.12";
 
     /**
      * The maximum points for a VPL assignment.
@@ -36,9 +39,14 @@ public class Evaluator {
     private static final int MAX = 100;
 
     /**
-     * The currently reached points for a VPL assignment.
+     * The currently reached percentage of maximum points.
      */
-    private int points = 0;
+    private double percentage = 0.0;
+
+    /**
+     * The results of the latest executed testcase.
+     */
+    private final List<Tuple2<Integer, Integer>> results = new LinkedList<>();
 
     /**
      * Test case counter.
@@ -52,7 +60,7 @@ public class Evaluator {
      * @return points [0, 100]
      */
     public int getPoints() {
-        int report = this.points;
+        int report = (int)Math.round(this.percentage * MAX);
         report = report > MAX ? MAX : report;
         report = report < 0 ? 0 : report;
         return report;
@@ -61,34 +69,40 @@ public class Evaluator {
     /**
      * Adds points for grading if a check is passed (wishful behavior).
      * A comment is always printed whether the check was successfull or not.
-     * @param add Points to add (on success)
-     * @param remark Comment to show
+     * @param p Points to add (on success)
+     * @param comment Comment to show
      * @param check Condition to check (success)
      */
-    protected final void grading(int add, String remark, Supplier<Boolean> check) {
+    protected final void grading(int p, String comment, Supplier<Boolean> check) {
         testcase++;
         try {
             if (check.get()) {
-                this.points += add;
-                comment("Check " + testcase + ": [OK] " + remark + " (" + add + " points)");
-            } else comment("Check " + testcase + ": [FAILED] " + remark + " (0 of " + add + " points)");
+                results.add(t(p, p));
+                comment("Check " + testcase + ": [OK] " + comment + " (" + p + " points)");
+            } else {
+                results.add(t(0, p));
+                comment("Check " + testcase + ": [FAILED] " + comment + " (0 of " + p + " points)");
+            }
         } catch (Exception ex) {
-            comment("Check " + testcase + ": [FAILED due to " + ex + "] " + remark + " (0 of " + add + " points)");
+            results.add(t(0, p));
+            comment("Check " + testcase + ": [FAILED due to " + ex + "] " + comment + " (0 of " + p + " points)");
         }
     }
 
     /**
-     * Deletes points (penalzing) if a check is passed (unwishful behavior).
+     * Deletes percentage points (penalzing) if a check is passed (unwishful behavior).
      * A comment is only printed if the check indicates a violation.
-     * @param penalty Points to remove (on violation)
+     * Penalities are applied to the complete percentage even if launched from 
+     * weighted checks.
+     * @param penalty Percentage points to remove (on violation)
      * @param remark Comment to show
      * @param violation Violation condition to check
      */
     protected final void penalize(int penalty, String remark, Supplier<Boolean> violation) {
         try {
             if (!violation.get()) return;
-            this.points -= penalty;
-            comment("[FAILED] " + remark + " (-" + penalty + " points)");
+            this.percentage -= penalty / 100.0;
+            comment(String.format("[FAILED] %s (-%d%% on total result)", remark, penalty));
         } catch (Exception ex) {
             comment("[FAILED due to " + ex + "] " + remark);
         }
@@ -102,7 +116,7 @@ public class Evaluator {
         try {
             if (!violation.get()) return;
             comment("Evaluation aborted! " + comment);
-            this.points = 0;
+            this.percentage = 0;
             if (REALWORLD) {
                 grade();
                 System.exit(1);
@@ -151,7 +165,27 @@ public class Evaluator {
      * Reports the current points to VPL via console output (truncated to [0, 100]).
      */
     public void grade() {
+        comment(String.format("Current percentage: %.0f%%", this.percentage * 100));
         System.out.println("Grade :=>> " + this.getPoints());
+    }
+
+    /**
+     * Reports current results to VPL via console output (truncated to [0, 100]).
+     * @param results List of results [(n, of possible points)]
+     * @param weight Weight to be considered for total sum
+     */
+    public void grade(double weight, List<Tuple2<Integer, Integer>> results) {
+        if (results.isEmpty() || weight <= 0.0) {
+            comment("No results or weight for this test");
+            grade();
+            return;
+        }
+        int points = results.stream().map(d -> d._1).reduce(0, (a, b) -> a + b);
+        int total = results.stream().map(d -> d._2).reduce(0, (a, b) -> a + b);
+        double p = 100.0 * points / total;
+        comment(String.format("Result for this test: %d of %d points (%.0f%%)", points, total, p));
+        this.percentage += (weight * points) / total;
+        grade();
     }
 
     private List<Method> allMethodsOf(Class<?> clazz) {
@@ -162,24 +196,52 @@ public class Evaluator {
     }
 
     /**
-     * Executes all methods annoted with a specified annotation.
+     * Executes all methods annoted with a Test annotation.
      * Methods are executed according to their alphabetical order.
-     * @param annotation Annotation, one of [@Constraint, @Check]
      */
-    public final void process(Class<? extends Annotation> annotation) {
+    public final void runTests() {
         allMethodsOf(this.getClass())
             .stream()
-            .filter(method -> method.isAnnotationPresent(annotation))
+            .filter(method -> method.isAnnotationPresent(Test.class))
             .sorted((m1, m2) -> m1.getName().compareTo(m2.getName()))
             .forEach(method -> {
                 try {
+                    Test t = method.getAnnotation(Test.class);
+                    comment(String.format("[%.2f%%]: ", t.weight() * 100) + t.description());
+                    results.clear();
                     method.invoke(this);
+                    grade(t.weight(), results);
                     comment("");
-                    grade();
                 } catch (Exception ex) {
                     comment("Test method " + method.getName() + " failed completely." + ex);
                     grade();
-                }    
+                }
+                results.clear();
+            });
+    }
+
+    /**
+     * Executes all methods annoted with a Test annotation.
+     * Methods are executed according to their alphabetical order.
+     */
+    public final void runInspections() {
+        allMethodsOf(this.getClass())
+            .stream()
+            .filter(method -> method.isAnnotationPresent(Inspection.class))
+            .sorted((m1, m2) -> m1.getName().compareTo(m2.getName()))
+            .forEach(method -> {
+                try {
+                    results.clear();
+                    Inspection i = method.getAnnotation(Inspection.class);
+                    comment(i.description());
+                    method.invoke(this);
+                    grade();
+                    comment("");
+                } catch (Exception ex) {
+                    comment("Test method " + method.getName() + " failed completely." + ex);
+                    grade();
+                }
+                results.clear();
             });
     }
 
@@ -204,12 +266,12 @@ public class Evaluator {
 
                     String msg = result.substring(result.indexOf(file));
                     comment(msg);
-                    this.points -= Config.CHECKSTYLE_PENALTY;
+                    this.percentage -= Config.CHECKSTYLE_PENALTY / 100.0;
                 }
             }
             in.close();
-            if (this.points >= 0) comment("Everything fine");
-            if (this.points < 0) comment("[CHECKSTYLE] Found violations: (" + this.points + " points)");
+            if (this.percentage >= 0) comment("Everything fine");
+            if (this.percentage < 0) comment("[CHECKSTYLE] Found violations: (" + this.percentage + " points)");
         } catch (Exception ex) {
             comment("You are so lucky! We had problems processing the checkstyle.log.");
             comment("This was due to: " + ex);
@@ -228,8 +290,8 @@ public class Evaluator {
             check.configure();
             if (Config.CHECKSTYLE) check.checkstyle();
             comment("");
-            check.process(Constraint.class); // process restriction checks
-            check.process(Check.class);      // process functional tests
+            check.runInspections();
+            check.runTests();
             comment(String.format("Finished: %d points", check.getPoints()));
         } catch (Exception ex) {
             comment("Severe error: " + ex);
