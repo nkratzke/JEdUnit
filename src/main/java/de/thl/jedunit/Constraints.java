@@ -41,8 +41,6 @@ public class Constraints extends Evaluator {
 
     @Inspection(description="Inspect source files for suspect code")
     public void cheatDetection() {
-        comment("Running pre-checks on " + Config.EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
-
         List<String> classes = Arrays.asList("Solution");
         List<String> calls   = Arrays.asList("System.exit", "Solution.");
 
@@ -71,10 +69,9 @@ public class Constraints extends Evaluator {
 
     @Inspection(description="Inspect source files for coding violations")
     public void conventions() {
-        comment("Checking coding restrictions for " + Config.EVALUATED_FILES.stream().collect(Collectors.joining(", ")));
         for (String file : Config.EVALUATED_FILES) {
 
-            if (Config.CHECK_IMPORTS) penalize(Config.IMPORT_PENALTY, "Non allowed libraries", () -> check(file, ast ->
+            if (Config.CHECK_IMPORTS) penalize(Config.IMPORT_PENALTY, "Non-allowed libraries", () -> check(file, ast ->
                 ast.select(ImportDeclaration.class)
                    .filter(imp -> !Config.ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
                    .annotate(imp -> "Import of " + imp.getName() + " not allowed")
