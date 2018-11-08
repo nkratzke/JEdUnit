@@ -193,47 +193,47 @@ Grade :=>> 0
 Comment :=>> 
 Comment :=>> [25,00%]: Provided example calls
 Comment :=>> Check 1: [OK] Counting 'o' in "Hello World" must return 2. (5 points)
-Comment :=>> Check 2: [FAILED] Counting 'w' in "Hello World" must return 1. (0 of 5 points)
-Comment :=>> Result for this test: 5 of 10 points (50%)
-Comment :=>> Current percentage: 8%
-Grade :=>> 8
+Comment :=>> Check 2: [OK] Counting 'w' in "Hello World" must return 1. (5 points)
+Comment :=>> Result for this test: 10 of 10 points (100%)
+Comment :=>> Current percentage: 20%
+Grade :=>> 20
 Comment :=>> 
 Comment :=>> [25,00%]: Boundary testcases (unknown test cases)
 Comment :=>> Check 3: [OK] countChars('x', "") -> 0 (10 points)
 Comment :=>> Check 4: [OK] countChars('X', "") -> 0 (10 points)
 Comment :=>> Check 5: [OK] countChars('x', "x") -> 1 (5 points)
 Comment :=>> Check 6: [FAILED] countChars('X', "x") -> 1 (0 of 5 points)
-Comment :=>> Check 7: [FAILED] countChars('x', "X") -> 1 (0 of 5 points)
-Comment :=>> Check 8: [OK] countChars('X', "X") -> 1 (5 points)
+Comment :=>> Check 7: [OK] countChars('x', "X") -> 1 (5 points)
+Comment :=>> Check 8: [FAILED] countChars('X', "X") -> 1 (0 of 5 points)
 Comment :=>> Check 9: [FAILED] countChars('X', "ax") -> 1 (0 of 5 points)
-Comment :=>> Check 10: [FAILED] countChars('x', "Xa") -> 1 (0 of 5 points)
-Comment :=>> Result for this test: 30 of 50 points (60%)
-Comment :=>> Current percentage: 22%
-Grade :=>> 22
+Comment :=>> Check 10: [OK] countChars('x', "Xa") -> 1 (5 points)
+Comment :=>> Result for this test: 35 of 50 points (70%)
+Comment :=>> Current percentage: 38%
+Grade :=>> 38
 Comment :=>> 
 Comment :=>> [50,00%]: Randomized testcases
-Comment :=>> Check 11: [OK] countChars('y', "yyT!?%§hP?l!??§zdz!") -> 2 (5 points)
-Comment :=>> Check 12: [FAILED] countChars('Y', "yyyy§?§%O$?§§Y") -> 5 (0 of 5 points)
-Comment :=>> Check 13: [FAILED] countChars('y', "$!§!V&%jm&YYYYYYY") -> 7 (0 of 5 points)
-Comment :=>> Check 14: [OK] countChars('Y', "§&?!§%k?T%&Y") -> 1 (5 points)
-Comment :=>> Check 15: [FAILED] countChars('y', "!!!b§YYY%§§!§") -> 3 (0 of 5 points)
-Comment :=>> Check 16: [OK] countChars('Y', "??uBMYYYYY!?i§n") -> 5 (5 points)
-Comment :=>> Check 17: [OK] countChars('y', "!!&$Jyy$?FG!") -> 2 (5 points)
-Comment :=>> Check 18: [FAILED] countChars('Y', "§G??jb??yyyy$§?§$&Q") -> 4 (0 of 5 points)
+Comment :=>> Check 11: [OK] countChars('p', "ppppp?n§?VIV!?Hk") -> 5 (5 points)
+Comment :=>> Check 12: [FAILED] countChars('P', "p§&??$%Z?b?&O?!§§?") -> 1 (0 of 5 points)
+Comment :=>> Check 13: [OK] countChars('p', "?%!§TVRi§!?§PP") -> 2 (5 points)
+Comment :=>> Check 14: [FAILED] countChars('P', "O$X&!§p?fyPPPPPPP") -> 8 (0 of 5 points)
+Comment :=>> Check 15: [OK] countChars('p', "I&$E!ehPirr%§") -> 1 (5 points)
+Comment :=>> Check 16: [FAILED] countChars('P', "???§?§!P$??!jn§") -> 1 (0 of 5 points)
+Comment :=>> Check 17: [OK] countChars('p', "fng$?ppppT%§F$&") -> 4 (5 points)
+Comment :=>> Check 18: [FAILED] countChars('P', "§D!j?p$F?&&$$") -> 1 (0 of 5 points)
 Comment :=>> Result for this test: 20 of 40 points (50%)
-Comment :=>> Current percentage: 48%
-Grade :=>> 48
+Comment :=>> Current percentage: 63%
+Grade :=>> 63
 Comment :=>> 
-Comment :=>> Finished: 48 points
+Comment :=>> Finished: 63 points
 ```
 
 that can be evaluated by VPL for automatic grading and commenting of student submissions.
 
 In this example case our student would have passed
 
-- 9 of 18 test cases,
-- violated on checkstyle rule
-- and got 48 of 100 points.
+- 12 of 18 test cases,
+- violated one checkstyle rule,
+- and got in total 63 of 100 points.
 
 Thats all the magic, basically.
 
@@ -247,8 +247,8 @@ According to our experiences students tend to make use of the following kind of 
 - __Redirection__ (e.g. to call the reference solution instead of implement it on their own)
 - __Injection__ (e.g. to write `System.out.println("Grade :=>> 100"); System.exit(0);` to get full points and prevent VPL to check the submission)
 
-So, and in addition to "normal" unit testing frameworks JEdUnit provides several addons to handle these
-special kinds of educational specifics that are hardly covered by current testing frameworks.
+So, and in addition to "normal" unit testing frameworks JEdUnit provides several addons to handle 
+educational specifics that are hardly covered by current testing frameworks.
 
 - Checkstyle integration to foster "readable" code.
 - Randomized test case generation to handle overfitting cheats.
