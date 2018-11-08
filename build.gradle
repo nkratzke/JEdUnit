@@ -9,6 +9,7 @@
 plugins {
     id 'java-library'
     id 'com.palantir.jacoco-coverage' version '0.4.0'
+    id 'maven'
 }
 
 // version = 'working'
@@ -25,6 +26,17 @@ dependencies {
 
 repositories {
     jcenter()
+}
+
+task generatePom << {
+    pom {
+        project {
+            groupId 'de.thl'
+            artifactId 'jedunit'
+            version project.version
+            inceptionYear '2018'
+        }
+    }.writeTo("pom.xml")
 }
 
 jar {
