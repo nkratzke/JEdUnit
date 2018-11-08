@@ -89,16 +89,13 @@ But is the solution correct, and how to check this automatically for grading?
 To write checks one simply has to take the `Checks.java` class as a template
 
 ```Java
-/**
- * Please add your test cases for evaluation here.
- * - Please provide meaningful remarks for your students in grading() calls.
- * - All grading() calls should sum up to 100.
- * - If you give more than 100 points it will be truncated. 
- * - This enable bonus rules (e.g. giving 120 points instead of 100) to tolerate some errors worth 20 points. 
- * - All methods that start with "test" will be executed automatically.
- * - If this sounds similar to unit testing - this is intended ;-)
- */
-class Checks extends Constraints {
+import static de.thl.jedunit.Randomized.*;
+
+import de.thl.jedunit.Test;
+import de.thl.jedunit.Constraints;
+import de.thl.jedunit.Config;
+
+public class Checks extends Constraints {
 
     @Test(weight=1.0, description="Tests the submission")
     public void testSubmissions() {
@@ -111,74 +108,132 @@ class Checks extends Constraints {
 and extend it with assignment specific checks and grading points. This could be done like this:
 
 ```Java
-class Checks extends Constraints {
+import static de.thl.jedunit.Randomized.*;
 
-    @Test(weight=0.25, description="Example cases")
-    public void testExampleCases() {
-        // You can give less points for provided example cases
-        grading(5, "Counting 'o' in 'Hello World' must return 2.", () -> Main.countChars('o', "Hello World") == 2);
-        grading(5, "Counting 'w' in 'Hello World' must return 2.", () -> Main.countChars('w', "Hello World") == 1);
+import de.thl.jedunit.Test;
+import de.thl.jedunit.Constraints;
+import de.thl.jedunit.Config;
+
+public class Checks extends Constraints {
+
+    @Test(weight=0.25, description="Provided example calls")
+    public void examples() {
+        testWith(
+            t('o', "Hello World", 5),
+            t('w', "Hello World", 5)
+        ).forEach(d -> {
+            int expected = Solution.countChars(d._1, d._2);
+            grading(d._3, String.format("Counting '%s' in \"%s\" must return %d.", d._1, d._2, expected), 
+                () -> Main.countChars(d._1, d._2) == expected
+            );
+        });
     }
 
-    @Test(weight=0.5, description="Further test cases")
-    public void testAdditionalCases() {
-        // You can give more points for additional checks
-        grading(10, "Counting 'x' in 'xxx' must return 3.", () -> Main.countChars('x', "xxx") == 3);
-        grading(10, "Counting 'X' in 'XxX' must return 3.", () -> Main.countChars('X', "XxX") == 3);
-        grading(10, "Counting 'x' in 'YYX' must return 1.", () -> Main.countChars('x', "YYX") == 1);
-        grading(10, "Counting 'X' in 'Xyy' must return 1.", () -> Main.countChars('X', "Xyy") == 1);
-        grading(10, "Counting 'x' in 'Xyy' must return 1.", () -> Main.countChars('x', "Xyy") == 1);
-
-        // You can give less points for less problematic checks
-        grading(5, "Counting 'x' in 'X' must return 1.", () -> Main.countChars('x', "X") == 1);
-        grading(5, "Counting 'y' in 'X' must return 0.", () -> Main.countChars('y', "X") == 0);
-        grading(5, "Counting 'Y' in 'X' must return 0.", () -> Main.countChars('Y', "X") == 0);
+    @Test(weight=0.25, description="Boundary testcases (unknown test cases)")
+    public void furtherTestcases() {
+        testWith(
+            t('x', "", 10),
+            t('X', "", 10),
+            t('x', "x", 5),
+            t('X', "x", 5),
+            t('x', "X", 5),
+            t('X', "X", 5),
+            t('X', "ax", 5),
+            t('x', "Xa", 5)
+        ).forEach(d -> {
+            int expected = Solution.countChars(d._1, d._2);
+            String msg = String.format("countChars('%s', \"%s\") -> %d", d._1, d._2, expected);
+            grading(d._3, msg, () -> Main.countChars(d._1, d._2) == expected);
+        });
     }
 
-    @Test(weight=0.25, description="Boundary test cases")
-    public void testBoundaryCases() {
-        // You can give more points for problem sensibilizing checks
-        grading(15, "Counting chars in an empty string must return 0.", () -> Main.countChars('x', "") == 0);
-        grading(15, "Counting chars in a null string must return 0.", () -> Main.countChars('x', null) == 0);
+    @Test(weight=0.5, description="Randomized testcases")
+    public void randomizedTestcases() {
+        String r = "[a-zA-Z!?&%$§]{5,17}";
+        char c = c("[a-z]");
+        char C = Character.toUpperCase(c);
 
-        // And a little bit less points for just potential problematic checks
-        String example = "Just  an example! ";
-        grading(10, "Counting ' ' in '" + example + "'", () -> Main.countChars(' ', example) == 4);
+        testWith(
+            t(c, s(c + "{1,7}", r, r), 5),
+            t(C, s(c + "{1,7}", r, r), 5),
+            t(c, s(r.toUpperCase(), r, C + "{1,7}"), 5),
+            t(C, s(r.toUpperCase(), r, C + "{1,7}"), 5),
+            t(c, s(r, C + "{1,7}", r.toLowerCase()), 5),
+            t(C, s(r, C + "{1,7}", r.toLowerCase()), 5),
+            t(c, s(r, c + "{1,7}", r.toUpperCase()), 5),
+            t(C, s(r, c + "{1,7}", r.toUpperCase()), 5)
+        ).forEach(d -> {
+            int expected = Solution.countChars(d._1, d._2);
+            String msg = String.format("countChars('%s', \"%s\") -> %d", d._1, d._2, expected);
+            grading(d._3, msg, () -> Main.countChars(d._1, d._2) == expected);
+        });
     }
 }
 ```
 
-As you see, the `grading()` command is essential here. It takes the following parameters:
-
-- __points__ (`int`) that will be added if the check is successfull (evaluates to `true`)
-- __remark__ (`String`) that will be printed in comments. A remark should describe the testcase in a meaningful but short way.
-- __check__ (`Supplier<Boolean>`) that will be executed. If evaluated to `true` points will be added, otherwise no points will be added.
-
 A VPL evaluation (triggered via the `vpl_evaluate.sh` script) will generate the following console output
 
 ```
-Comment :=>> Check 1: Counting 'o' in 'Hello World' must return 2. [OK] (5 points)
-Comment :=>> Check 2: Counting 'w' in 'Hello World' must return 2. [OK] (5 points)
-Comment :=>> Check 3: Counting 'x' in 'xxx' must return 3. [OK] (10 points)
-Comment :=>> Check 4: Counting 'X' in 'XxX' must return 3. [FAILED] (0 of 10 points)
-Comment :=>> Check 5: Counting 'x' in 'YYX' must return 1. [OK] (10 points)
-Comment :=>> Check 6: Counting 'X' in 'Xyy' must return 1. [FAILED] (0 of 10 points)
-Comment :=>> Check 7: Counting 'x' in 'Xyy' must return 1. [OK] (10 points)
-Comment :=>> Check 8: Counting 'x' in 'X' must return 1. [OK] (5 points)
-Comment :=>> Check 9: Counting 'y' in 'X' must return 0. [OK] (5 points)
-Comment :=>> Check 10: Counting 'Y' in 'X' must return 0. [OK] (5 points)
-Comment :=>> Check 11: Counting chars in an empty string must return 0. [OK] (15 points)
-Comment :=>> Check 12: Counting chars in a null string must return 0. [FAILED due to java.lang.NullPointerException] (0 of 15 points)
-Comment :=>> Check 13: Counting ' ' in 'Just  an example! ' [OK] (10 points)
-Grade :=>> 80
+Comment :=>> JEdUnit 0.1.13
+Comment :=>> 
+Comment :=>> Checkstyle
+Comment :=>> Main.java:11:5: Es fehlt ein Javadoc-Kommentar. [JavadocMethod]
+Comment :=>> [CHECKSTYLE] Found violations (-5%)
+Comment :=>> Current percentage: -5%
+Grade :=>> 0
+Comment :=>> 
+Comment :=>> Inspect source files for suspect code
+Comment :=>> Everything fine
+Comment :=>> Current percentage: -5%
+Grade :=>> 0
+Comment :=>> 
+Comment :=>> Inspect source files for coding violations
+Comment :=>> Current percentage: -5%
+Grade :=>> 0
+Comment :=>> 
+Comment :=>> [25,00%]: Provided example calls
+Comment :=>> Check 1: [OK] Counting 'o' in "Hello World" must return 2. (5 points)
+Comment :=>> Check 2: [FAILED] Counting 'w' in "Hello World" must return 1. (0 of 5 points)
+Comment :=>> Result for this test: 5 of 10 points (50%)
+Comment :=>> Current percentage: 8%
+Grade :=>> 8
+Comment :=>> 
+Comment :=>> [25,00%]: Boundary testcases (unknown test cases)
+Comment :=>> Check 3: [OK] countChars('x', "") -> 0 (10 points)
+Comment :=>> Check 4: [OK] countChars('X', "") -> 0 (10 points)
+Comment :=>> Check 5: [OK] countChars('x', "x") -> 1 (5 points)
+Comment :=>> Check 6: [FAILED] countChars('X', "x") -> 1 (0 of 5 points)
+Comment :=>> Check 7: [FAILED] countChars('x', "X") -> 1 (0 of 5 points)
+Comment :=>> Check 8: [OK] countChars('X', "X") -> 1 (5 points)
+Comment :=>> Check 9: [FAILED] countChars('X', "ax") -> 1 (0 of 5 points)
+Comment :=>> Check 10: [FAILED] countChars('x', "Xa") -> 1 (0 of 5 points)
+Comment :=>> Result for this test: 30 of 50 points (60%)
+Comment :=>> Current percentage: 22%
+Grade :=>> 22
+Comment :=>> 
+Comment :=>> [50,00%]: Randomized testcases
+Comment :=>> Check 11: [OK] countChars('y', "yyT!?%§hP?l!??§zdz!") -> 2 (5 points)
+Comment :=>> Check 12: [FAILED] countChars('Y', "yyyy§?§%O$?§§Y") -> 5 (0 of 5 points)
+Comment :=>> Check 13: [FAILED] countChars('y', "$!§!V&%jm&YYYYYYY") -> 7 (0 of 5 points)
+Comment :=>> Check 14: [OK] countChars('Y', "§&?!§%k?T%&Y") -> 1 (5 points)
+Comment :=>> Check 15: [FAILED] countChars('y', "!!!b§YYY%§§!§") -> 3 (0 of 5 points)
+Comment :=>> Check 16: [OK] countChars('Y', "??uBMYYYYY!?i§n") -> 5 (5 points)
+Comment :=>> Check 17: [OK] countChars('y', "!!&$Jyy$?FG!") -> 2 (5 points)
+Comment :=>> Check 18: [FAILED] countChars('Y', "§G??jb??yyyy$§?§$&Q") -> 4 (0 of 5 points)
+Comment :=>> Result for this test: 20 of 40 points (50%)
+Comment :=>> Current percentage: 48%
+Grade :=>> 48
+Comment :=>> 
+Comment :=>> Finished: 48 points
 ```
 
 that can be evaluated by VPL for automatic grading and commenting of student submissions.
 
 In this example case our student would have passed
 
-- 10 of 13 test cases and
-- and got 80 of 100 points.
+- 9 of 18 test cases,
+- violated on checkstyle rule
+- and got 48 of 100 points.
 
 Thats all the magic, basically.
 
