@@ -100,7 +100,7 @@ To write checks one simply has to take the `Checks.java` class as a template
  */
 class Checks extends Constraints {
 
-    @Check
+    @Test(weight=1.0, description="Tests the submission")
     public void testSubmissions() {
         // Please add your checks and grading points here
         grading(10, "This will always fail.", () -> "hello".equals("Hello"));
@@ -113,14 +113,14 @@ and extend it with assignment specific checks and grading points. This could be 
 ```Java
 class Checks extends Constraints {
 
-    @Check
+    @Test(weight=0.25, description="Example cases")
     public void testExampleCases() {
         // You can give less points for provided example cases
         grading(5, "Counting 'o' in 'Hello World' must return 2.", () -> Main.countChars('o', "Hello World") == 2);
         grading(5, "Counting 'w' in 'Hello World' must return 2.", () -> Main.countChars('w', "Hello World") == 1);
     }
 
-    @Check
+    @Test(weight=0.5, description="Further test cases")
     public void testAdditionalCases() {
         // You can give more points for additional checks
         grading(10, "Counting 'x' in 'xxx' must return 3.", () -> Main.countChars('x', "xxx") == 3);
@@ -135,7 +135,7 @@ class Checks extends Constraints {
         grading(5, "Counting 'Y' in 'X' must return 0.", () -> Main.countChars('Y', "X") == 0);
     }
 
-    @Check
+    @Test(weight=0.25, description="Boundary test cases")
     public void testBoundaryCases() {
         // You can give more points for problem sensibilizing checks
         grading(15, "Counting chars in an empty string must return 0.", () -> Main.countChars('x', "") == 0);
@@ -196,7 +196,8 @@ So, and in addition to "normal" unit testing frameworks JEdUnit provides several
 special kinds of educational specifics that are hardly covered by current testing frameworks.
 
 - Checkstyle integration to foster "readable" code.
-- Parser integration and an easy to use selector model (comparable to CSS selectors for a DOM-tree) that enables to formulate
-- checks to detect the import of non allowed libraries,
-- checks to detect the use of non allowed programming constructs like loops, methods, lambda functions, and so on
-- checks to detect the import of non allowed reflection libraries or method calls that enable "Injection" attacks or the redirection to reference solutions
+- Randomized test case generation to handle overfitting cheats.
+- Parser integration and an easy to use selector model (comparable to CSS selectors for a DOM-tree).
+- Selectors enable to detect the import of non allowed libraries,
+- the use of non allowed programming constructs like loops, methods, lambda functions, and so on
+- or the import of non allowed reflection libraries or method calls that enable "Injection" attacks or the redirection to reference solutions
