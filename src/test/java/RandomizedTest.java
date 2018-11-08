@@ -66,6 +66,9 @@ public class RandomizedTest {
         char c = 'X';
         double d = Math.PI;
         String e = "Test";
+        float f = 1.0f;
+        byte g = 0;
+        String[] h = { "Hello", "World" };
         
         assertTrue(a == t(a, b)._1);
         assertTrue(b == t(a, b)._2);
@@ -84,6 +87,10 @@ public class RandomizedTest {
         assertTrue(c == t(a, b, c, d, e)._3);
         assertTrue(d == t(a, b, c, d, e)._4);
         assertEquals(e, t(a, b, c, d, e)._5);
+
+        assertTrue(f == t(a, b, c, d, e, f)._6);
+        assertTrue(g == t(a, b, c, d, e, f, g)._7);
+        assertArrayEquals(h, t(a, b, c, d, e, f, g, h)._8);
     }
 
     @Test public void testData() {

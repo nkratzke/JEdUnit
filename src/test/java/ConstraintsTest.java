@@ -1,4 +1,5 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -6,6 +7,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import de.thl.jedunit.Config;
 import de.thl.jedunit.Constraints;
 import de.thl.jedunit.Evaluator;
 
@@ -21,15 +23,15 @@ public class ConstraintsTest {
             public void configure() {
                 super.configure();
                 String file = ClassLoader.getSystemClassLoader().getResource("Nightmare.java").getFile();
-                Evaluator.EVALUATED_FILES = Arrays.asList(file);
-                Constraints.ALLOWED_IMPORTS = Arrays.asList("java.io");
-                Constraints.ALLOW_LOOPS = false;                 
-                Constraints.ALLOW_METHODS = false;               
-                Constraints.ALLOW_LAMBDAS = false;               
-                Constraints.ALLOW_INNER_CLASSES = false;         
-                Constraints.ALLOW_GLOBAL_VARIABLES = false;      
-                Constraints.CHECK_COLLECTION_INTERFACES = true;  
-                Constraints.ALLOW_CONSOLE_OUTPUT = false;
+                Config.EVALUATED_FILES = Arrays.asList(file);
+                Config.ALLOWED_IMPORTS = Arrays.asList("java.io");
+                Config.ALLOW_LOOPS = false;                 
+                Config.ALLOW_METHODS = false;               
+                Config.ALLOW_LAMBDAS = false;               
+                Config.ALLOW_INNER_CLASSES = false;         
+                Config.ALLOW_GLOBAL_VARIABLES = false;      
+                Config.CHECK_COLLECTION_INTERFACES = true;  
+                Config.ALLOW_CONSOLE_OUTPUT = false;
             }
         };
         checks.configure();
@@ -80,7 +82,7 @@ public class ConstraintsTest {
             public void configure() {
                 super.configure();
                 String file = ClassLoader.getSystemClassLoader().getResource("Evil.java").getFile();
-                Evaluator.EVALUATED_FILES = Arrays.asList(file);
+                Config.EVALUATED_FILES = Arrays.asList(file);
                 Evaluator.REALWORLD = false;
             }
         };

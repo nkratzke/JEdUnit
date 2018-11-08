@@ -61,9 +61,9 @@ public class Evaluator {
     /**
      * Adds points for grading if a check is passed (wishful behavior).
      * A comment is always printed whether the check was successfull or not.
-     * @param add
-     * @param remark
-     * @param check
+     * @param add Points to add (on success)
+     * @param remark Comment to show
+     * @param check Condition to check (success)
      */
     protected final void grading(int add, String remark, Supplier<Boolean> check) {
         testcase++;
@@ -80,6 +80,9 @@ public class Evaluator {
     /**
      * Deletes points (penalzing) if a check is passed (unwishful behavior).
      * A comment is only printed if the check indicates a violation.
+     * @param penalty Points to remove (on violation)
+     * @param remark Comment to show
+     * @param violation Violation condition to check
      */
     protected final void penalize(int penalty, String remark, Supplier<Boolean> violation) {
         try {
@@ -110,7 +113,11 @@ public class Evaluator {
     }
 
     /**
-     * Can be used to formulate arbitrary checks on parsed source code.
+     * Can be used to formulate arbitrary AST-based checks on parsed source code.
+     * @param file File to load an parse
+     * @param test Logical predicate on the AST of file
+     * @return evaluated test predicate
+     *         false in case the file could not be loaded or parsed
      */
     protected final boolean check(String file, Predicate<SyntaxTree> test) {
         try {
@@ -176,35 +183,11 @@ public class Evaluator {
             });
     }
 
-        /**
-     * List of Checkstyle checks that are ignored for evaluation.
-     * This list can be adapted in the configure method().
-     */
-    protected static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>(); { 
-        CHECKSTYLE_IGNORES.addAll(Arrays.asList(
-            "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
-            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", 
-            "[NeedBraces]", "[MagicNumber]"
-        ));
-    }
-
-    /**
-     * List of file names that shall be considered by checkstyle and evaluation.
-     * This list is set in the configure method() and might be adpated by
-     * the assignments Checks class.
-     */
-    protected static List<String> EVALUATED_FILES = Arrays.asList("Main.java");
-
     /**
      * Indicates whether JEdUnit runs in the real world (true)
      * or under unit test conditions (false)
      */
     public static boolean REALWORLD = true;
-
-    /**
-     * Downgrade for every found checkstyle error.
-     */
-    protected static int CHECKSTYLE_PENALTY = 5;
 
     /**
      * This method evaluates the checkstyle log file.
@@ -215,13 +198,13 @@ public class Evaluator {
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
                 String result = in.nextLine();
-                for (String file : Evaluator.EVALUATED_FILES) {
+                for (String file : Config.EVALUATED_FILES) {
                     if (!result.contains(file)) continue;
-                    if (Evaluator.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
+                    if (Config.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
 
                     String msg = result.substring(result.indexOf(file));
                     comment(msg);
-                    this.points -= Evaluator.CHECKSTYLE_PENALTY;
+                    this.points -= Config.CHECKSTYLE_PENALTY;
                 }
             }
             in.close();
@@ -235,6 +218,7 @@ public class Evaluator {
 
     /**
      * Runs the evaluation.
+     * @param args command line options (not evaluated)
      */
     public static final void main(String[] args) {
         try {
@@ -242,7 +226,7 @@ public class Evaluator {
             comment("JEdUnit " + Evaluator.VERSION);
             comment("");
             check.configure();
-            check.checkstyle();
+            if (Config.CHECKSTYLE) check.checkstyle();
             comment("");
             check.process(Constraint.class); // process restriction checks
             check.process(Check.class);      // process functional tests
