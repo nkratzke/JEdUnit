@@ -96,6 +96,22 @@ public class Selected <T extends Node> {
         return this;
     }
 
+    /**
+     * Returns the first selected node.
+     * @return first selected node
+     */
+    public T first() {
+        return this.nodes.get(0);
+    }
+
+    /**
+     * Returns selected nodes as stream.
+     * @return Stream of selected nodes
+     */
+    public Stream<T> stream() {
+        return nodes.stream();
+    }
+
     public boolean isEmpty() { return this.nodes.isEmpty(); }
 
     public boolean exists() { return !this.isEmpty(); }

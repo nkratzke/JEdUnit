@@ -28,18 +28,28 @@ repositories {
     jcenter()
 }
 
-task generatePom << {
-    pom {
-        project {
-            groupId 'de.thl'
-            artifactId 'jedunit'
-            version project.version
-            inceptionYear '2018'
+task runExample(type: JavaExec) {
+    doFirst {
+        delete 'test'
+        mkdir 'test'
+        workingDir = 'test'
+        classpath = sourceSets.main.runtimeClasspath
+        main = 'de.thl.jedunit.CLI'
+    }
+    doLast {
+        exec {
+            workingDir = 'test'
+            commandLine './vpl_evaluate.sh'
         }
-    }.writeTo("pom.xml")
+        exec {
+            workingDir = 'test'
+            commandLine './vpl_execution'
+        }
+    }
 }
 
 jar {
+    // dependsOn 'runExample'
     manifest {
         attributes(
             'Implementation-Title': project.name,

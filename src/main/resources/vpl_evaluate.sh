@@ -1,3 +1,4 @@
+#! /bin/bash
 cat > vpl_execution <<EEOOFF
 #! /bin/bash
 
