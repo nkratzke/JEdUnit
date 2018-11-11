@@ -131,7 +131,7 @@ public class DSLTest {
         );
     }
 
-    @Test public void testParse() throws Exception {
+    @Test public void testParse() {
         SyntaxTree ast = parse(resource("Main.java.template"));
         assertEquals(1, ast.select(CLAZZ).count());
         assertEquals(0, ast.select(FIELD).count());
@@ -139,16 +139,17 @@ public class DSLTest {
         assertEquals(2, ast.select(METHOD).count());
     }
 
-    @Test(expected = Exception.class)
-    public void testNonSuccessfulParse() throws Exception {
-        SyntaxTree ast = parse("NotExisting.java");
-        ast.select(CLAZZ);
+    @Test
+    public void testNonSuccessfulParse() {
+        assertNull(parse("NotExisting.java"));
+        assertNull(parse(resource("SyntaxError.java.test")));
     }
 
-    @Test(expected = Exception.class)
-    public void testSyntaxErrorCode() throws Exception {
-        SyntaxTree ast = parse("SyntaxError.java");
-        ast.select(ClassOrInterfaceDeclaration.class);    
+    @Test
+    public void testInspect() {
+        assertTrue(inspect(resource("Reference.java.test"), ast -> ast.select(CLAZZ).isSingle()));
+        assertFalse(inspect(resource("SyntaxError.java.test"), ast -> true));
+        assertFalse(inspect("NotExisting.java", ast -> true));
     }
 
     @Test
@@ -173,8 +174,8 @@ public class DSLTest {
         assertEquals(3, compareClasses(reference, submission, t("Reference", "Submission")).violations().count());
         assertEquals(3, compareClasses(reference, submission, t("Stupid", "Nonsense"), t("Reference", "Submission")).violations().count());
 
-
         compareClasses(reference, submission, t("Reference", "Submission")).results().forEach(r -> {
+            r.getPoints();
             if (r.violates()) comment(submission.getFile(), r.getNode().getRange(), r.comment());
         });
         

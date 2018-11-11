@@ -261,10 +261,14 @@ public class DSL {
      * Parses a Java source file to generate an abstract syntax tree representation.
      * @param f Java source file
      * @return SyntaxTree object
-     * @throws Expection if file f could not be parsed sucessfully
+     *         null, if file f could not be parsed sucessfully
      */
-    public static SyntaxTree parse(String f) throws Exception {
-        return new SyntaxTree(f);
+    public static SyntaxTree parse(String f) {
+        try {
+            return new SyntaxTree(f);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     /**
@@ -276,7 +280,12 @@ public class DSL {
      */
     public static boolean inspect(String file, Predicate<SyntaxTree> test) {
         try {
-            return test.test(new SyntaxTree(file));
+            SyntaxTree ast = parse(file);
+            if (ast == null) {
+                comment("Could not parse file: " + file);
+                return false;
+            }
+            return test.test(ast);
         } catch (Exception ex) {
             comment("Check failed: " + ex);
             comment("Is there a syntax error in your submission? " + file);
@@ -308,9 +317,9 @@ public class DSL {
         ClassOrInterfaceDeclaration subClass = sub.asNode();
 
         if (normalize(subClass).equals(normalize(refClass, renamings))) {
-            result.add(true, subClass, "Class declaration correct");
+            result.add(true, refClass, subClass, "Class declaration correct");
         } else {
-            result.add(false, subClass, "Class declaration incorrect");
+            result.add(false, refClass, subClass, "Class declaration incorrect");
         }
 
         Selected<FieldDeclaration> refFields = ref.select(FIELD);
@@ -324,13 +333,13 @@ public class DSL {
                     for (VariableDeclarator svar : sf.getVariables()) {
                         String sfield = "" + sf.getModifiers() + sf.getCommonType() + " " + svar.getName();
                         if (rfield.equals(sfield)) {
-                            result.add(true, svar, "Datafield found: " + rfield);
+                            result.add(true, rvar, svar, "Datafield found: " + rfield);
                             found = true;
                         }
                     }
                 }
                 if (!found) {
-                    result.add(false, subClass, "Missing datafield: " + rfield);
+                    result.add(false, rvar, subClass, "Missing datafield: " + rfield);
                 }
             }
         }
@@ -344,14 +353,14 @@ public class DSL {
             for (CallableDeclaration sc : subCallables) {
                 if (normalize(rc, renamings).equals(normalize(sc))) {
                     String declaration = sc.getDeclarationAsString(true, false, false);
-                    result.add(true, sc, kind + " found: " + declaration);
+                    result.add(true, rc, sc, kind + " found: " + declaration);
                     found = true;
                     continue;
                 }
             }
             if (!found) {
                 String declaration = rename(rc.getDeclarationAsString(true, false, false), renamings);
-                result.add(false, subClass, "Missing " + kind + ": " + declaration);
+                result.add(false, rc, subClass, "Missing " + kind + ": " + declaration);
             }
         }
 

@@ -3,8 +3,17 @@ import java.util.List;
 public class Reference {
     
     public int datafield = 43, other=17;
+
+    /**
+     * 2 points
+     */    
     public static String CONST = "";
+    
+    /**
+     * 5 points
+     */
     protected List<Reference> next;
+
     String notSubmitted;
 
     public Reference(int a, String s) {
@@ -16,6 +25,7 @@ public class Reference {
     public void method(C c, Reference a) {
     }
 
+    // 3 points
     public Reference method(Reference a) {
         return null;
     }

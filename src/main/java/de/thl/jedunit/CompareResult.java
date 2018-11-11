@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.comments.Comment;
 
 
 public class CompareResult {
@@ -13,18 +14,21 @@ public class CompareResult {
     public class Entry {
 
         private boolean ok;
-        private Node node;
+        private Node reference;
+        private Node submission;
         private String comment;
 
         /**
          * Constructor to create a result entry.
          * @param ok check passed successfully
-         * @param n JavaParser node object to indicate the position in source file
+         * @param r reference node object (to get the )
+         * @param s submission node object to indicate the position in source file
          * @param c comment
          */
-        public Entry(boolean ok, Node n, String c) {
+        public Entry(boolean ok, Node r, Node s, String c) {
             this.ok = ok;
-            this.node = n;
+            this.reference = r;
+            this.submission = s;
             this.comment = c;
         }
 
@@ -32,7 +36,17 @@ public class CompareResult {
 
         public boolean ok() { return this.ok; }
 
-        public Node getNode() { return this.node; }
+        public Node getNode() { return this.submission; }
+
+        public int getPoints() { 
+            int p = 1;
+            if (this.reference.getComment().isPresent()) {
+                Comment comment = this.reference.getComment().get();
+                String content = comment.getContent();
+                DSL.comment(content);
+            }
+            return p;
+        }
 
         public String comment() { return this.comment; }
 
@@ -44,8 +58,8 @@ public class CompareResult {
 
     private List<Entry> results = new LinkedList<>();
 
-    public void add(boolean ok, Node n, String c) {
-        results.add(new Entry(ok, n, c));
+    public void add(boolean ok, Node r, Node s, String c) {
+        results.add(new Entry(ok, r, s, c));
     }
 
     public Stream<Entry> results() {

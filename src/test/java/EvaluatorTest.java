@@ -73,7 +73,6 @@ public class EvaluatorTest {
         assertTrue("Failing abort condition", console.contains("This kind of abort should not reduce points"));
         assertTrue("Evaluation aborted.", console.contains("Evaluation aborted! This should result in zero points"));
         assertTrue("Handles failing tests", console.contains("failingTest failed"));
-        assertTrue("Handles failing checks", console.contains("FileNotFoundException"));
         assertTrue("Handles failing checks", console.contains("ArrayIndexOutOfBoundsException"));
         assertTrue("Penalizing messages occur if condition is met", console.contains("[FAILED] This should reduce points (-3% on total result)"));
         assertFalse("Penalizing messages don't occur if condition is not met", console.contains("This message should not occur"));
