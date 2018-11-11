@@ -1,6 +1,9 @@
 package de.thl.jedunit;
 
+import static de.thl.jedunit.DSL.*;
+
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -15,7 +18,7 @@ import com.github.javaparser.ast.Node;
  * 
  * @author Nane Kratzke
  */
-public class Selected <T extends Node> {
+public class Selected <T extends Node> implements Iterable<T> {
 
     private String file = "";
 
@@ -78,7 +81,7 @@ public class Selected <T extends Node> {
      */
     public Selected<T> annotate(String msg) {
         for(T node : this.nodes) {
-            Evaluator.comment(this.file, node.getRange(), msg);
+            comment(this.file, node.getRange(), msg);
         }
         return this;
     }
@@ -91,7 +94,7 @@ public class Selected <T extends Node> {
      */
     public Selected<T> annotate(Function<T, String> msg) {
         for (T node  : this.nodes) {
-            Evaluator.comment(this.file, node.getRange(), msg.apply(node));
+            comment(this.file, node.getRange(), msg.apply(node));
         }
         return this;
     }
@@ -100,20 +103,51 @@ public class Selected <T extends Node> {
      * Returns the first selected node.
      * @return first selected node
      */
-    public T first() {
-        return this.nodes.get(0);
+    public Selected<T> first() {
+        return new Selected<T>(this.nodes.get(0), this.file);
     }
 
     /**
-     * Returns selected nodes as stream.
-     * @return Stream of selected nodes
+     * Returns an iterator over selected nodes.
+     * @return Iterator object to process selected nodes
      */
-    public Stream<T> stream() {
-        return nodes.stream();
+    public Iterator<T> iterator() {
+        return this.nodes.iterator();
     }
 
+    /**
+     * Returns whether no nodes have been selected.
+     * @return true, if no nodes are selected
+     *         false, otherwise
+     */
     public boolean isEmpty() { return this.nodes.isEmpty(); }
 
+    /**
+     * Returns whether only a single node is selected.
+     */
+    public boolean isSingle() { return this.nodes.size() == 1; }
+
+    /**
+     * Gets the first selected node.
+     * @return First selected node.
+     */
+    public T asNode() { return this.nodes.get(0); }
+
+    /**
+     * Returns whether selected node exists.
+     * @return true, if nodes are selected
+     *         false, otherwise
+     */
     public boolean exists() { return !this.isEmpty(); }
+
+    /**
+     * Returns the amount of selected nodes.
+     */
+    public int count() { return this.nodes.size(); }
+
+    /**
+     * Returns the file where the selected nodes are coded.
+     */
+    public String getFile() { return this.file; }
 
 }

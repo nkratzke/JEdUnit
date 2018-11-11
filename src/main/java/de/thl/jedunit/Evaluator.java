@@ -1,18 +1,15 @@
 package de.thl.jedunit;
 
-import static de.thl.jedunit.Randomized.t;
+import static de.thl.jedunit.DSL.comment;
+import static de.thl.jedunit.DSL.t;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import com.github.javaparser.Range;
 
 import io.vavr.Tuple2;
 
@@ -31,7 +28,7 @@ public class Evaluator {
     /**
      * Version (Semantic Versioning).
      */
-    public static final String VERSION = "0.1.13";
+    public static final String VERSION = "0.1.14";
 
     /**
      * The maximum points for a VPL assignment.
@@ -124,41 +121,6 @@ public class Evaluator {
         } catch (Exception ex) {
             comment("[FAILED due to " + ex + "] " + comment);
         }
-    }
-
-    /**
-     * Can be used to formulate arbitrary AST-based checks on parsed source code.
-     * @param file File to load an parse
-     * @param test Logical predicate on the AST of file
-     * @return evaluated test predicate
-     *         false in case the file could not be loaded or parsed
-     */
-    protected final boolean check(String file, Predicate<SyntaxTree> test) {
-        try {
-            return test.test(new SyntaxTree(file));
-        } catch (Exception ex) {
-            comment("Check failed: " + ex);
-            comment("Is there a syntax error in your submission? " + file);
-            return false;
-        }
-    }
-
-    /**
-     * Adds a comment for VPL via console output.
-     */
-    public static void comment(String c) { 
-        System.out.println("Comment :=>> " + c); 
-    }
-
-    /**
-     * Adds a comment for VPL via console output.
-     * Marks file and position via a JavaParser range.
-     */
-    public static void comment(String file, Optional<Range> range, String c) {
-        if (!range.isPresent()) comment(file + ": " + c);
-        int line = range.get().begin.line;
-        int col = range.get().begin.column;
-        comment(String.format("%s:%d:%d: %s", file, line, col, c));
     }
 
     /**

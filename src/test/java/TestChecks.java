@@ -1,9 +1,13 @@
-import de.thl.jedunit.*;
-import java.util.stream.*;
+import static de.thl.jedunit.DSL.c;
+import static de.thl.jedunit.DSL.inspect;
+import static de.thl.jedunit.DSL.s;
+
+import java.util.stream.Stream;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import static de.thl.jedunit.Randomized.*;
+import de.thl.jedunit.Constraints;
+import de.thl.jedunit.Test;
 
 public class TestChecks extends Constraints {
     
@@ -56,7 +60,7 @@ public class TestChecks extends Constraints {
 
     @Test(weight=0.0, description="Failing Checks test")
     public void failingCheck() {
-        grading(100, "This check will fail", () -> check("NotExisting.java", (ast) -> ast.select(ClassOrInterfaceDeclaration.class).exists()));
+        grading(100, "This check will fail", () -> inspect("NotExisting.java", (ast) -> ast.select(ClassOrInterfaceDeclaration.class).exists()));
         grading(100, "This check will also fail", () -> { double[] d = {}; return d[0] == 0; });
     }
 

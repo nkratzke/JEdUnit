@@ -1,9 +1,7 @@
-import static de.thl.jedunit.Randomized.s;
+import static de.thl.jedunit.DSL.s;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -14,8 +12,8 @@ import de.thl.jedunit.CLI;
 
 public class CLITest {
 
-    public static String DIR = null;
-    public static String CWD = null;
+    private static String DIR = null;
+    private static String CWD = null;
 
     @Before public void createTestDir() {
         DIR = s("/tmp/test-[a-z]{5}-[0-9]{3}");

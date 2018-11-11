@@ -1,0 +1,26 @@
+import java.util.List;
+
+public class Submission {
+    
+    public int datafield = 43;
+    public static String CONST = "";
+    protected List<Submission> next;
+    private boolean notRequested;
+
+    public Submission(int a, String s) {
+    }
+
+    Submission(String s) {
+    }
+
+    public void method(C c, Submission a) {
+    }
+
+    public Submission method(Submission a) {
+        return null;
+    }
+
+    private int test(Submission a) {
+        return 0;
+    }
+}

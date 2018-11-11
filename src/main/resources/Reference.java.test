@@ -1,0 +1,30 @@
+import java.util.List;
+
+public class Reference {
+    
+    public int datafield = 43, other=17;
+    public static String CONST = "";
+    protected List<Reference> next;
+    String notSubmitted;
+
+    public Reference(int a, String s) {
+    }
+
+    Reference(String s) {
+    }
+
+    public void method(C c, Reference a) {
+    }
+
+    public Reference method(Reference a) {
+        return null;
+    }
+
+    private int test(Reference a) {
+        return 0;
+    }
+
+    protected boolean notFound() {
+        return false;
+    }
+}
