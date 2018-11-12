@@ -172,15 +172,15 @@ public class DSLTest {
         assertEquals(members + 1, compareClasses(submission, empty, t("Stupid", "Nonsense")).violations().count());
 
         assertEquals(3, compareClasses(reference, submission, t("Reference", "Submission")).violations().count());
-        assertEquals(3, compareClasses(reference, submission, t("Stupid", "Nonsense"), t("Reference", "Submission")).violations().count());
+        assertEquals(3, compareClasses(reference, submission, t("Stupid", "Nonsense"), t("Reference", "Submission")).violations().count());        
+    }
 
+    @Test
+    public void testComments() {
+        Selected<ClassOrInterfaceDeclaration> submission = parse(resource("Submission.java.test")).select(CLAZZ).first();
+        Selected<ClassOrInterfaceDeclaration> reference = parse(resource("Reference.java.test")).select(CLAZZ).first();
         compareClasses(reference, submission, t("Reference", "Submission")).results().forEach(r -> {
-            r.getPoints();
-            if (r.violates()) comment(submission.getFile(), r.getNode().getRange(), r.comment());
+            System.out.println(r.getPoints());
         });
-        
-        inspect(resource("Reference.java.test"), ast -> 
-            ast.select(CLAZZ).filter(c -> c.isPublic()).first().isSingle()
-        );
     }
 }

@@ -333,13 +333,13 @@ public class DSL {
                     for (VariableDeclarator svar : sf.getVariables()) {
                         String sfield = "" + sf.getModifiers() + sf.getCommonType() + " " + svar.getName();
                         if (rfield.equals(sfield)) {
-                            result.add(true, rvar, svar, "Datafield found: " + rfield);
+                            result.add(true, rf, svar, "Datafield found: " + rfield);
                             found = true;
                         }
                     }
                 }
                 if (!found) {
-                    result.add(false, rvar, subClass, "Missing datafield: " + rfield);
+                    result.add(false, rf, subClass, "Missing datafield: " + rfield);
                 }
             }
         }

@@ -1,19 +1,28 @@
 import java.util.List;
 
+/**
+ * @points 1
+ */
 public class Reference {
     
+    /**
+     * Without points
+     */
     public int datafield = 43, other=17;
 
     /**
-     * 2 points
+     * @points 2
      */    
     public static String CONST = "";
     
     /**
-     * 5 points
+     * @points 5
      */
     protected List<Reference> next;
 
+    /**
+     * @points no numeric value
+     */ 
     String notSubmitted;
 
     public Reference(int a, String s) {
@@ -25,7 +34,9 @@ public class Reference {
     public void method(C c, Reference a) {
     }
 
-    // 3 points
+    /**
+     * @points 3
+     */
     public Reference method(Reference a) {
         return null;
     }

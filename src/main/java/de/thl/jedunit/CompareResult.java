@@ -2,6 +2,7 @@ package de.thl.jedunit;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,13 +40,16 @@ public class CompareResult {
         public Node getNode() { return this.submission; }
 
         public int getPoints() { 
-            int p = 1;
-            if (this.reference.getComment().isPresent()) {
-                Comment comment = this.reference.getComment().get();
-                String content = comment.getContent();
-                DSL.comment(content);
+            try {
+                return Integer.parseInt(
+                    this.reference.getComment().get().asJavadocComment().parse().getBlockTags().stream()
+                        .filter(t -> t.getTagName().equals("points"))
+                        .map(t -> t.getContent().toText())
+                        .findFirst().get()
+                );
+            } catch (Exception ex) {
+                return 1;
             }
-            return p;
         }
 
         public String comment() { return this.comment; }
