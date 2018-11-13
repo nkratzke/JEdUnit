@@ -3,8 +3,6 @@ package de.thl.jedunit;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.body.CallableDeclaration;
@@ -12,7 +10,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.mifmif.common.regex.Generex;
 
 import io.vavr.Tuple;
@@ -291,115 +288,6 @@ public class DSL {
             comment("Is there a syntax error in your submission? " + file);
             return false;
         }
-    }
-
-    /**
-     * Compares the structure of a submitted class with a reference class.
-     * Returns all structural differences between both classes of following kinds:
-     * 
-     * - structural difference of class declaration (extends, implements)
-     * - structural differences of datafields
-     * - structural differences of callables (methods, constructors)
-     * 
-     * So far: no type parameters are supported (generic classes)!
-     * 
-     * @param ref reference class (reference must be a single selected)
-     * @param sub submitted class (submitted must be a single selected)
-     * @param renamings List of renaming tuples (to match the names in reference class with the in the submitted class)
-     * @return null, if ref of sub are not single selected nodes.
-     *         structural differences (as CompareResult object)
-     */
-    public static CompareResult compareClasses(Selected<ClassOrInterfaceDeclaration> ref, Selected<ClassOrInterfaceDeclaration> sub, Tuple2<String, String>... renamings) {
-        if (!ref.isSingle() || !sub.isSingle()) return null;
-
-        CompareResult result = new CompareResult();
-        ClassOrInterfaceDeclaration refClass = ref.asNode();
-        ClassOrInterfaceDeclaration subClass = sub.asNode();
-
-        if (normalize(subClass).equals(normalize(refClass, renamings))) {
-            result.add(true, refClass, subClass, "Class declaration correct");
-        } else {
-            result.add(false, refClass, subClass, "Class declaration incorrect");
-        }
-
-        Selected<FieldDeclaration> refFields = ref.select(FIELD);
-        Selected<FieldDeclaration> subFields = sub.select(FIELD);
-
-        for(FieldDeclaration rf : refFields) {
-            for (VariableDeclarator rvar : rf.getVariables()) {
-                String rfield = rename("" + rf.getModifiers() + rf.getCommonType() + " " + rvar.getName(), renamings);
-                boolean found = false;
-                for (FieldDeclaration sf : subFields) {
-                    for (VariableDeclarator svar : sf.getVariables()) {
-                        String sfield = "" + sf.getModifiers() + sf.getCommonType() + " " + svar.getName();
-                        if (rfield.equals(sfield)) {
-                            result.add(true, rf, svar, "Datafield found: " + rfield);
-                            found = true;
-                        }
-                    }
-                }
-                if (!found) {
-                    result.add(false, rf, subClass, "Missing datafield: " + rfield);
-                }
-            }
-        }
-
-        Selected<CallableDeclaration> refCallables = ref.select(CALLABLE);
-        Selected<CallableDeclaration> subCallables = sub.select(CALLABLE);
-
-        for (CallableDeclaration rc : refCallables) {
-            boolean found = false;
-            String kind = rc.isConstructorDeclaration() ? "constructor" : "method";
-            for (CallableDeclaration sc : subCallables) {
-                if (normalize(rc, renamings).equals(normalize(sc))) {
-                    String declaration = sc.getDeclarationAsString(true, false, false);
-                    result.add(true, rc, sc, kind + " found: " + declaration);
-                    found = true;
-                    continue;
-                }
-            }
-            if (!found) {
-                String declaration = rename(rc.getDeclarationAsString(true, false, false), renamings);
-                result.add(false, rc, subClass, "Missing " + kind + ": " + declaration);
-            }
-        }
-
-        return result;
-    }
-
-    @SafeVarargs
-    private static String normalize(ClassOrInterfaceDeclaration clazz, Tuple2<String, String>... renamings) {
-        return join(" ", Stream.of(
-            "class:",
-            clazz.getModifiers(),
-            rename(clazz.getNameAsExpression(), renamings),
-            rename(clazz.getTypeParameters(), renamings),
-            rename(clazz.getExtendedTypes(), renamings),
-            rename(clazz.getImplementedTypes(), renamings)
-        ));
-    }
-
-    @SafeVarargs
-    private static String normalize(CallableDeclaration<?> callable, Tuple2<String, String>... renamings) {       
-        return join(" ", Stream.of(
-            callable.isConstructorDeclaration() ? "constructor:" : "method:",
-            callable.getModifiers(),
-            rename(callable.getTypeParameters(), renamings),
-            rename(callable.getDeclarationAsString(false, false), renamings)
-        ));
-    }
-
-    @SafeVarargs
-    private static <T> String rename(T s, Tuple2<String, String>... renamings) {
-        String result = s.toString();
-        for (Tuple2<String, String> rename : renamings) {
-            result = result.replaceAll(rename._1, rename._2);
-        }
-        return result;
-    }
-
-    private static <T> String join(String sep, Stream<T> s) {
-        return s.map(d -> d.toString()).collect(Collectors.joining(sep)).trim();
     }
 
     /**

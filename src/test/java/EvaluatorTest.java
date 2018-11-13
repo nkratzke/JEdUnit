@@ -68,8 +68,8 @@ public class EvaluatorTest {
         String console = system.toString();
         // redirected.println(console);
         assertTrue("Commenting", console.contains("Comment :=>>"));
-        assertTrue("OK detection", console.contains("Check 1: [OK]"));
-        assertTrue("FAILED detection", console.contains("Check 2: [FAILED]"));
+        assertTrue("OK detection", console.contains("[OK] Counting 'o' in \"Hello World\" must return 2."));
+        assertTrue("FAILED detection", console.contains("[FAILED] Counting 'w' in \"Hello World\" must return 2."));
         assertTrue("Failing abort condition", console.contains("This kind of abort should not reduce points"));
         assertTrue("Evaluation aborted.", console.contains("Evaluation aborted! This should result in zero points"));
         assertTrue("Handles failing tests", console.contains("failingTest failed"));
@@ -81,6 +81,5 @@ public class EvaluatorTest {
         assertEquals(4, Stream.of(console.split("\n")).filter(line -> line.endsWith("Grade :=>> 0")).count());
         assertEquals(1, Stream.of(console.split("\n")).filter(line -> line.contains("Grade :=>> 12")).count());
         assertEquals(7, Stream.of(console.split("\n")).filter(line -> line.contains("Grade :=>>")).count());
-        assertTrue("Runs all checks", console.contains("Check 22:"));
     }
 }

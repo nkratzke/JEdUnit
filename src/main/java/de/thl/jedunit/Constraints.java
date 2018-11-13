@@ -1,17 +1,23 @@
 package de.thl.jedunit;
 
+import static de.thl.jedunit.DSL.CALLABLE;
+import static de.thl.jedunit.DSL.FIELD;
 import static de.thl.jedunit.DSL.comment;
 import static de.thl.jedunit.DSL.inspect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -25,6 +31,8 @@ import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
+
+import io.vavr.Tuple2;
 
 /**
  * This class provides several preconfigured constraints.
@@ -149,5 +157,151 @@ public class Constraints extends Evaluator {
                 ));
             }
         }
+    }
+
+    /**
+     * Compares the structure of a submitted class with a reference class.
+     * Reports all structural differences between both classes of following kinds:
+     * 
+     * - structural difference of class declaration (extends, implements)
+     * - structural differences of datafields
+     * - structural differences of callables (methods, constructors)
+     * 
+     * So far: 
+     * - no type parameters are considered (generic classes)!
+     * - no inner classes are considered
+     * 
+     * @param ref reference class (reference must be a single selected)
+     * @param sub submitted class (submitted must be a single selected)
+     * @param renamings List of renaming tuples (to match the names in reference class with the in the submitted class)
+     * @return Results of structural difference analysis (CompareResult object)
+     */
+    @SafeVarargs
+    public final CompareResult compareClasses(Selected<ClassOrInterfaceDeclaration> ref, Selected<ClassOrInterfaceDeclaration> sub, Tuple2<String, String>... renamings) {
+        return compareClasses(false, ref, sub, renamings);
+    }
+    
+    /**
+     * Compares the structure of a submitted class with a reference class.
+     * Reports all structural differences between both classes of following kinds:
+     * 
+     * - structural difference of class declaration (extends, implements)
+     * - structural differences of datafields
+     * - structural differences of callables (methods, constructors)
+     * 
+     * So far: 
+     * - no type parameters are considered (generic classes)!
+     * - no inner classes are considered
+     * 
+     * @param verbose Differences are printed to console
+     * @param ref reference class (reference must be a single selected)
+     * @param sub submitted class (submitted must be a single selected)
+     * @param renamings List of renaming tuples (to match the names in reference class with the in the submitted class)
+     * @return Results of structural difference analysis (CompareResult object)
+     */
+    @SafeVarargs
+    public final CompareResult compareClasses(boolean verbose, Selected<ClassOrInterfaceDeclaration> ref, Selected<ClassOrInterfaceDeclaration> sub, Tuple2<String, String>... renamings) {
+        if (!ref.isSingle() || !sub.isSingle()) return null;
+
+        CompareResult result = new CompareResult();
+        ClassOrInterfaceDeclaration refClass = ref.asNode();
+        ClassOrInterfaceDeclaration subClass = sub.asNode();
+
+        if (normalize(subClass).equals(normalize(refClass, renamings))) {
+            result.add(true, refClass, subClass, "Class declaration correct");
+        } else {
+            result.add(false, refClass, subClass, "Class declaration incorrect");
+        }
+
+        Selected<FieldDeclaration> refFields = ref.select(FIELD);
+        Selected<FieldDeclaration> subFields = sub.select(FIELD);
+
+        for(FieldDeclaration rf : refFields) {
+            for (VariableDeclarator rvar : rf.getVariables()) {
+                String rfield = rename("" + normalize(rf.getModifiers()) + " " + rf.getCommonType() + " " + rvar.getName(), renamings);
+                boolean found = false;
+                for (FieldDeclaration sf : subFields) {
+                    for (VariableDeclarator svar : sf.getVariables()) {
+                        String sfield = "" + normalize(sf.getModifiers()) + " " + sf.getCommonType() + " " + svar.getName();
+                        if (rfield.equals(sfield)) {
+                            result.add(true, rf, svar, "Datafield found: " + rfield);
+                            found = true;
+                        }
+                    }
+                }
+                if (!found) {
+                    result.add(false, rf, subClass, "Missing/wrong declared datafield: " + rfield);
+                }
+            }
+        }
+
+        Selected<CallableDeclaration> refCallables = ref.select(CALLABLE);
+        Selected<CallableDeclaration> subCallables = sub.select(CALLABLE);
+
+        for (CallableDeclaration rc : refCallables) {
+            boolean found = false;
+            String kind = rc.isConstructorDeclaration() ? "constructor" : "method";
+            for (CallableDeclaration sc : subCallables) {
+                if (normalize(rc, renamings).equals(normalize(sc))) {
+                    String declaration = sc.getDeclarationAsString(true, false, false);
+                    result.add(true, rc, sc, kind + " found: " + declaration);
+                    found = true;
+                    continue;
+                }
+            }
+            if (!found) {
+                String declaration = rename(rc.getDeclarationAsString(true, false, false), renamings);
+                result.add(false, rc, subClass, "Missing/wrong declared " + kind + ": " + declaration);
+            }
+        }
+
+        // Report results
+        if (verbose) result.forEach(r -> {
+            grading(r.getPoints(), r.comment(), () -> r.ok());
+            if (r.violates()) {
+                comment(sub.getFile(), r.getNode().getRange(), r.comment());
+            }
+        });
+
+        return result;
+    }
+
+    @SafeVarargs
+    private static String normalize(ClassOrInterfaceDeclaration clazz, Tuple2<String, String>... renamings) {
+        return join(" ", Stream.of(
+            "class:",
+            normalize(clazz.getModifiers()),
+            rename(clazz.getNameAsExpression(), renamings),
+            rename(clazz.getTypeParameters(), renamings),
+            rename(clazz.getExtendedTypes(), renamings),
+            rename(clazz.getImplementedTypes(), renamings)
+        ));
+    }
+
+    private static String normalize(EnumSet<?> xs) {
+        return xs.stream().map(x -> x.toString().toLowerCase()).collect(Collectors.joining(" "));
+    }
+
+    @SafeVarargs
+    private static String normalize(CallableDeclaration<?> callable, Tuple2<String, String>... renamings) {       
+        return join(" ", Stream.of(
+            callable.isConstructorDeclaration() ? "constructor:" : "method:",
+            normalize(callable.getModifiers()),
+            rename(callable.getTypeParameters(), renamings),
+            rename(callable.getDeclarationAsString(false, false), renamings)
+        ));
+    }
+
+    @SafeVarargs
+    private static <T> String rename(T s, Tuple2<String, String>... renamings) {
+        String result = s.toString();
+        for (Tuple2<String, String> rename : renamings) {
+            result = result.replaceAll(rename._1, rename._2);
+        }
+        return result;
+    }
+
+    private static <T> String join(String sep, Stream<T> s) {
+        return s.map(d -> d.toString()).collect(Collectors.joining(sep)).trim();
     }
 }

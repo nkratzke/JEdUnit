@@ -175,7 +175,7 @@ public class Evaluator {
                     grade(t.weight(), results);
                     comment("");
                 } catch (Exception ex) {
-                    comment("Test method " + method.getName() + " failed completely." + ex);
+                    comment("Test " + method.getName() + " failed completely." + ex);
                     grade();
                 }
                 results.clear();
@@ -200,7 +200,7 @@ public class Evaluator {
                     grade();
                     comment("");
                 } catch (Exception ex) {
-                    comment("Test method " + method.getName() + " failed completely." + ex);
+                    comment("Inspection " + method.getName() + " failed completely." + ex);
                     grade();
                 }
                 results.clear();

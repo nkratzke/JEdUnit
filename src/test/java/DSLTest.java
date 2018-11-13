@@ -5,8 +5,6 @@ import static de.thl.jedunit.DSL.FIELD;
 import static de.thl.jedunit.DSL.METHOD;
 import static de.thl.jedunit.DSL.b;
 import static de.thl.jedunit.DSL.c;
-import static de.thl.jedunit.DSL.comment;
-import static de.thl.jedunit.DSL.compareClasses;
 import static de.thl.jedunit.DSL.d;
 import static de.thl.jedunit.DSL.i;
 import static de.thl.jedunit.DSL.inspect;
@@ -21,16 +19,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import de.thl.jedunit.Constraints;
+import de.thl.jedunit.Evaluator;
 import de.thl.jedunit.Selected;
 import de.thl.jedunit.SyntaxTree;
 
-public class DSLTest {
+public class DSLTest extends Constraints {
 
     public static int N = 1000;
     
@@ -175,12 +179,27 @@ public class DSLTest {
         assertEquals(3, compareClasses(reference, submission, t("Stupid", "Nonsense"), t("Reference", "Submission")).violations().count());        
     }
 
-    @Test
-    public void testComments() {
+    @Test public void testComments() {
+        PrintStream redirected = System.out;
+        ByteArrayOutputStream system = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(system));
+
         Selected<ClassOrInterfaceDeclaration> submission = parse(resource("Submission.java.test")).select(CLAZZ).first();
         Selected<ClassOrInterfaceDeclaration> reference = parse(resource("Reference.java.test")).select(CLAZZ).first();
-        compareClasses(reference, submission, t("Reference", "Submission")).results().forEach(r -> {
-            System.out.println(r.getPoints());
-        });
+        compareClasses(true, reference, submission, t("Reference", "Submission"));
+
+        String console = system.toString();
+        // redirected.println(console);
+
+        assertTrue(console.contains("[OK] Class declaration correct (1 points)"));
+        assertTrue(console.contains("[OK] Datafield found: public int datafield (1 points)"));
+        assertTrue(console.contains("[OK] Datafield found: public static String CONST (2 points)"));
+        assertTrue(console.contains("[OK] method found: public Submission method(Submission) (3 points)"));
+        assertTrue(console.contains("[OK] Datafield found: protected List<Submission> next (5 points)"));
+        assertTrue(console.contains("[FAILED] Missing/wrong declared datafield:  String notSubmitted (0 of 1 points)"));
+        assertTrue(console.contains("[FAILED] Missing/wrong declared datafield: public int other (0 of 1 points)"));
+        assertTrue(console.contains("[FAILED] Missing/wrong declared method: protected boolean notFound() (0 of 1 points)"));
+
+        System.setOut(redirected);
     }
 }
