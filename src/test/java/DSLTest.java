@@ -18,19 +18,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import de.thl.jedunit.DSL;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import static com.github.javaparser.ast.Modifier.*;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import de.thl.jedunit.Constraints;
-import de.thl.jedunit.Evaluator;
 import de.thl.jedunit.Selected;
 import de.thl.jedunit.SyntaxTree;
 
@@ -179,7 +178,7 @@ public class DSLTest extends Constraints {
         assertEquals(3, compareClasses(reference, submission, t("Stupid", "Nonsense"), t("Reference", "Submission")).violations().count());        
     }
 
-    @Test public void testComments() {
+    @Test public void testCompareClassesOutput() {
         PrintStream redirected = System.out;
         ByteArrayOutputStream system = new ByteArrayOutputStream();
         System.setOut(new PrintStream(system));
