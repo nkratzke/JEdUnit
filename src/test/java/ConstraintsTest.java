@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class ConstraintsTest {
             public void configure() {
                 super.configure();
                 String file = ClassLoader.getSystemClassLoader().getResource("Nightmare.java").getFile();
-                Config.EVALUATED_FILES = Arrays.asList(file);
+                Config.EVALUATED_FILES = new HashSet<>(Arrays.asList(file));
                 Config.CHECK_IMPORTS = true;
                 Config.ALLOWED_IMPORTS = Arrays.asList("java.io");
                 Config.ALLOW_LOOPS = false;                 
@@ -83,7 +84,7 @@ public class ConstraintsTest {
             public void configure() {
                 super.configure();
                 String file = ClassLoader.getSystemClassLoader().getResource("Nightmare.java").getFile();
-                Config.EVALUATED_FILES = Arrays.asList(file);
+                Config.EVALUATED_FILES = new HashSet<>(Arrays.asList(file));
                 Config.CHECK_IMPORTS = false;
                 Config.ALLOW_LOOPS = true;                 
                 Config.ALLOW_METHODS = true;               
@@ -115,7 +116,7 @@ public class ConstraintsTest {
             public void configure() {
                 super.configure();
                 String file = ClassLoader.getSystemClassLoader().getResource("Evil.java").getFile();
-                Config.EVALUATED_FILES = Arrays.asList(file);
+                Config.EVALUATED_FILES = new HashSet<>(Arrays.asList(file));
                 Evaluator.REALWORLD = false;
             }
         };

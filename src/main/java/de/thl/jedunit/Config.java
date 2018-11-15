@@ -3,6 +3,8 @@ package de.thl.jedunit;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Provides all config options for JEdUnit that can be set in
@@ -16,7 +18,7 @@ public class Config {
      * This list is set in the configure method() and might be adpated by
      * the assignments Checks class.
      */
-    public static List<String> EVALUATED_FILES = Arrays.asList("Main.java");
+    public static Set<String> EVALUATED_FILES = new HashSet<>(Arrays.asList("Main.java"));
 
     /**
      * Option to evaluate the checkstyle log.
@@ -34,10 +36,11 @@ public class Config {
      */
     public static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>(); 
     static { 
-        CHECKSTYLE_IGNORES.addAll(Arrays.asList(
+        CHECKSTYLE_IGNORES.addAll(Arrays.asList("[Javadoc",
             "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
-            "[JavadocPackage]", "[AvoidInlineConditionals]", "[RegexpSingleline]", 
-            "[NeedBraces]", "[MagicNumber]"
+            "[AvoidInlineConditionals]", "[RegexpSingleline]", 
+            "[NeedBraces]", "[MagicNumber]", "[RedundantModifier]", "[VisibilityModifier]",
+            "[DesignForExtension]"
         ));
     }
 
