@@ -206,7 +206,7 @@ public class DSLTest extends Constraints {
         assertTrue(console.contains("[OK] Class declaration correct (1 points)"));
         assertTrue(console.contains("[OK] Datafield found: public int datafield (1 points)"));
         assertTrue(console.contains("[OK] Datafield found: public static String CONST (2 points)"));
-        assertTrue(console.contains("[OK] method found: public Submission method(Submission) (3 points)"));
+        assertTrue(console.contains("[OK] Method found: public Submission method(Submission) (3 points)"));
         assertTrue(console.contains("[OK] Datafield found: protected List<Submission> next (5 points)"));
         assertTrue(console.contains("[FAILED] Missing/wrong declared datafield:  String notSubmitted (0 of 1 points)"));
         assertTrue(console.contains("[FAILED] Missing/wrong declared datafield: public int other (0 of 1 points)"));

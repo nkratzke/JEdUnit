@@ -247,7 +247,7 @@ public class Constraints extends Evaluator {
 
         for (CallableDeclaration rc : refCallables) {
             boolean found = false;
-            String kind = rc.isConstructorDeclaration() ? "constructor" : "method";
+            String kind = rc.isConstructorDeclaration() ? "Constructor" : "Method";
             for (CallableDeclaration sc : subCallables) {
                 if (normalize(rc, renamings).equals(normalize(sc))) {
                     String declaration = sc.getDeclarationAsString(true, false, false);
@@ -258,7 +258,7 @@ public class Constraints extends Evaluator {
             }
             if (!found) {
                 String declaration = rename(rc.getDeclarationAsString(true, false, false), renamings);
-                result.add(false, rc, subClass, "Missing/wrong declared " + kind + ": " + declaration);
+                result.add(false, rc, subClass, "Missing/wrong declared " + kind.toLowerCase() + ": " + declaration);
             }
         }
 
