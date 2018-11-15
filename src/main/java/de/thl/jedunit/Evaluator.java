@@ -28,7 +28,7 @@ public class Evaluator {
     /**
      * Version (Semantic Versioning).
      */
-    public static final String VERSION = "0.1.14";
+    public static final String VERSION = "0.1.15";
 
     /**
      * The maximum points for a VPL assignment.

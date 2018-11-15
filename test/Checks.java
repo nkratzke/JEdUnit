@@ -17,6 +17,8 @@ public class Checks extends Constraints {
     public void configure() {
         super.configure();
 
+        Config.EVALUATED_FILES.add("Main.java");
+
         // Config.CHECKSTYLE = false;                  // default: true
         // Config.CHECKSTYLE_PENALITY = 5;
         // Config.CHECKSTYLE_IGNORES.add("[NeedBraces]")

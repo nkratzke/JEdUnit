@@ -5,6 +5,7 @@ import static de.thl.jedunit.DSL.FIELD;
 import static de.thl.jedunit.DSL.comment;
 import static de.thl.jedunit.DSL.inspect;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -80,6 +81,12 @@ public class Constraints extends Evaluator {
     @Inspection(description="Inspect source files for coding violations")
     public void conventions() {
         for (String file : Config.EVALUATED_FILES) {
+
+            File f = new File(file);
+            if (!f.exists()) {
+                comment("File not found: " + file); 
+                continue; 
+            }
 
             if (Config.CHECK_IMPORTS) penalize(Config.IMPORT_PENALTY, "Non-allowed libraries", () -> inspect(file, ast ->
                 ast.select(ImportDeclaration.class)
