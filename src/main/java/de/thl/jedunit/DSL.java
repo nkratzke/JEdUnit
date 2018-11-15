@@ -207,6 +207,16 @@ public class DSL {
     }
 
     /**
+     * Generates a random list of specified length.
+     * @param l Length of list > 0
+     * @param p Supplier to create random entries for the list
+     * @return List of random entries
+     */
+    public static <T> List<T> l(int l, Supplier<T> p) {
+        return List.ofAll(Stream.generate(p).limit(l));
+    }
+
+    /**
      * Generates a tuple from two values.
      * @return two-tuple
      */

@@ -96,6 +96,10 @@ public class DSLTest extends Constraints {
             assertTrue(l.size() >= 3);
             assertTrue(l.size() <= 10);
         });
+
+        assertEquals(3, l(3, () -> s(1, 10)).size());
+        assertEquals(2, l(2, () -> s(1, 10)).size());
+        assertEquals(1, l(1, () -> s(1, 10)).size());
     }
 
     @Test public void testTupleBuilding() {
