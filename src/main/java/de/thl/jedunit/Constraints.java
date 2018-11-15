@@ -263,13 +263,16 @@ public class Constraints extends Evaluator {
         }
 
         // Report results
-        if (verbose) result.forEach(r -> {
-            grading(r.getPoints(), r.comment(), () -> r.ok());
-            if (r.violates()) {
-                comment(sub.getFile(), r.getNode().getRange(), r.comment());
-            }
-        });
-
+        if (verbose) {
+            comment("Checking class structure: " + sub.getFile());
+            result.forEach(r -> {
+                grading(r.getPoints(), r.comment(), () -> r.ok());
+                if (r.violates()) {
+                    comment(sub.getFile(), r.getNode().getRange(), r.comment());
+                }
+            });
+            comment("");
+        }
         return result;
     }
 
