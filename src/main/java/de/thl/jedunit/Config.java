@@ -36,7 +36,7 @@ public class Config {
      */
     public static List<String> CHECKSTYLE_IGNORES = new LinkedList<String>(); 
     static { 
-        CHECKSTYLE_IGNORES.addAll(Arrays.asList("[Javadoc",
+        CHECKSTYLE_IGNORES.addAll(Arrays.asList("[Javadoc", "Javadoc]",
             "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]", "[FinalParameters]",
             "[AvoidInlineConditionals]", "[RegexpSingleline]", 
             "[NeedBraces]", "[MagicNumber]", "[RedundantModifier]", "[VisibilityModifier]",
