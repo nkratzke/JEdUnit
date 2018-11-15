@@ -32,10 +32,16 @@ task runExample(type: JavaExec) {
     doFirst {
         delete 'test'
         mkdir 'test'
-        workingDir = 'test'
-        classpath = sourceSets.main.runtimeClasspath
-        main = 'de.thl.jedunit.CLI'
+        exec {
+            workingDir = 'test'
+            commandLine = '../init.sh'
+        }
     }
+    
+    workingDir = 'test'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'de.thl.jedunit.CLI'
+    
     doLast {
         exec {
             workingDir = 'test'

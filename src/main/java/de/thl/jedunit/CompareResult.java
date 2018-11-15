@@ -38,10 +38,10 @@ public class CompareResult implements Iterable<CompareResult.Entry> {
          * @param c comment
          */
         public Entry(boolean ok, Node r, Node s, String c) {
-            this.ok = ok;
             this.reference = r;
             this.submission = s;
             this.comment = c;
+            this.ok = ok;
         }
 
         /**
