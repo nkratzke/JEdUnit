@@ -8,6 +8,7 @@ import static de.thl.jedunit.DSL.c;
 import static de.thl.jedunit.DSL.d;
 import static de.thl.jedunit.DSL.i;
 import static de.thl.jedunit.DSL.inspect;
+import static de.thl.jedunit.DSL.l;
 import static de.thl.jedunit.DSL.parse;
 import static de.thl.jedunit.DSL.resource;
 import static de.thl.jedunit.DSL.s;
@@ -18,20 +19,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import de.thl.jedunit.DSL;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import static com.github.javaparser.ast.Modifier.*;
 
 import org.junit.Test;
 
 import de.thl.jedunit.Constraints;
 import de.thl.jedunit.Selected;
 import de.thl.jedunit.SyntaxTree;
+import io.vavr.collection.List;
 
 public class DSLTest extends Constraints {
 
@@ -86,6 +86,15 @@ public class DSLTest extends Constraints {
             assertTrue("Generated char should be in [a-z]", c >= 'a' && c <= 'z');
             c = c();
             assertTrue("Generated char should be in [a-z]", c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
+        });
+    }
+
+    @Test public void testGenerateList() {
+        Stream.generate(() -> true).limit(N).forEach(list -> {
+            int length = i(3, 10);
+            List<String> l = l(3, length, () -> s(1, 10));
+            assertTrue(l.size() >= 3);
+            assertTrue(l.size() <= 10);
         });
     }
 

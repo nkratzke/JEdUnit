@@ -3,6 +3,8 @@ package de.thl.jedunit;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.body.CallableDeclaration;
@@ -191,6 +193,17 @@ public class DSL {
      */
     public static char c() {
         return s(DEFAULT_CHARS).charAt(0);
+    }
+
+    /**
+     * Generates a random list.
+     * @param min Minimum length of list (must be >= 0)
+     * @param max Maximum length of list (must be > min)
+     * @param p Supplier to create random entries for the list
+     * @return List of random length with random entries
+     */
+    public static <T> List<T> l(int min, int max, Supplier<T> p) {
+        return List.ofAll(Stream.generate(p).limit(i(min, max + 1)));
     }
 
     /**
