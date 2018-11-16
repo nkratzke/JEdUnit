@@ -77,7 +77,7 @@ public class DSL {
      * Adds a comment for VPL via console output.
      */
     public static void comment(String c) { 
-        System.out.println("Comment :=>> " + c); 
+        System.out.println("Comment :=>>" + c); 
     }
 
     /**
