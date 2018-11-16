@@ -234,7 +234,7 @@ public class Evaluator {
             in.close();
             if (this.percentage >= 0) comment("Everything fine");
             if (this.percentage < 0) {
-                String msg = String.format("[CHECKSTYLE] Found violations (-%d%%)", (int)(this.percentage * 100));
+                String msg = String.format("[CHECKSTYLE] Found violations (%d%%)", (int)(this.percentage * 100));
                 comment(msg);
             }
             grade();
