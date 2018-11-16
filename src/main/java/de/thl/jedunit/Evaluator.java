@@ -169,7 +169,7 @@ public class Evaluator {
             .forEach(method -> {
                 try {
                     Test t = method.getAnnotation(Test.class);
-                    comment(String.format("-[%.2f%%]: ", t.weight() * 100) + t.description());
+                    comment(String.format("- [%.2f%%]: ", t.weight() * 100) + t.description());
                     results.clear();
                     method.invoke(this);
                     grade(t.weight(), results);
@@ -195,7 +195,7 @@ public class Evaluator {
                 try {
                     results.clear();
                     Inspection i = method.getAnnotation(Inspection.class);
-                    comment("-" + i.description());
+                    comment("- " + i.description());
                     method.invoke(this);
                     grade();
                     comment("");
@@ -218,7 +218,7 @@ public class Evaluator {
      */
     public final void checkstyle() {
         try {
-            comment("-Checkstyle");
+            comment("- Checkstyle");
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
                 String result = in.nextLine();
