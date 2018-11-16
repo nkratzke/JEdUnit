@@ -14,6 +14,11 @@ import java.util.HashSet;
 public class Config {
 
     /**
+     * Version of JEdUnit (Semantic Versioning).
+     */
+    public final static String VERSION = "0.1.17"; 
+
+    /**
      * List of file names that shall be considered by checkstyle and evaluation.
      * This list is set in the configure method() and might be adpated by
      * the assignments Checks class.
