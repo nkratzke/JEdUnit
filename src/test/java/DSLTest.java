@@ -11,6 +11,7 @@ import static de.thl.jedunit.DSL.inspect;
 import static de.thl.jedunit.DSL.l;
 import static de.thl.jedunit.DSL.parse;
 import static de.thl.jedunit.DSL.resource;
+import static de.thl.jedunit.DSL.symbolize;
 import static de.thl.jedunit.DSL.s;
 import static de.thl.jedunit.DSL.t;
 import static de.thl.jedunit.DSL.testWith;
@@ -133,6 +134,10 @@ public class DSLTest extends Constraints {
         assertTrue(f == t(a, b, c, d, e, f)._6);
         assertTrue(g == t(a, b, c, d, e, f, g)._7);
         assertArrayEquals(h, t(a, b, c, d, e, f, g, h)._8);
+    }
+
+    @Test public void testSymbolize() {
+        assertEquals(symbolize(" \t\n"), "\u23b5\u21e5\u21a9\n");
     }
 
     @Test public void testData() {

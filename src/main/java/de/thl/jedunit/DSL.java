@@ -92,6 +92,14 @@ public class DSL {
     }
 
     /**
+     * Symbolizes typical non-printable chars in Strings.
+     */
+    public static String symbolize(String s) {
+        return s.replace(" ", "\u23b5")
+                .replace("\t", "\u21e5")
+                .replace("\n", "\u21a9\n");
+    }
+    /**
      * Generates a string concatenated from regular expression generated random strings.
      * @param regexps Build patterns (regular expressions) for String generation
      * @return concatenated random String
