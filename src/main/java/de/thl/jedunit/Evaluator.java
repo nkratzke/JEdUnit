@@ -64,13 +64,24 @@ public class Evaluator {
     }
 
     /**
+     * Generates a TestSeries object that executes a series of tests.
+     * @param data Test data
+     * @return Object that executes tests on the test data.
+     * @since 0.2.0
+     */
+    @SafeVarargs
+    public final <T> TestSeries<T> test(T... data) {
+        return new TestSeries<T>(this, data);
+    }
+
+    /**
      * Adds points for grading if a check is passed (wishful behavior).
      * A comment is always printed whether the check was successfull or not.
      * @param p Points to add (on success)
      * @param comment Comment to show
      * @param check Condition to check (success)
      */
-    protected final void grading(int p, String comment, Supplier<Boolean> check) {
+    public final void grading(int p, String comment, Supplier<Boolean> check) {
         testcase++;
         try {
             if (check.get()) {

@@ -23,6 +23,7 @@ import io.vavr.Tuple6;
 import io.vavr.Tuple7;
 import io.vavr.Tuple8;
 import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 
 /**
  * This class provides the Domain Specific Language (DSL)
@@ -92,13 +93,14 @@ public class DSL {
     }
 
     /**
-     * Symbolizes typical non-printable chars in Strings.
+     * Indicates typical non-printable chars in Strings.
      */
-    public static String symbolize(String s) {
-        return s.replace(" ", "\u23b5")
+    public static String repr(String s) {
+        return "\"" + s.replace(" ", "\u23b5")
                 .replace("\t", "\u21e5")
-                .replace("\n", "\u21a9\n");
+                .replace("\n", "\u21a9\n") + "\"";
     }
+
     /**
      * Generates a string concatenated from regular expression generated random strings.
      * @param regexps Build patterns (regular expressions) for String generation
@@ -280,7 +282,13 @@ public class DSL {
         return Tuple.of(a, b, c, d, e, f, g, h);
     }
 
+    /**
+     * Generates a list of test data tuples.
+     * @return List of test data tuples
+     * @deprecated Use {@link #test()} instead.
+     */
     @SafeVarargs
+    @Deprecated
     public static <T> List<T> testWith(T... ts) {
         return List.of(ts);
     }
