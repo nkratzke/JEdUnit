@@ -32,7 +32,6 @@ import org.junit.Test;
 import de.thl.jedunit.Constraints;
 import de.thl.jedunit.Selected;
 import de.thl.jedunit.SyntaxTree;
-import io.vavr.Tuple3;
 import io.vavr.collection.List;
 
 public class DSLTest extends Constraints {
@@ -158,24 +157,12 @@ public class DSLTest extends Constraints {
         test(
             t(1, "Hello", 3),
             t(1, "Hello this is just a  test", 3),
-            t(1, "Hello", 3)
-        ).each(
-            d -> d._3,
-            d -> { int[] i = {}; i[0] *= 1; return d._1 + d._2; }, 
-            d -> d._2 + d._1, 
-            (expected, result) -> expected.equals(result),
-            d -> String.format("method(%d, \"%s\") should return \"%s\"", d._1, repr(d._2), repr(d._1 + d._2)),
-            d -> String.format("but was %s", repr(d._2 + d._1))
-        );
-
-        test(
-            t(1, "Hello", 3),
-            t(1, "Hello this is just a  test", 3),
             t(1, "Hello", 3)        
         ).each(
-            d -> d._1 + d._2,
-            d -> d._2 + d._1,
-            (e, r) -> e.equals(r)
+            d -> d._3,
+            d -> (d._1 + d._2).equals("" + d._1 + d._1),
+            d -> String.format("call(%d, %s) should return %s", d._1, repr(d._2), repr(d._1 + d._2)),
+            d -> String.format("but returned " + repr("" + d._1 + d._1))
         );
 
         test(
@@ -183,9 +170,8 @@ public class DSLTest extends Constraints {
             t(1, "Hello this is just a  test"),
             t(1, "Hello")
         ).each(
-            d -> d._1 + d._2,
-            d -> d._1 + d._2,
-            (e, r) -> e.equals(r)
+            d -> (d._1 + d._2).equals("" + d._1 + d._1),
+            d -> String.format("call(%d, %s) should return %s", d._1, repr(d._2), repr(d._1 + d._2))
         );
     }
 
