@@ -72,7 +72,7 @@ public class Checks extends Constraints {
             t('X', "X", 5),
             t('X', "ax", 5),
             t('x', "Xa", 5)
-        ).each(d -> {
+        ).each(
             d -> d._3,
             d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
             d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
