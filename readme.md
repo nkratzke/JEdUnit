@@ -34,14 +34,14 @@ curl -s https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/ini
 Then
 
 1. Import the following __requested files__ `Main.java` via the Moodle web interface from this repository as __starting point for your students__.
-2. Import the following __execution files__ `Checks.java`, `Solution.java`, `style_checks.xml`, `vpl_evaluate.sh`, `vpl_run.sh`, `jedunit.jar.b64`, and `checkstyle.jar.b64` via the Moodle web interface from this directory.
+2. Import the following __execution files__ `Checks.java`, `Solution.java`, `style_checks.xml`, `vpl_evaluate.sh`, `vpl_run.sh`, `jedunit.jar`, and `checkstyle.jar` via the Moodle web interface from this directory.
     - `Solution.java` is where you should place your reference solution.
     - `Checks.java` is where you place your grading test cases.
     - _`style_checks.xml` is a [checkstyle](http://checkstyle.sourceforge.net/index.html) file that is used to enforce coding standards. In most cases you do not need to touch this file._
     - _`vpl_run.sh` is the VPL run script that compiles and executes the `Main.java`. In most cases you do not need to touch this file._
     - _`vpl_evaluate.sh` is the VPL evaluate script that checks style, and compiles all Java files. Furthermore, it launches `Checks.java` to evaluate the student submission. In most cases you do not need to touch this file._
-    - `jedunit.jar.b64`, and `checkstyle.jar.b64` are Base64 encoded jars that are needed on the classpath. Do not touch these files.
-3. Select __to be keeped files__ `Checks.java`, `Solution.java`, `style_checks.xml`, `jedunit.jar.b64`, and `checkstyle.jar.b64` via the Moodle web interface (otherwise these files will be deleted by the VPL jail server and your evaluation will not work).
+    - `jedunit.jar`, and `checkstyle.jar` are Java libraries that are needed on the classpath. Do not touch these files.
+3. __!!!IMPORTANT!!!__ Select `jedunit.jar` as a __to be keeped file__ via the Moodle web interface (otherwise your evaluation will not work).
 
 It is recommended to do these __settings only once for a Moodle course__ and derive all your assignments via the __"based-on"__ feature of the Moodle VPL plugin.
 

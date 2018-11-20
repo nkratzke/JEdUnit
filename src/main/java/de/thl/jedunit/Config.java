@@ -16,7 +16,7 @@ public class Config {
     /**
      * Version of JEdUnit (Semantic Versioning).
      */
-    public final static String VERSION = "0.1.18"; 
+    public final static String VERSION = "0.1.19"; 
 
     /**
      * List of file names that shall be considered by checkstyle and evaluation.
