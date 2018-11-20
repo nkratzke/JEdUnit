@@ -50,20 +50,20 @@ public class Checks extends Constraints {
 
     @Test(weight=0.25, description="Provided example calls")
     public void examples() {
-        testWith(
+        test(
             t('o', "Hello World", 5),
             t('w', "Hello World", 5)
-        ).forEach(d -> {
-            int expected = Solution.countChars(d._1, d._2);
-            grading(d._3, String.format("Counting '%s' in \"%s\" must return %d.", d._1, d._2, expected), 
-                () -> Main.countChars(d._1, d._2) == expected
-            );            
+        ).each(
+            d -> d._3,
+            d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
+            d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
+            d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
         });
     }
 
     @Test(weight=0.25, description="Boundary testcases (unknown test cases)")
     public void furtherTestcases() {
-        testWith(
+        test(
             t('x', "", 10),
             t('X', "", 10),
             t('x', "x", 5),
@@ -72,10 +72,11 @@ public class Checks extends Constraints {
             t('X', "X", 5),
             t('X', "ax", 5),
             t('x', "Xa", 5)
-        ).forEach(d -> {
-            int expected = Solution.countChars(d._1, d._2);
-            String msg = String.format("countChars('%s', \"%s\") -> %d", d._1, d._2, expected);
-            grading(d._3, msg, () -> Main.countChars(d._1, d._2) == expected);
+        ).each(d -> {
+            d -> d._3,
+            d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
+            d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
+            d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
         });
     }
 
@@ -85,7 +86,7 @@ public class Checks extends Constraints {
         char c = c("[a-z]");
         char C = Character.toUpperCase(c);
 
-        testWith(
+        test(
             t(c, s(c + "{1,7}", r, r), 5),
             t(C, s(c + "{1,7}", r, r), 5),
             t(c, s(r.toUpperCase(), r, C + "{1,7}"), 5),
@@ -94,10 +95,11 @@ public class Checks extends Constraints {
             t(C, s(r, C + "{1,7}", r.toLowerCase()), 5),
             t(c, s(r, c + "{1,7}", r.toUpperCase()), 5),
             t(C, s(r, c + "{1,7}", r.toUpperCase()), 5)
-        ).forEach(d -> {
-            int expected = Solution.countChars(d._1, d._2);
-            String msg = String.format("countChars('%s', \"%s\") -> %d", d._1, d._2, expected);
-            grading(d._3, msg, () -> Main.countChars(d._1, d._2) == expected);
-        });
+        ).each(
+            d -> d._3,
+            d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
+            d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
+            d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
+        );
     }
 }
