@@ -10,9 +10,9 @@ import static de.thl.jedunit.DSL.i;
 import static de.thl.jedunit.DSL.inspect;
 import static de.thl.jedunit.DSL.l;
 import static de.thl.jedunit.DSL.parse;
+import static de.thl.jedunit.DSL.repr;
 import static de.thl.jedunit.DSL.resource;
 import static de.thl.jedunit.DSL.s;
-import static de.thl.jedunit.DSL.repr;
 import static de.thl.jedunit.DSL.t;
 import static de.thl.jedunit.DSL.testWith;
 import static org.junit.Assert.assertArrayEquals;
@@ -24,12 +24,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.stream.Stream;
+import java.util.*;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import org.junit.Test;
 
 import de.thl.jedunit.Constraints;
+import de.thl.jedunit.DSL;
 import de.thl.jedunit.Selected;
 import de.thl.jedunit.SyntaxTree;
 import io.vavr.collection.List;
@@ -241,5 +243,45 @@ public class DSLTest extends Constraints {
         assertTrue(console.contains("[FAILED] Missing/wrong declared method: protected boolean notFound() (0 of 1 points)"));
 
         System.setOut(redirected);
+    }
+
+    @Test public void testAssertEqualsMap() {
+        Map<String, Integer> a = new HashMap<>();
+        Map<String, Integer> b = new TreeMap<>();
+
+        assertTrue(DSL.assertEquals(a, b));
+        assertTrue(DSL.assertEquals(b, a));
+        assertTrue(DSL.assertEquals(a, a));
+        assertTrue(DSL.assertEquals(b, b));
+
+        a.put("", 0);
+        b.put("", 1);
+
+        assertFalse(DSL.assertEquals(a, b));
+        assertFalse(DSL.assertEquals(b, a));
+        assertTrue(DSL.assertEquals(a, a));
+        assertTrue(DSL.assertEquals(b, b));
+
+        a.clear();
+        b.clear();
+        for (int i = 0; i < 100; i++) {
+            a.put("Key: " + (99 - i), 99 - i);
+            b.put("Key: " + i, i);
+        }
+
+        assertFalse(a.toString().equals(b.toString()));
+        System.out.println(repr(a));
+        System.out.println(repr(b));
+        assertTrue(DSL.assertEquals(a, b));
+        assertTrue(DSL.assertEquals(b, a));
+        assertTrue(DSL.assertEquals(a, a));
+        assertTrue(DSL.assertEquals(b, b));
+
+        a.put("42", -1);
+        assertFalse(DSL.assertEquals(b, a));
+        assertFalse(DSL.assertEquals(a, b));
+        assertTrue(DSL.assertEquals(a, a));
+        assertTrue(DSL.assertEquals(b, b));
+
     }
 }

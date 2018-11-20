@@ -1,7 +1,10 @@
 package de.thl.jedunit;
 
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -23,7 +26,6 @@ import io.vavr.Tuple6;
 import io.vavr.Tuple7;
 import io.vavr.Tuple8;
 import io.vavr.collection.List;
-import io.vavr.collection.Seq;
 
 /**
  * This class provides the Domain Specific Language (DSL)
@@ -99,6 +101,39 @@ public class DSL {
         return "\"" + s.replace(" ", "\u23b5")
                 .replace("\t", "\u21e5")
                 .replace("\n", "\u21a9\n") + "\"";
+    }
+
+    /**
+     * Creates a normalized string representation of a map.
+     * Keys are ordered alphabetically.
+     * Non-printable chers in Strings are indicated.
+     * @param m Map
+     * @return normalized representation of a Map as String representation
+     */
+    public static <K, V> String repr(Map<K, V> m) {
+        Map<String, String> r = new TreeMap<>();
+        for (K k : m.keySet()) {
+            V v = m.get(k);
+            String ks = k instanceof String ? repr(k.toString()) : k.toString();
+            String vs = v instanceof String ? repr(v.toString()) : v.toString();
+            r.put(ks, vs);
+        }
+        return r.toString();
+    }
+
+    /**
+     * Creates a normalized string representation of a list.
+     * Non-printable chers in Strings are indicated.
+     * @param l ist
+     * @return normalized representation of the List
+     */
+    public static <T> String repr(List<T> list) {
+        java.util.List<String> r = new LinkedList<>();
+        for (T t : list) {
+            String v = t instanceof String ? repr(t.toString()) : t.toString();
+            r.add(v);
+        }
+        return r.toString();
     }
 
     /**
@@ -337,5 +372,31 @@ public class DSL {
      */
     public static String resource(String r) {
         return ClassLoader.getSystemClassLoader().getResource(r).getFile();
+    }
+
+    /**
+     * Compares to Map objects.
+     * Both maps are converted into key-sorted TreeMaps.
+     * Then, the String representation of these key-sorted maps are compared.
+     * @param expected Expected map
+     * @param actual Actual map
+     * @return true, if key-sorted String representations of the maps are equal.
+     *         false, otherwise.
+     */
+    public static <K, V> boolean assertEquals(Map<K, V> expected, Map<K, V> actual) {
+        Map<K, V> e = new TreeMap<>(expected);
+        Map<K, V> a = new TreeMap<>(actual);
+        return e.toString().equals(a.toString());
+    }
+
+    /**
+     * Compares two objects via their String representations.
+     * @param expected Expected value
+     * @param actual Actual value
+     * @return true, if <code>expected.toString().equals(actual.toString())</code>
+     *         false, otherwise
+     */
+    public static <T> boolean assertEquals(T expected, T actual) {
+        return expected.toString().equals(actual.toString());
     }
 }
