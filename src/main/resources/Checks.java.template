@@ -58,7 +58,7 @@ public class Checks extends Constraints {
             d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
             d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
             d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
-        });
+        );
     }
 
     @Test(weight=0.25, description="Boundary testcases (unknown test cases)")
@@ -77,7 +77,7 @@ public class Checks extends Constraints {
             d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
             d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
             d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
-        });
+        );
     }
 
     @Test(weight=0.5, description="Randomized testcases")
