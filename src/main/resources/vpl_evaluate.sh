@@ -2,7 +2,7 @@
 . common_script.sh
 rm -f *.class
 java  -jar checkstyle.jar -c style_checks.xml *.java > checkstyle.log
-javac -cp ".:*" Checks.java
+javac -encoding UTF-8 -proc:none -cp ".:*" Checks.java
 
 cat > vpl_execution <<EEOOFF
 #! /bin/bash
