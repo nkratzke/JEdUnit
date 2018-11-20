@@ -39,7 +39,7 @@ Then
     - `Checks.java` is where you place your grading test cases.
     - _`style_checks.xml` is a [checkstyle](http://checkstyle.sourceforge.net/index.html) file that is used to enforce coding standards. In most cases you do not need to touch this file._
     - _`vpl_run.sh` is the VPL run script that compiles and executes the `Main.java`. In most cases you do not need to touch this file._
-    - _`vpl_evaluate.sh` is the VPL evaluate script that checks style, and compiles all Java files. Furthermore, it launches `Checks.java` to evaluate the student submission. In most cases you do not need to touch this file._
+    - _`vpl_evaluate.sh` is the VPL evaluate script that runs checkstyle, compiles all Java files for evaluation, and executes `Checks.java` to evaluate student submissions. In most cases you do not need to touch this file._
     - `jedunit.jar`, and `checkstyle.jar` are Java libraries that are needed on the classpath. Do not touch these files.
 3. __!!!IMPORTANT!!!__ Select `jedunit.jar` as a __to be keeped file__ via the Moodle web interface (otherwise your evaluation will not work).
 
