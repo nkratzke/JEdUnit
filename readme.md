@@ -41,7 +41,7 @@ Then
     - _`vpl_run.sh` is the VPL run script that compiles and executes the `Main.java`. In most cases you do not need to touch this file._
     - _`vpl_evaluate.sh` is the VPL evaluate script that runs checkstyle, compiles all Java files for evaluation, and executes `Checks.java` to evaluate student submissions. In most cases you do not need to touch this file._
     - `jedunit.jar`, and `checkstyle.jar` are Java libraries that are needed on the classpath. Do not touch these files.
-3. __!!!IMPORTANT!!!__ Select `jedunit.jar` as a __to be keeped file__ via the Moodle web interface (otherwise your evaluation will not work).
+3. __!!!IMPORTANT!!!__ Select `jedunit.jar` as a __to be kept file__ via the Moodle web interface (otherwise your evaluation will not work).
 
 It is recommended to do these __settings only once for a Moodle course__ and derive all your assignments via the __"based-on"__ feature of the Moodle VPL plugin.
 
