@@ -105,14 +105,18 @@ public class Evaluator {
      * @param penalty Percentage points to remove (on violation)
      * @param remark Comment to show
      * @param violation Violation condition to check
+     * @return true, if penalized
+     *         false, otherwise
      */
-    protected final void penalize(int penalty, String remark, Supplier<Boolean> violation) {
+    public final boolean penalize(int penalty, String remark, Supplier<Boolean> violation) {
         try {
-            if (!violation.get()) return;
+            if (!violation.get()) return false;
             this.percentage -= penalty / 100.0;
             comment(String.format("[FAILED] %s (-%d%% on total result)", remark, penalty));
+            return true;
         } catch (Exception ex) {
             comment("[FAILED due to " + ex + "] " + remark);
+            return true;
         }
     }
 

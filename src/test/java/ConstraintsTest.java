@@ -11,6 +11,7 @@ import org.junit.Test;
 import de.thl.jedunit.Config;
 import de.thl.jedunit.Constraints;
 import de.thl.jedunit.Evaluator;
+import de.thl.jedunit.DSL;
 
 public class ConstraintsTest {
 
@@ -101,7 +102,7 @@ public class ConstraintsTest {
         String console = redirect.toString();
         System.setOut(redirected);
         System.out.println(console);
-        assertTrue("No detections", console.trim().isEmpty());
+        assertTrue("No detections", console.trim().contains("Everything fine"));
     }
 
 

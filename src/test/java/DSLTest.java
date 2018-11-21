@@ -143,6 +143,13 @@ public class DSLTest extends Constraints {
         assertEquals("\"\"", repr(""));
     }
 
+    @Test public void testListRepr() {
+        java.util.List<String> strings = Arrays.asList("", " ", "Hello World");
+        java.util.List<Integer> ints = Arrays.asList(1, 2, 3);
+        assertEquals(String.format("[%s, %s, %s]", repr(""), repr(" "), repr("Hello World")), repr(strings));
+        assertEquals(String.format("[%d, %d, %d]", 1, 2, 3), repr(ints));
+    }
+
     @Test public void testTest() {
         test(
             t(1, "Hello", 3),
@@ -233,6 +240,12 @@ public class DSLTest extends Constraints {
         System.setOut(redirected);
     }
 
+    @Test public void testAssertEqualsGeneral() {
+        assertTrue(DSL.assertEquals(5, 2 + 3));
+        assertTrue(DSL.assertEquals(DSL.l(5, () -> 1), Arrays.asList(1, 1, 1, 1, 1)));
+        assertTrue(DSL.assertEquals(DSL.l(0, () -> 1), Arrays.asList()));
+    }
+
     @Test public void testAssertEqualsMap() {
         Map<String, Integer> a = new HashMap<>();
         Map<String, Integer> b = new TreeMap<>();
@@ -258,8 +271,6 @@ public class DSLTest extends Constraints {
         }
 
         assertFalse(a.toString().equals(b.toString()));
-        System.out.println(repr(a));
-        System.out.println(repr(b));
         assertTrue(DSL.assertEquals(a, b));
         assertTrue(DSL.assertEquals(b, a));
         assertTrue(DSL.assertEquals(a, a));

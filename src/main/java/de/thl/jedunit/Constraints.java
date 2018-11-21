@@ -80,22 +80,24 @@ public class Constraints extends Evaluator {
 
     @Inspection(description="Inspect source files for coding violations")
     public void conventions() {
+        boolean allfine = true;
         for (String file : Config.EVALUATED_FILES) {
 
             File f = new File(file);
             if (!f.exists()) {
                 comment("File not found: " + file); 
+                allfine &= false;
                 continue; 
             }
 
-            if (Config.CHECK_IMPORTS) penalize(Config.IMPORT_PENALTY, "Non-allowed libraries", () -> inspect(file, ast ->
+            if (Config.CHECK_IMPORTS) allfine &= !penalize(Config.IMPORT_PENALTY, "Non-allowed libraries", () -> inspect(file, ast ->
                 ast.select(ImportDeclaration.class)
                    .filter(imp -> !Config.ALLOWED_IMPORTS.stream().anyMatch(lib -> imp.getName().asString().startsWith(lib)))
                    .annotate(imp -> "Import of " + imp.getName() + " not allowed")
                    .exists()
             ));
 
-            if (!Config.ALLOW_LOOPS) penalize(Config.LOOP_PENALTY, "No loops", () -> inspect(file, ast ->
+            if (!Config.ALLOW_LOOPS) allfine &= !penalize(Config.LOOP_PENALTY, "No loops", () -> inspect(file, ast ->
                 ast.select(WhileStmt.class).annotate("while loop not allowed").exists() |
                 ast.select(ForStmt.class).annotate("for loop not allowed").exists() |
                 ast.select(ForEachStmt.class).annotate("for loop not allowed").exists() |
@@ -103,25 +105,25 @@ public class Constraints extends Evaluator {
                 ast.select(MethodCallExpr.class).filter(m -> m.toString().contains(".forEach(")).annotate("forEach not allowed").exists()
             ));
 
-            if (!Config.ALLOW_METHODS) penalize(Config.METHOD_PENALTY, "No methods (except main)", () -> inspect(file, ast ->
+            if (!Config.ALLOW_METHODS) allfine &= !penalize(Config.METHOD_PENALTY, "No methods (except main)", () -> inspect(file, ast ->
                 ast.select(MethodDeclaration.class)
                    .filter(m -> !m.getNameAsString().equals("main"))
                    .annotate("No methods except main() method allowed")
                    .exists()
             ));
 
-            if (!Config.ALLOW_LAMBDAS) penalize(Config.LAMBDA_PENALITY, "No lambdas", () -> inspect(file, ast ->
+            if (!Config.ALLOW_LAMBDAS) allfine &= !penalize(Config.LAMBDA_PENALITY, "No lambdas", () -> inspect(file, ast ->
                 ast.select(LambdaExpr.class).annotate(l -> "lambda expression " + l + " not allowed").exists()
             ));
             
-            if (!Config.ALLOW_GLOBAL_VARIABLES) penalize(Config.GLOBAL_VARIABLE_PENALTY, "No global variables", () -> inspect(file, ast ->
+            if (!Config.ALLOW_GLOBAL_VARIABLES) allfine &= !penalize(Config.GLOBAL_VARIABLE_PENALTY, "No global variables", () -> inspect(file, ast ->
                 ast.select(FieldDeclaration.class)
                    .filter(field -> !(field.isStatic() && field.isFinal()))
                    .annotate("No datafields allowed. Add the final static modifier to make it a constant value.")
                    .exists()
             ));
 
-            if (!Config.ALLOW_INNER_CLASSES) penalize(Config.INNER_CLASS_PENALTY, "No inner classes", () -> inspect(file, ast -> 
+            if (!Config.ALLOW_INNER_CLASSES) allfine &= !penalize(Config.INNER_CLASS_PENALTY, "No inner classes", () -> inspect(file, ast -> 
                 ast.select(ClassOrInterfaceDeclaration.class)
                    .select(ClassOrInterfaceDeclaration.class)
                    .distinct()
@@ -129,7 +131,7 @@ public class Constraints extends Evaluator {
                    .exists()
             ));
 
-            if (!Config.ALLOW_CONSOLE_OUTPUT) penalize(Config.CONSOLE_OUTPUT_PENALTY, "No console output in methods (except main)", () -> inspect(file, ast ->
+            if (!Config.ALLOW_CONSOLE_OUTPUT) allfine &= !penalize(Config.CONSOLE_OUTPUT_PENALTY, "No console output in methods (except main)", () -> inspect(file, ast ->
                 ast.select(MethodDeclaration.class)
                    .filter(m -> !m.getDeclarationAsString(false, false, false).equals("void main(String[])"))
                    .select(MethodCallExpr.class, expr -> expr.toString().startsWith("System.out.print"))
@@ -142,21 +144,21 @@ public class Constraints extends Evaluator {
                     HashMap.class, TreeMap.class, HashSet.class, LinkedList.class, ArrayList.class
                 );
 
-                penalize(Config.COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for return types", () -> inspect(file, ast ->
+                allfine &= !penalize(Config.COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for return types", () -> inspect(file, ast ->
                     ast.select(MethodDeclaration.class)
                        .filter(m -> collections.stream().anyMatch(type -> m.getType().asString().startsWith(type.getSimpleName())))
                        .annotate(m -> "Do not use " + m.getType() + " as return type")
                        .exists()
                 ));
 
-                penalize(Config.COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for parameters", () -> inspect(file, ast ->
+                allfine &= !penalize(Config.COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for parameters", () -> inspect(file, ast ->
                     ast.select(Parameter.class)
                        .filter(param -> collections.stream().anyMatch(type -> param.getType().asString().startsWith(type.getSimpleName())))
                        .annotate(p -> "Do not use " + p.getType() + " as parameter type")
                        .exists()
                 ));
 
-                penalize(Config.COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for variable declarators", () -> inspect(file, ast -> 
+                allfine &= !penalize(Config.COLLECTION_INTERFACE_PENALTY, "Use Map, List, and Set interfaces for variable declarators", () -> inspect(file, ast -> 
                     ast.select(VariableDeclarator.class)
                        .filter(v -> collections.stream().anyMatch(type -> v.getType().asString().startsWith(type.getSimpleName())))
                        .annotate(v -> "Do not use " + v.getType() + " as variable declarator")
@@ -164,6 +166,8 @@ public class Constraints extends Evaluator {
                 ));
             }
         }
+        
+        if (allfine) comment("Everything fine");
     }
 
     /**
