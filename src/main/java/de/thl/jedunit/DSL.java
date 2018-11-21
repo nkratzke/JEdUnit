@@ -127,7 +127,7 @@ public class DSL {
      * @param l ist
      * @return normalized representation of the List
      */
-    public static <T> String repr(List<T> list) {
+    public static <T> String repr(java.util.List<T> list) {
         java.util.List<String> r = new LinkedList<>();
         for (T t : list) {
             String v = t instanceof String ? repr(t.toString()) : t.toString();
