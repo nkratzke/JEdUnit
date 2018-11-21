@@ -1,12 +1,14 @@
 package de.thl.jedunit;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.javaparser.Range;
@@ -25,7 +27,6 @@ import io.vavr.Tuple5;
 import io.vavr.Tuple6;
 import io.vavr.Tuple7;
 import io.vavr.Tuple8;
-import io.vavr.collection.List;
 
 /**
  * This class provides the Domain Specific Language (DSL)
@@ -248,7 +249,7 @@ public class DSL {
      * @return List of random length with random entries
      */
     public static <T> List<T> l(int min, int max, Supplier<T> p) {
-        return List.ofAll(Stream.generate(p).limit(i(min, max + 1)));
+        return Stream.generate(p).limit(i(min, max + 1)).collect(Collectors.toList());
     }
 
     /**
@@ -258,7 +259,7 @@ public class DSL {
      * @return List of random entries
      */
     public static <T> List<T> l(int l, Supplier<T> p) {
-        return List.ofAll(Stream.generate(p).limit(l));
+        return Stream.generate(p).limit(l).collect(Collectors.toList());
     }
 
     /**

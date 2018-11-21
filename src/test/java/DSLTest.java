@@ -95,7 +95,7 @@ public class DSLTest extends Constraints {
     @Test public void testGenerateList() {
         Stream.generate(() -> true).limit(N).forEach(list -> {
             int length = i(3, 10);
-            List<String> l = l(3, length, () -> s(1, 10));
+            java.util.List<String> l = l(3, length, () -> s(1, 10));
             assertTrue(l.size() >= 3);
             assertTrue(l.size() <= 10);
         });
@@ -141,18 +141,6 @@ public class DSLTest extends Constraints {
     @Test public void testRepr() {
         assertEquals("\"\u23b5\u21e5\u21a9\n\"", repr(" \t\n"));
         assertEquals("\"\"", repr(""));
-    }
-
-    @Test public void testData() {
-        assertTrue(
-            testWith(
-                t(1, "Hello", 3),
-                t(1, "Hello", 3),
-                t(1, "Hello", 3),
-                t(1, "Hello", 3),
-                t(1, "Hello", 3)
-            ).forAll(t -> t._1 == 1 && t._2.equals("Hello") && t._3 == 3)
-        );
     }
 
     @Test public void testTest() {
