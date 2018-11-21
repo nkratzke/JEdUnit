@@ -1,8 +1,10 @@
 package de.thl.jedunit;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Optional;
 import java.util.Random;
 import java.util.TreeMap;
@@ -76,6 +78,19 @@ public class DSL {
      * Abbreviation to select callables (so methods or constructors).
      */
     public final static Class<CallableDeclaration> CALLABLE = CallableDeclaration.class;
+
+    /**
+     * Determines automatically all Java files of the submission
+     * for evaluation.
+     * @return Set of filenames ending on ".java"
+     */
+    public static Set<String> autoFiles() {
+        return Stream.of(new File(".").listFiles())
+            .filter(f -> f.isFile())
+            .filter(f -> f.getName().endsWith(".java"))
+            .map(f -> f.getName())
+            .collect(Collectors.toSet());
+    }
 
     /**
      * Adds a comment for VPL via console output.

@@ -16,14 +16,13 @@ public class Config {
     /**
      * Version of JEdUnit (Semantic Versioning).
      */
-    public final static String VERSION = "0.1.21"; 
+    public final static String VERSION = "0.1.22"; 
 
     /**
-     * List of file names that shall be considered by checkstyle and evaluation.
-     * This list is set in the configure method() and might be adpated by
-     * the assignments Checks class.
+     * Set of file names that shall be considered by checkstyle and evaluation.
+     * This set is determined automatically but can be overwritten in the configure method().
      */
-    public static Set<String> EVALUATED_FILES = new HashSet<>(Arrays.asList("Main.java"));
+    public static Set<String> EVALUATED_FILES = DSL.autoFiles();
 
     /**
      * Option to evaluate the checkstyle log.
