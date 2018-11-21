@@ -23,6 +23,7 @@ public class CLI {
                 System.out.println("Preparing " + resource.replace(".template", ""));
                 Scanner read = new Scanner(CLI.class.getResourceAsStream("/" + resource));
                 File f = new File(System.getProperty("user.dir") + File.separator + resource.replace(".template", ""));
+                if (f.exists()) continue;
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));
                 while (read.hasNextLine()) {
                     writer.write(read.nextLine() + "\n");
