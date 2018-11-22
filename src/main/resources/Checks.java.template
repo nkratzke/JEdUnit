@@ -1,6 +1,10 @@
 import static de.thl.jedunit.DSL.*;
 import de.thl.jedunit.*;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+import io.vavr.Tuple2;
+
 /**
  * Please add your test cases for evaluation here.
  * - Please provide meaningful remarks for your students in grading() calls.
@@ -12,6 +16,23 @@ import de.thl.jedunit.*;
  * - If this sounds similar to JUnit - this is intended ;-)
  */
 public class Checks extends Constraints {
+
+    // Checks the correctness of the submission.
+    Predicate<Tuple2<Character, String>> check = d -> assertEquals(
+        Solution.countChars(d._1, d._2), 
+        Main.countChars(d._1, d._2)
+    );
+
+    // Explains the call and the expected result.
+    Function<Tuple2<Character, String>, String> explain = d -> f(
+        "countChars(%s, %s) should return %d", 
+        repr(d._1), repr(d._2), Solution.countChars(d._1, d._2)
+    );
+
+    // Is called on error and should return a message with actual result.
+    Function<Tuple2<Character, String>, String> onError = d -> f(
+        "but returned %d", Main.countChars(d._1, d._2)
+    );
 
     @Override
     public void configure() {
@@ -52,55 +73,40 @@ public class Checks extends Constraints {
     @Test(weight=0.25, description="Provided example calls")
     public void examples() {
         test(
-            t('o', "Hello World", 5),
-            t('w', "Hello World", 5)
-        ).each(
-            d -> d._3,
-            d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
-            d -> f("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
-            d -> f("but returned %d.", Main.countChars(d._1, d._2))
-        );
+            t('o', "Hello World"),
+            t('w', "Hello World")
+        ).each(check, explain, onError);
     }
 
     @Test(weight=0.25, description="Boundary testcases (unknown test cases)")
     public void furtherTestcases() {
         test(
-            t('x', "", 10),
-            t('X', "", 10),
-            t('x', "x", 5),
-            t('X', "x", 5),
-            t('x', "X", 5),
-            t('X', "X", 5),
-            t('X', "ax", 5),
-            t('x', "Xa", 5)
-        ).each(
-            d -> d._3,
-            d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
-            d -> f("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
-            d -> f("but returned %d.", Main.countChars(d._1, d._2))
-        );
+            t('x', ""),
+            t('X', ""),
+            t('x', "x"),
+            t('X', "x"),
+            t('x', "X"),
+            t('X', "X"),
+            t('X', "ax"),
+            t('x', "Xa")
+        ).each(check, explain, onError);
     }
 
     @Test(weight=0.5, description="Randomized testcases")
     public void randomizedTestcases() {
-        String r = "[a-zA-Z!?&%$§]{5,17}";
+        String r = "[a-zA-Z]{5,17}";
         char c = c("[a-z]");
         char C = Character.toUpperCase(c);
 
         test(
-            t(c, s(c + "{1,7}", r, r), 5),
-            t(C, s(c + "{1,7}", r, r), 5),
-            t(c, s(r.toUpperCase(), r, C + "{1,7}"), 5),
-            t(C, s(r.toUpperCase(), r, C + "{1,7}"), 5),
-            t(c, s(r, C + "{1,7}", r.toLowerCase()), 5),
-            t(C, s(r, C + "{1,7}", r.toLowerCase()), 5),
-            t(c, s(r, c + "{1,7}", r.toUpperCase()), 5),
-            t(C, s(r, c + "{1,7}", r.toUpperCase()), 5)
-        ).each(
-            d -> d._3,
-            d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
-            d -> f("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
-            d -> f("but returned %d.", Main.countChars(d._1, d._2))
-        );
+            t(c, s(c + "{1,7}", r, r)),
+            t(C, s(c + "{1,7}", r, r)),
+            t(c, s(r.toUpperCase(), r, C + "{1,7}")),
+            t(C, s(r.toUpperCase(), r, C + "{1,7}")),
+            t(c, s(r, C + "{1,7}", r.toLowerCase())),
+            t(C, s(r, C + "{1,7}", r.toLowerCase())),
+            t(c, s(r, c + "{1,7}", r.toUpperCase())),
+            t(C, s(r, c + "{1,7}", r.toUpperCase()))
+        ).each(check, explain, onError);
     }
 }
