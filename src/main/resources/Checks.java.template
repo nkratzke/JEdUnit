@@ -25,13 +25,13 @@ public class Checks extends Constraints {
 
     // Explains the call and the expected result.
     Function<Tuple2<Character, String>, String> explain = d -> f(
-        "countChars(%s, %s) should return %d", 
-        repr(d._1), repr(d._2), Solution.countChars(d._1, d._2)
+        "countChars(%s, %s) should return %s", 
+        d._1, d._2, Solution.countChars(d._1, d._2)
     );
 
     // Is called on error and should return a message with actual result.
     Function<Tuple2<Character, String>, String> onError = d -> f(
-        "but returned %d", Main.countChars(d._1, d._2)
+        "but returned %s", Main.countChars(d._1, d._2)
     );
 
     @Override

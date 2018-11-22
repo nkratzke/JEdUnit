@@ -115,7 +115,19 @@ public class DSL {
      * @see String.format()
      */
     public static String f(String format, Object... args) {
-        return String.format(format, args);
+        Object[] stringified = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+            stringified[i] = repr(args[i]);
+        }
+        return String.format(format, stringified);
+    }
+
+    public static String repr(Object o) {
+        if (o instanceof String) return repr((String)o);
+        if (o instanceof Character) return repr((char)o);
+        if (o instanceof List) return repr((List)o);
+        if (o instanceof Map) return repr((Map)o);
+        return o.toString();
     }
 
     /**

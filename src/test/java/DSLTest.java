@@ -6,6 +6,7 @@ import static de.thl.jedunit.DSL.METHOD;
 import static de.thl.jedunit.DSL.b;
 import static de.thl.jedunit.DSL.c;
 import static de.thl.jedunit.DSL.d;
+import static de.thl.jedunit.DSL.f;
 import static de.thl.jedunit.DSL.i;
 import static de.thl.jedunit.DSL.inspect;
 import static de.thl.jedunit.DSL.l;
@@ -22,8 +23,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
-import java.util.*;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
@@ -150,6 +154,13 @@ public class DSLTest extends Constraints {
         java.util.List<Integer> ints = Arrays.asList(1, 2, 3);
         assertEquals(String.format("[%s, %s, %s]", repr(""), repr(" "), repr("Hello World")), repr(strings));
         assertEquals(String.format("[%d, %d, %d]", 1, 2, 3), repr(ints));
+    }
+
+    @Test public void testFormat() {
+        assertEquals("[1, 2, 3, 4]", f("%s", Arrays.asList(1, 2, 3, 4)));
+        assertEquals("[" + repr("This is just a test") + "]", f("%s", Arrays.asList("This is just a test")));
+        System.out.println(f("%s %s %s %s", 1, true, 'C', "\t"));
+        assertEquals("1 true 'C' \"\u21e5\"", f("%s %s %s %s", 1, true, 'C', "\t"));
     }
 
     @Test public void testTest() {
