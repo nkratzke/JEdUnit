@@ -7,13 +7,11 @@ import io.vavr.Tuple2;
 
 /**
  * Please add your test cases for evaluation here.
- * - Please provide meaningful remarks for your students in grading() calls.
  * - All test weights should sum up to 1.0.
  * - If the weights sum up to more than 1.0, points it will be truncated. 
  * - This enable bonus rules to tolerate some errors. 
  * - First, all methods with an @Inspection annotation will be executed (in alphabetical order)
  * - Then, all methods with a @Test annotation will be executed automatically (in alphabetical order).
- * - If this sounds similar to JUnit - this is intended ;-)
  */
 public class Checks extends Constraints {
 
