@@ -20,10 +20,13 @@ public class CLI {
     public static void main(String[] args) {
         for (String resource : RESOURCES) {
             try {
-                System.out.println("Preparing " + resource.replace(".template", ""));
                 Scanner read = new Scanner(CLI.class.getResourceAsStream("/" + resource));
                 File f = new File(System.getProperty("user.dir") + File.separator + resource.replace(".template", ""));
-                if (f.exists()) continue;
+                if (f.exists()) {
+                    System.out.println("Skipping existing " + resource.replace(".template", ""));
+                    continue;
+                }
+                System.out.println("Preparing " + resource.replace(".template", ""));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(f));
                 while (read.hasNextLine()) {
                     writer.write(read.nextLine() + "\n");
