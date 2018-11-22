@@ -6,12 +6,13 @@ import java.util.function.Predicate;
 import io.vavr.Tuple2;
 
 /**
- * Please add your test cases for evaluation here.
- * - All test weights should sum up to 1.0.
- * - If the weights sum up to more than 1.0, points it will be truncated. 
- * - This enable bonus rules to tolerate some errors. 
+ * Please add your inspections and test cases for evaluation here.
+ * - Configure your evaluation in the configure() method.
  * - First, all methods with an @Inspection annotation will be executed (in alphabetical order)
  * - Then, all methods with a @Test annotation will be executed automatically (in alphabetical order).
+ * - All test weights should sum up to 1.0.
+ * - If the weights sum up to more than 1.0, points it will be truncated. 
+ * - This enable bonus rules to tolerate some errors.  
  */
 public class Checks extends Constraints {
 
