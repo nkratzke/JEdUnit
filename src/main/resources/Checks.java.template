@@ -57,8 +57,8 @@ public class Checks extends Constraints {
         ).each(
             d -> d._3,
             d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
-            d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
-            d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
+            d -> f("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
+            d -> f("but returned %d.", Main.countChars(d._1, d._2))
         );
     }
 
@@ -76,8 +76,8 @@ public class Checks extends Constraints {
         ).each(
             d -> d._3,
             d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
-            d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
-            d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
+            d -> f("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
+            d -> f("but returned %d.", Main.countChars(d._1, d._2))
         );
     }
 
@@ -99,8 +99,8 @@ public class Checks extends Constraints {
         ).each(
             d -> d._3,
             d -> Solution.countChars(d._1, d._2) == Main.countChars(d._1, d._2),
-            d -> String.format("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
-            d -> String.format("but returned %d.", Main.countChars(d._1, d._2))
+            d -> f("countChars('%s', %s) should return %d.", d._1, repr(d._2), Solution.countChars(d._1, d._2)),
+            d -> f("but returned %d.", Main.countChars(d._1, d._2))
         );
     }
 }

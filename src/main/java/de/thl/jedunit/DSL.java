@@ -111,12 +111,30 @@ public class DSL {
     }
 
     /**
-     * Indicates typical non-printable chars in Strings.
+     * Abbreviation for String.format().
+     * @see String.format()
+     */
+    public static String f(String format, Object... args) {
+        return String.format(format, args);
+    }
+
+    /**
+     * Makes typical non-printable characters explicit.
+     */
+    public static String repr(char c) {
+        if (c == ' ') return "'\u23b5'";
+        if (c == '\t') return "'\u21e5'";
+        if (c == '\n') return "'\u21a9'";
+        return "'" + c + "'";
+    }
+
+    /**
+     * Represents typical non-printable chars in Strings.
      */
     public static String repr(String s) {
         return "\"" + s.replace(" ", "\u23b5")
                 .replace("\t", "\u21e5")
-                .replace("\n", "\u21a9\n") + "\"";
+                .replace("\n", "\u21a9") + "\"";
     }
 
     /**

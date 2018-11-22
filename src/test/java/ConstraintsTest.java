@@ -32,7 +32,7 @@ public class ConstraintsTest {
                 Config.ALLOW_METHODS = false;               
                 Config.ALLOW_LAMBDAS = false;               
                 Config.ALLOW_INNER_CLASSES = false;         
-                Config.ALLOW_GLOBAL_VARIABLES = false;      
+                Config.ALLOW_DATAFIELDS = false;      
                 Config.CHECK_COLLECTION_INTERFACES = true;  
                 Config.ALLOW_CONSOLE_OUTPUT = false;
             }
@@ -91,7 +91,7 @@ public class ConstraintsTest {
                 Config.ALLOW_METHODS = true;               
                 Config.ALLOW_LAMBDAS = true;               
                 Config.ALLOW_INNER_CLASSES = true;         
-                Config.ALLOW_GLOBAL_VARIABLES = true;      
+                Config.ALLOW_DATAFIELDS = true;      
                 Config.CHECK_COLLECTION_INTERFACES = false;  
                 Config.ALLOW_CONSOLE_OUTPUT = true;
             }

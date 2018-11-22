@@ -116,7 +116,7 @@ public class Constraints extends Evaluator {
                 ast.select(LambdaExpr.class).annotate(l -> "lambda expression " + l + " not allowed").exists()
             ));
             
-            if (!Config.ALLOW_GLOBAL_VARIABLES) allfine &= !penalize(Config.GLOBAL_VARIABLE_PENALTY, "No global variables", () -> inspect(file, ast ->
+            if (!Config.ALLOW_DATAFIELDS) allfine &= !penalize(Config.DATAFIELD_PENALTY, "No global variables", () -> inspect(file, ast ->
                 ast.select(FieldDeclaration.class)
                    .filter(field -> !(field.isStatic() && field.isFinal()))
                    .annotate("No datafields allowed. Add the final static modifier to make it a constant value.")

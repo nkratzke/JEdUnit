@@ -14,7 +14,6 @@ import static de.thl.jedunit.DSL.repr;
 import static de.thl.jedunit.DSL.resource;
 import static de.thl.jedunit.DSL.s;
 import static de.thl.jedunit.DSL.t;
-import static de.thl.jedunit.DSL.testWith;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,7 +33,6 @@ import de.thl.jedunit.Constraints;
 import de.thl.jedunit.DSL;
 import de.thl.jedunit.Selected;
 import de.thl.jedunit.SyntaxTree;
-import io.vavr.collection.List;
 
 public class DSLTest extends Constraints {
 
@@ -139,8 +137,12 @@ public class DSLTest extends Constraints {
     }
 
     @Test public void testRepr() {
-        assertEquals("\"\u23b5\u21e5\u21a9\n\"", repr(" \t\n"));
+        assertEquals("\"\u23b5\u21e5\u21a9\"", repr(" \t\n"));
         assertEquals("\"\"", repr(""));
+        assertEquals("'x'", repr('x'));
+        assertEquals("'\u23b5'", repr(' '));
+        assertEquals("'\u21e5'", repr('\t'));
+        assertEquals("'\u21a9'", repr('\n'));
     }
 
     @Test public void testListRepr() {

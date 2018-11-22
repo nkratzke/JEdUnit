@@ -15,7 +15,7 @@ public class Config {
     /**
      * Version of JEdUnit (Semantic Versioning).
      */
-    public final static String VERSION = "0.1.23"; 
+    public final static String VERSION = "0.1.24"; 
 
     /**
      * Set of file names that shall be considered by checkstyle and evaluation.
@@ -111,12 +111,12 @@ public class Config {
     /**
      * Option to allow non final static datafields. Not allowed by default.
      */
-    public static boolean ALLOW_GLOBAL_VARIABLES = false;
+    public static boolean ALLOW_DATAFIELDS = false;
 
     /**
      * Option to penalize the use of non final static datafields.
      */
-    public static int GLOBAL_VARIABLE_PENALTY = 25;
+    public static int DATAFIELD_PENALTY = 25;
 
     /**
      * Option to check for proper use of collection interfaces Map, Set, List.
