@@ -7,14 +7,6 @@ JEdUnit is a unit testing framework with a special focus on educational aspects.
 
 We developed this framework mainly for our purposes in programming classes at the Lübeck University of Applied Sciences. However, this framework might be helpful for other programming instructors, and that is why this framework is provided as open source.
 
-## Intended audience
-
-This framework is written for programming instructors and teachers at schools, colleges, universities or further
-programming training facilities that want (or need) to automatically evaluate and grade (small)
-Java programming assignments typically at a "freshman" (1st/2nd semester) level.
-
-We assume the reader to be familiar with Java in general.
-
 ## Usage and features
 
 We assume the reader to be familiar with Java in general.
