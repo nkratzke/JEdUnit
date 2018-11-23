@@ -48,4 +48,4 @@ First of all, initialize a directory on your local machine.
 curl -s https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh | sh
 ```
 
-Then we recommend to study the [Wiki](wiki).
+Then we recommend to study the [Wiki](../../wiki).
