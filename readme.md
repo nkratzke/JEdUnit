@@ -34,7 +34,7 @@ educational specifics that are hardly covered by current testing frameworks.
 ## Learn how to use it
 
 To make use of this framework, the following workflow is recommended to set up a basic configuration for a new programming assignment.
-First of all, initialize a directory on your local machine.
+First of all, initialize a directory on your local machine and run:
 
 ```
 curl -s https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh | sh
