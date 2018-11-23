@@ -122,7 +122,9 @@ public class DSL {
         return String.format(format, stringified);
     }
 
+    @SuppressWarnings("unchecked")
     public static String repr(Object o) {
+        if (o == null) return "null";
         if (o instanceof String) return repr((String)o);
         if (o instanceof Character) return repr((char)o);
         if (o instanceof List) return repr((List)o);
@@ -144,6 +146,7 @@ public class DSL {
      * Represents typical non-printable chars in Strings.
      */
     public static String repr(String s) {
+        if (s == null) return "null";
         return "\"" + s.replace(" ", "\u23b5")
                 .replace("\t", "\u21e5")
                 .replace("\n", "\u21a9") + "\"";
@@ -157,6 +160,7 @@ public class DSL {
      * @return normalized representation of a Map as String representation
      */
     public static <K, V> String repr(Map<K, V> m) {
+        if (m == null) return "null";
         Map<String, String> r = new TreeMap<>();
         for (K k : m.keySet()) {
             V v = m.get(k);
@@ -174,6 +178,7 @@ public class DSL {
      * @return normalized representation of the List
      */
     public static <T> String repr(java.util.List<T> list) {
+        if (list == null) return "null";
         java.util.List<String> r = new LinkedList<>();
         for (T t : list) {
             String v = t instanceof String ? repr(t.toString()) : t.toString();

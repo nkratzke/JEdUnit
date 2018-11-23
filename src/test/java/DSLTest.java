@@ -147,6 +147,7 @@ public class DSLTest extends Constraints {
         assertEquals("'\u23b5'", repr(' '));
         assertEquals("'\u21e5'", repr('\t'));
         assertEquals("'\u21a9'", repr('\n'));
+        assertEquals("null", repr("test".length() > "test".length() ? "test" : null));
     }
 
     @Test public void testListRepr() {
