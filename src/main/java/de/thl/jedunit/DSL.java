@@ -308,6 +308,19 @@ public class DSL {
     }
 
     /**
+     * Converts a list into an array.
+     * @param list List of values
+     * @return Array of values
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T[] a(List<T> list) {
+        T[] arr = (T[])new Object[list.size()];
+        int i = 0;
+        for (T entry : list) arr[i++] = entry;
+        return arr;
+    }
+
+    /**
      * Generates a tuple from two values.
      * @return two-tuple
      */
