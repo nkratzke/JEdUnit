@@ -443,6 +443,7 @@ public class DSL {
      *         false, otherwise.
      */
     public static <K, V> boolean assertEquals(Map<K, V> expected, Map<K, V> actual) {
+        if (expected == null || actual == null) return expected == actual;
         Map<K, V> e = new TreeMap<>(expected);
         Map<K, V> a = new TreeMap<>(actual);
         return e.toString().equals(a.toString());
@@ -456,6 +457,7 @@ public class DSL {
      *         false, otherwise
      */
     public static <T> boolean assertEquals(T expected, T actual) {
+        if (expected == null || actual == null) return expected == actual;
         return expected.toString().equals(actual.toString());
     }
 }

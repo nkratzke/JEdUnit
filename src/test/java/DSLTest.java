@@ -257,6 +257,9 @@ public class DSLTest extends Constraints {
         assertTrue(DSL.assertEquals(5, 2 + 3));
         assertTrue(DSL.assertEquals(DSL.l(5, () -> 1), Arrays.asList(1, 1, 1, 1, 1)));
         assertTrue(DSL.assertEquals(DSL.l(0, () -> 1), Arrays.asList()));
+        assertFalse(DSL.assertEquals(null, "Something"));
+        assertFalse(DSL.assertEquals("Something", null));
+        assertTrue(DSL.assertEquals(null, null));
     }
 
     @Test public void testAssertEqualsMap() {
