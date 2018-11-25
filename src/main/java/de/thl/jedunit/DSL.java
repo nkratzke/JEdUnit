@@ -19,6 +19,14 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.LambdaExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import com.mifmif.common.regex.Generex;
 
 import io.vavr.Tuple;
@@ -78,6 +86,46 @@ public class DSL {
      * Abbreviation to select callables (so methods or constructors).
      */
     public final static Class<CallableDeclaration> CALLABLE = CallableDeclaration.class;
+
+    /**
+     * Abbreviation to select lambdas.
+     */
+    public final static Class<LambdaExpr> LAMBDA = LambdaExpr.class;
+
+    /**
+     * Abbreviation to select blocks.
+     */
+    public final static Class<BlockStmt> BLOCK = BlockStmt.class;
+
+    /**
+     * Abbreviation to select if statements.
+     */
+    public final static Class<IfStmt> IF = IfStmt.class;
+
+    /**
+     * Abbreviation to select return statements.
+     */
+    public final static Class<ReturnStmt> RETURN = ReturnStmt.class;
+
+    /**
+     * Abbreviation to select for-loops.
+     */
+    public final static Class<ForStmt> FOR = ForStmt.class;
+
+    /**
+     * Abbreviation to select foreach-loops.
+     */
+    public final static Class<ForEachStmt> FOREACH = ForEachStmt.class;
+
+    /**
+     * Abbreviation to select while-loops.
+     */
+    public final static Class<WhileStmt> WHILE = WhileStmt.class;
+
+    /**
+     * Abbreviation to select do-while-loops.
+     */
+    public final static Class<DoStmt> DOWHILE = DoStmt.class;
 
     /**
      * Determines automatically all Java files of the submission
