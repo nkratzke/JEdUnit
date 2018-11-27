@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -19,6 +19,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -74,7 +75,7 @@ public class DSL {
     public final static Class<FieldDeclaration> FIELD = FieldDeclaration.class;
     
     /**
-     * Abbreviation to select datafield variables (and constants).
+     * Abbreviation to select variables (in class datafield declarations or methods).
      */
     public final static Class<VariableDeclarator> VAR = VariableDeclarator.class;
 
@@ -87,6 +88,11 @@ public class DSL {
      * Abbreviation to select methods.
      */
     public final static Class<MethodDeclaration> METHOD = MethodDeclaration.class;
+
+    /**
+     * Abbreviation to select parameters.
+     */
+    public final static Class<Parameter> PARAMETER = Parameter.class;
 
     /**
      * Abbreviation to select callables (so methods or constructors).

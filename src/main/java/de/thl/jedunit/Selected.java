@@ -12,10 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
-import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
 
@@ -107,17 +104,16 @@ public class Selected <T extends Node> implements Iterable<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public Selected<T> filter(String filters) {
+    public Selected<T> filter(String... filters) {
         List<T> selected = new LinkedList<>();
-        for (String filter : filters.trim().split(", *")) {
-            String[] components = filter.split("=");
+        for (String filter : filters) {
+            String[] components = filter.split("\\*=|^=|$=|=");
             String attribute = components[0].trim();
-            Optional<String> value = components.length > 1 ? Optional.of(components[1].trim()) : Optional.empty();
+            Optional<String> value = components.length == 2 ? Optional.of(components[1].trim()) : Optional.empty();
             for (Node n : this.nodes) {
                 if (attribute.equals("name") && matchName(n, value)) selected.add((T)n);
                 if (attribute.equals("modifier") && matchModifier(n, value)) selected.add((T)n);
                 if (attribute.equals("type") && matchType(n, value)) selected.add((T)n);
-
             }
         }
         return new Selected<T>(selected, this.file);
