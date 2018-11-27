@@ -1,17 +1,23 @@
 package de.thl.jedunit;
 
-import static de.thl.jedunit.DSL.*;
+import static de.thl.jedunit.DSL.comment;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
+import com.github.javaparser.ast.nodeTypes.NodeWithType;
 
 /**
  * Selector concept for abstract syntax trees (AST).
@@ -34,6 +40,11 @@ public class Selected <T extends Node> implements Iterable<T> {
         this.file = f;
     }
 
+    /**
+     * Selects nodes that are recursive childs of selected nodes.
+     * @param selector Child nodes to be selected
+     * @return Reference to selected child nodes
+     */
     public <R extends Node> Selected<R> select(Class<R> selector) {
         List<R> selected = new LinkedList<>();
         for (T n : this.nodes) {
@@ -44,9 +55,72 @@ public class Selected <T extends Node> implements Iterable<T> {
         return new Selected<R>(selected, this.file);
     }
 
+    /**
+     * Selects nodes that are recursive childs of selected nodes
+     * and fulfill a condition.
+     * @param selector Child nodes to be selected
+     * @param pred Filter predicate
+     * @return Reference to selected and filtered child nodes
+     */
     public <R extends Node> Selected<R> select(Class<R> selector, Predicate<R> pred) {
         Selected<R> selected = this.select(selector);
         return selected.filter(pred);
+    }
+
+    /**
+     * Selects nodes that are direct childs of selected nodes.
+     * @param selector Child nodes to be selected
+     * @return Reference to selected child nodes
+     */
+    @SuppressWarnings("unchecked")
+    public <R extends Node> Selected<R> childSelect(Class<R> selector) {
+        List<R> selected = new LinkedList<>();
+        for (T n : this.nodes) {
+            for (Node child : n.findAll(selector)) {
+                if (child.getParentNode().get().equals(n)) selected.add((R)child);
+            }
+        }
+        return new Selected<R>(selected, this.file);
+    }
+
+    private boolean matchName(Node n, Optional<String> name) {
+        if (!(n instanceof NodeWithSimpleName)) return false;
+        NodeWithSimpleName<?> node = (NodeWithSimpleName<?>)n;
+        if (!name.isPresent()) return true;
+        return node.getNameAsString().equals(name.get());
+    }
+
+    private boolean matchModifier(Node n, Optional<String> modifier) {
+        if (!(n instanceof NodeWithModifiers)) return false;
+        NodeWithModifiers<?> node = (NodeWithModifiers<?>)n;
+        if (!modifier.isPresent() && !node.getModifiers().isEmpty()) return true;
+        if (!modifier.isPresent()) return false;
+        String modifiers = node.getModifiers().toString().toLowerCase();
+        return modifiers.contains(modifier.get().toLowerCase());
+    }
+
+    private boolean matchType(Node n, Optional<String> type) {
+        if (!(n instanceof NodeWithType)) return false;
+        NodeWithType<?,?> node = (NodeWithType<?,?>)n;
+        if (!type.isPresent()) return true;
+        return node.getTypeAsString().equals(type.get());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Selected<T> filter(String filters) {
+        List<T> selected = new LinkedList<>();
+        for (String filter : filters.trim().split(", *")) {
+            String[] components = filter.split("=");
+            String attribute = components[0].trim();
+            Optional<String> value = components.length > 1 ? Optional.of(components[1].trim()) : Optional.empty();
+            for (Node n : this.nodes) {
+                if (attribute.equals("name") && matchName(n, value)) selected.add((T)n);
+                if (attribute.equals("modifier") && matchModifier(n, value)) selected.add((T)n);
+                if (attribute.equals("type") && matchType(n, value)) selected.add((T)n);
+
+            }
+        }
+        return new Selected<T>(selected, this.file);
     }
 
     /**

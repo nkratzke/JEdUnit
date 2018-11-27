@@ -19,6 +19,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
@@ -72,6 +73,11 @@ public class DSL {
      */
     public final static Class<FieldDeclaration> FIELD = FieldDeclaration.class;
     
+    /**
+     * Abbreviation to select datafield variables (and constants).
+     */
+    public final static Class<VariableDeclarator> VAR = VariableDeclarator.class;
+
     /**
      * Abbreviation to select constructors.
      */    
