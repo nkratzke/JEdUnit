@@ -1,8 +1,5 @@
 # JEdUnit
 
-This is a basic evaluation framework to simplify automatic evaluation of (small) __Java__ programming assignments
-using [Moodle](https://moodle.org/) and [VPL](http://vpl.dis.ulpgc.es/).
-
 JEdUnit is a unit testing framework with a special focus on educational aspects. It strives to simplify automatic evaluation of (small) __Java__ programming assignments using [Moodle](https://moodle.org/) and [VPL](http://vpl.dis.ulpgc.es/).
 
 We developed this framework mainly for our purposes in programming classes at the Lübeck University of Applied Sciences. However, this framework might be helpful for other programming instructors, and that is why this framework is provided as open source.
