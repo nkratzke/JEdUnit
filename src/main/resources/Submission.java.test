@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Function;
 
 public class Submission {
     
@@ -18,6 +19,8 @@ public class Submission {
     }
 
     public Submission method(Submission a) {
+        Function<String, Integer> len = (String s) -> s.length();
+        Supplier<Integer> sup = () -> 42;
         return null;
     }
 

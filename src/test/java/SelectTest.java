@@ -3,8 +3,8 @@ import static de.thl.jedunit.DSL.CONSTRUCTOR;
 import static de.thl.jedunit.DSL.FIELD;
 import static de.thl.jedunit.DSL.FOREACH;
 import static de.thl.jedunit.DSL.IF;
+import static de.thl.jedunit.DSL.LAMBDA;
 import static de.thl.jedunit.DSL.METHOD;
-import static de.thl.jedunit.DSL.PARAMETER;
 import static de.thl.jedunit.DSL.RETURN;
 import static de.thl.jedunit.DSL.VAR;
 import static de.thl.jedunit.DSL.inspect;
@@ -91,6 +91,22 @@ public class SelectTest {
             assertEquals(3, ast.select(METHOD).filter("type").count());
             assertEquals(1, ast.select(METHOD).filter("type=int").count());
             assertEquals(0, ast.select(RETURN).filter("type").count());
+            return true;
+        });
+    }
+
+    @Test public void testFilteredParamSelect() {
+        inspect(resource("Submission.java.test"), ast -> {
+            assertEquals(2, ast.select(METHOD).filter("param=Submission").count());
+            assertEquals(1, ast.select(METHOD).filter("param=C,Submission").count());
+            assertEquals(0, ast.select(METHOD).filter("param=Submission,C").count());
+            assertEquals(0, ast.select(METHOD).filter("param=C").count());
+            assertEquals(3, ast.select(METHOD).filter("param").count());
+            assertEquals(0, ast.select(FIELD).filter("param").count());
+            assertEquals(2, ast.select(LAMBDA).count());
+            assertEquals(1, ast.select(LAMBDA).filter("param").count());
+            assertEquals(1, ast.select(LAMBDA).filter("param=String").count());
+            assertEquals(0, ast.select(LAMBDA).filter("param=int").count());
             return true;
         });
     }

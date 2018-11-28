@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
+import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
 
@@ -103,6 +104,14 @@ public class Selected <T extends Node> implements Iterable<T> {
         return node.getTypeAsString().equals(type.get());
     }
 
+    private boolean matchParam(Node n, Optional<String> param) {
+        if (!(n instanceof NodeWithParameters)) return false;
+        NodeWithParameters<?> node = (NodeWithParameters<?>)n;
+        if (!param.isPresent()) return !node.getParameters().isEmpty();
+        String ps = node.getParameters().stream().map(p -> p.getType() + (p.isVarArgs() ? "..." : "")).collect(Collectors.joining(","));
+        return ps.equals(param.get());
+    }
+
     @SuppressWarnings("unchecked")
     public Selected<T> filter(String... filters) {
         List<T> selected = new LinkedList<>();
@@ -114,6 +123,7 @@ public class Selected <T extends Node> implements Iterable<T> {
                 if (attribute.equals("name") && matchName(n, value)) selected.add((T)n);
                 if (attribute.equals("modifier") && matchModifier(n, value)) selected.add((T)n);
                 if (attribute.equals("type") && matchType(n, value)) selected.add((T)n);
+                if (attribute.equals("param") && matchParam(n, value)) selected.add((T)n);
             }
         }
         return new Selected<T>(selected, this.file);
