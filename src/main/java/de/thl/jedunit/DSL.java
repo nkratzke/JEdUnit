@@ -155,8 +155,12 @@ public class DSL {
     /**
      * Adds a comment for VPL via console output.
      */
-    public static void comment(String c) { 
-        System.out.println("Comment :=>>" + c); 
+    public static void comment(String c) {
+        if (c.contains("\n")) {
+            System.out.println("<|-");
+            System.out.println(c);
+            System.out.println("-|>");
+        } else System.out.println("Comment :=>>" + c);
     }
 
     /**
@@ -197,8 +201,8 @@ public class DSL {
      */
     public static String repr(char c) {
         if (c == ' ') return "'\u23b5'";
-        if (c == '\t') return "'\u21e5'";
-        if (c == '\n') return "'\u21a9'";
+        if (c == '\t') return "'\u21b9'";
+        if (c == '\n') return "'\u23ce'";
         return "'" + c + "'";
     }
 
@@ -208,8 +212,8 @@ public class DSL {
     public static String repr(String s) {
         if (s == null) return "null";
         return "\"" + s.replace(" ", "\u23b5")
-                .replace("\t", "\u21e5")
-                .replace("\n", "\u21a9") + "\"";
+                .replace("\t", "\u21b9")
+                .replace("\n", "\u23ce\n") + "\"";
     }
 
     /**

@@ -42,6 +42,11 @@ public class DSLTest extends Constraints {
 
     public static int N = 1000;
     
+    @Test public void testComment() {
+        DSL.comment(repr("This\nis\njust\nan\nexample"));
+        DSL.comment(repr("This\tis\ta\ttest"));
+    }
+
     @Test public void testGenerateString() {
         Stream.iterate(0, l -> l + 1).limit(N / 100).forEach(l -> {
             String generated = s(String.format("[a-cA-C]{0,%d}", l));
@@ -141,12 +146,12 @@ public class DSLTest extends Constraints {
     }
 
     @Test public void testRepr() {
-        assertEquals("\"\u23b5\u21e5\u21a9\"", repr(" \t\n"));
+        assertEquals("\"\u23b5\u21b9\u23ce\n\"", repr(" \t\n"));
         assertEquals("\"\"", repr(""));
         assertEquals("'x'", repr('x'));
         assertEquals("'\u23b5'", repr(' '));
-        assertEquals("'\u21e5'", repr('\t'));
-        assertEquals("'\u21a9'", repr('\n'));
+        assertEquals("'\u21b9'", repr('\t'));
+        assertEquals("'\u23ce'", repr('\n'));
         assertEquals("null", repr("test".length() > "test".length() ? "test" : null));
     }
 
@@ -160,8 +165,7 @@ public class DSLTest extends Constraints {
     @Test public void testFormat() {
         assertEquals("[1, 2, 3, 4]", f("%s", Arrays.asList(1, 2, 3, 4)));
         assertEquals("[" + repr("This is just a test") + "]", f("%s", Arrays.asList("This is just a test")));
-        System.out.println(f("%s %s %s %s", 1, true, 'C', "\t"));
-        assertEquals("1 true 'C' \"\u21e5\"", f("%s %s %s %s", 1, true, 'C', "\t"));
+        assertEquals("1 true 'C' \"\u21b9\"", f("%s %s %s %s", 1, true, 'C', "\t"));
     }
 
     @Test public void testTest() {
