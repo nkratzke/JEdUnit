@@ -157,9 +157,9 @@ public class DSL {
      */
     public static void comment(String c) {
         if (c.contains("\n")) {
-            System.out.println("<|-");
+            System.out.println("<|--");
             System.out.println(c);
-            System.out.println("-|>");
+            System.out.println("--|>");
         } else System.out.println("Comment :=>>" + c);
     }
 
