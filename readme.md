@@ -34,7 +34,7 @@ To make use of this framework, the following workflow is recommended to set up a
 First of all, initialize a directory on your local machine and run:
 
 ```
-curl -s https://raw.githubusercontent.com/nkratzke/VPL-java-template/working/init.sh | sh
+curl -s https://raw.githubusercontent.com/nkratzke/JEdUnit/working/init.sh | sh
 ```
 
 Then we recommend to study the [Wiki](../../wiki).
