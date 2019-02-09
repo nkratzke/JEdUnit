@@ -1,0 +1,30 @@
+import java.util.List;
+import java.util.Function;
+
+public class Submission {
+    
+    public int datafield = 43;
+    private int anotherOne = 0;
+    public static String CONST = "";
+    protected List<Submission> next;
+    private boolean notRequested;
+
+    public Submission(int a, String s) {
+    }
+
+    Submission(String s) {
+    }
+
+    public void method(C c, Submission a) {
+    }
+
+    public Submission method(Submission a) {
+        Function<String, Integer> len = (String s) -> s.length();
+        Supplier<Integer> sup = () -> 42;
+        return null;
+    }
+
+    private int test(Submission a) {
+        return 0;
+    }
+}
