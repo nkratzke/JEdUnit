@@ -270,7 +270,7 @@ public class Constraints extends Evaluator {
         if (verbose) {
             comment("Checking class structure: " + sub.getFile());
             result.forEach(r -> {
-                grading(r.getPoints(), r.comment(), () -> r.ok());
+                grading(r.getPoints(), r.comment(), () -> r.ok(), true);
                 if (r.violates()) {
                     comment(sub.getFile(), r.getNode().getRange(), r.comment());
                 }

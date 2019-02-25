@@ -15,13 +15,19 @@ public class Config {
     /**
      * Version of JEdUnit (Semantic Versioning).
      */
-    public final static String VERSION = "0.1.26"; 
+    public final static String VERSION = "0.2.1"; 
 
     /**
      * Set of file names that shall be considered by checkstyle and evaluation.
      * This set is determined automatically but can be overwritten in the configure method().
      */
     public static Set<String> EVALUATED_FILES = DSL.autoFiles();
+
+    /**
+     * Std-out redirection of submission code.
+     * This is used to avoid injection attacks. 
+     */
+    public static String STD_OUT_REDIRECTION = "console.log";
 
     /**
      * Option to evaluate the checkstyle log.

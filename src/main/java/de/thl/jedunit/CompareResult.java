@@ -132,7 +132,7 @@ public class CompareResult implements Iterable<CompareResult.Entry> {
     }
 
     public String toString() {
-        return results.stream().map(r -> r.toString()).collect(Collectors.joining("\n"));
+        return results().map(r -> r.toString()).collect(Collectors.joining("\n"));
     } 
 
 }

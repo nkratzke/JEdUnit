@@ -64,9 +64,10 @@ public class EvaluatorTest {
     public void testEvaluationProcess() {
         Constraints check = new TestChecks();
         check.runTests(); // process functional tests
-
+        
         String console = system.toString();
         // redirected.println(console);
+        
         assertTrue("Commenting", console.contains("<|--") && console.contains("--|>"));
         assertTrue("OK detection", console.contains("[OK] Counting 'o' in \"Hello World\" must return 2."));
         assertTrue("FAILED detection", console.contains("[FAILED] Counting 'w' in \"Hello World\" must return 2."));

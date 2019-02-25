@@ -235,16 +235,18 @@ public class DSLTest extends Constraints {
     }
 
     @Test public void testCompareClassesOutput() {
-        PrintStream redirected = System.out;
-        ByteArrayOutputStream system = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(system));
+
+        PrintStream orig = System.out;
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(boas));
 
         Selected<ClassOrInterfaceDeclaration> submission = parse(resource("Submission.java.test")).select(CLAZZ).first();
         Selected<ClassOrInterfaceDeclaration> reference = parse(resource("Reference.java.test")).select(CLAZZ).first();
+
         compareClasses(true, reference, submission, t("Reference", "Submission"));
 
-        String console = system.toString();
-        // redirected.println(console);
+        String console = boas.toString();
+        System.setOut(orig);
 
         assertTrue(console.contains("[OK] Class declaration correct (1 points)"));
         assertTrue(console.contains("[OK] Datafield found: public int datafield (1 points)"));
@@ -254,8 +256,6 @@ public class DSLTest extends Constraints {
         assertTrue(console.contains("[FAILED] Missing/wrong declared datafield:  String notSubmitted (0 of 1 points)"));
         assertTrue(console.contains("[FAILED] Missing/wrong declared datafield: public int other (0 of 1 points)"));
         assertTrue(console.contains("[FAILED] Missing/wrong declared method: protected boolean notFound() (0 of 1 points)"));
-
-        System.setOut(redirected);
     }
 
     @Test public void testAssertEqualsGeneral() {

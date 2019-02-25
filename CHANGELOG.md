@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.2.1
+
+- Maximum line length for submissions is now 120 characters.
+- Isolated submission and evaluation logic stdout streams (to prevent injection attacks)
+
 ## Version 0.2.0 (JEdUnit)
 
 - vavr integration for better expressiveness to formulate tests (especially tuple support)

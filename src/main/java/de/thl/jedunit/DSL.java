@@ -156,11 +156,9 @@ public class DSL {
      * Adds a comment for VPL via console output.
      */
     public static void comment(String c) {
-        // if (c.contains("\n")) {
         System.out.println("<|--");
         System.out.println(c);
         System.out.println("--|>");
-        // } else System.out.println("Comment :=>>" + c);
     }
 
     /**
