@@ -59,8 +59,8 @@ public class Checks extends Constraints {
         // Config.ALLOW_INNER_CLASSES = true;          // default: false
         // Config.INNER_CLASS_PENALTY = 25;
     
-        // Config.ALLOW_GLOBAL_VARIABLES = true;       // default: false
-        // Config.GLOBAL_VARIABLE_PENALTY = 25;
+        // Config.ALLOW_DATAFIELDS = true;             // default: false
+        // Config.DATAFIELD_PENALTY = 25;
     
         // Config.CHECK_COLLECTION_INTERFACES = false; // default: true
         // Config,COLLECTION_INTERFACE_PENALTY = 25;
