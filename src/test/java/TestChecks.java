@@ -43,10 +43,10 @@ public class TestChecks extends Constraints {
             s(r, C + "{1,7}", r.toLowerCase()),
             s(r, c + "{1,7}", r.toUpperCase())
         ).forEach(s -> {
-            grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", c, s), 
+            grading(5, String.format("Do you considered cases like\n countChars('%s', \"%s\")?", c, s), 
                 () -> Main.countChars(c, s) == Solution.countChars(c, s)
             );
-            grading(5, String.format("Do you considered cases like countChars('%s', \"%s\")?", C, s), 
+            grading(5, String.format("Do you considered cases like\n countChars('%s', \"%s\")?", C, s), 
                 () -> Main.countChars(C, s) == Solution.countChars(C, s)
             );
         });

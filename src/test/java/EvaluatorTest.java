@@ -68,7 +68,8 @@ public class EvaluatorTest {
         String console = system.toString();
         // redirected.println(console);
         
-        assertTrue("Commenting", console.contains("<|--") && console.contains("--|>"));
+        assertTrue("Multiple line commenting", console.contains("<|--") && console.contains("--|>"));
+        assertTrue("Single line commenting", console.contains("Comment :=>>"));
         assertTrue("OK detection", console.contains("[OK] Counting 'o' in \"Hello World\" must return 2."));
         assertTrue("FAILED detection", console.contains("[FAILED] Counting 'w' in \"Hello World\" must return 2."));
         assertTrue("Failing abort condition", console.contains("This kind of abort should not reduce points"));
