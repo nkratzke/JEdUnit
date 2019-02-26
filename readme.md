@@ -12,7 +12,7 @@ Furthermore, we recommend to study at least the following VPL related documentat
 - [VPL General documentation](http://vpl.dis.ulpgc.es/index.php/support)
 - [Moodle VPL Tutorials](http://www.science.smith.edu/dftwiki/index.php/Moodle_VPL_Tutorials) from Smith College
 
-According to our experiences students tend to make use of the following kind of "cheats".
+According to our [studies](https://www.researchgate.net/publication/330752881) students tend to make use of the following kind of "cheats".
 
 - __Overfitting__ (e.g. to map simply the test values to expected results, outside the scope of the test values the solution is useless)
 - __Problem evasion__ (e.g. to solve a problem using loops instead of to solve it recursively)
