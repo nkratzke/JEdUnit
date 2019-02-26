@@ -285,6 +285,7 @@ public class Evaluator {
      */
     public final void checkstyle() {
         try {
+            reset();
             comment("- Checkstyle");
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
@@ -294,22 +295,31 @@ public class Evaluator {
                     if (Config.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
 
                     String msg = result.substring(result.indexOf(file));
+                    reset();
                     comment(msg);
                     this.percentage -= Config.CHECKSTYLE_PENALTY / 100.0;
                 }
             }
             in.close();
-            if (this.percentage >= 0) comment("Everything fine");
+            if (this.percentage >= 0) {
+                reset();
+                comment("Everything fine");
+            }
             if (this.percentage < 0) {
                 String msg = String.format("[CHECKSTYLE] Found violations (%d%%)", (int)(this.percentage * 100));
+                reset();
                 comment(msg);
             }
             grade();
         } catch (Exception ex) {
+            reset();
             comment("You are so lucky! We had problems processing the checkstyle.log.");
             comment("This was due to: " + ex);
             grade();
         }
+        reset();
+        comment("");
+        redirect();
     }
 
     /**
