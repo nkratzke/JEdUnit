@@ -219,7 +219,6 @@ public class Evaluator {
      * Standard out of submissions is redirected to file called console.log;
      */
     public final void runTests() {
-        reset();
         allMethodsOf(this.getClass())
             .stream()
             .filter(method -> method.isAnnotationPresent(Test.class))
@@ -227,13 +226,14 @@ public class Evaluator {
             .forEach(method -> {
                 try {
                     Test t = method.getAnnotation(Test.class);
+                    reset();
                     comment(String.format("- [%.2f%%]: ", t.weight() * 100) + t.description());
                     results.clear();
                     // To prevent console injection attacks console output is redirected
                     redirect();
                     method.invoke(this);
-                    reset(); // Resetting from console (stdout) redirection
                     grade(t.weight(), results);
+                    reset();
                     comment("");
                 } catch (Exception ex) {
                     reset();
@@ -242,6 +242,7 @@ public class Evaluator {
                 }
                 results.clear();
             });    
+        redirect();
     }
 
     /**
@@ -257,16 +258,20 @@ public class Evaluator {
                 try {
                     results.clear();
                     Inspection i = method.getAnnotation(Inspection.class);
+                    reset();
                     comment("- " + i.description());
                     method.invoke(this);
                     grade();
+                    reset();
                     comment("");
                 } catch (Exception ex) {
+                    reset();
                     comment("Inspection " + method.getName() + " failed completely." + ex);
                     grade();
                 }
                 results.clear();
             });
+        redirect();
     }
 
     /**
