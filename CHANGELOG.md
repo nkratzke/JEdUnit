@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.2
+
+- Internal class compare optimizations
+
 ## Version 0.2.1
 
 - Maximum line length for submissions is now 120 characters.

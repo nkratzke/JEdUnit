@@ -52,6 +52,7 @@ public class Constraints extends Evaluator {
 
     @Inspection(description="Inspect source files for suspect code")
     public void cheatDetection() {
+        reset();
         List<String> classes = Arrays.asList("Solution");
         List<String> calls   = Arrays.asList("System.exit", "Solution.");
 
@@ -76,10 +77,12 @@ public class Constraints extends Evaluator {
             ));
         }
         comment("Everything fine");
+        redirect();
     }
 
     @Inspection(description="Inspect source files for coding violations")
     public void conventions() {
+        reset();
         boolean allfine = true;
         for (String file : Config.EVALUATED_FILES) {
 
@@ -168,8 +171,9 @@ public class Constraints extends Evaluator {
         }
         
         if (allfine) comment("Everything fine");
+        redirect();
     }
-
+    
     /**
      * Compares the structure of a submitted class with a reference class.
      * Reports all structural differences between both classes of following kinds:
@@ -189,29 +193,6 @@ public class Constraints extends Evaluator {
      */
     @SafeVarargs
     public final CompareResult compareClasses(Selected<ClassOrInterfaceDeclaration> ref, Selected<ClassOrInterfaceDeclaration> sub, Tuple2<String, String>... renamings) {
-        return compareClasses(false, ref, sub, renamings);
-    }
-    
-    /**
-     * Compares the structure of a submitted class with a reference class.
-     * Reports all structural differences between both classes of following kinds:
-     * 
-     * - structural difference of class declaration (extends, implements)
-     * - structural differences of datafields
-     * - structural differences of callables (methods, constructors)
-     * 
-     * So far: 
-     * - no type parameters are considered (generic classes)!
-     * - no inner classes are considered
-     * 
-     * @param verbose Differences are printed to console
-     * @param ref reference class (reference must be a single selected)
-     * @param sub submitted class (submitted must be a single selected)
-     * @param renamings List of renaming tuples (to match the names in reference class with the in the submitted class)
-     * @return Results of structural difference analysis (CompareResult object)
-     */
-    @SafeVarargs
-    public final CompareResult compareClasses(boolean verbose, Selected<ClassOrInterfaceDeclaration> ref, Selected<ClassOrInterfaceDeclaration> sub, Tuple2<String, String>... renamings) {
         if (!ref.isSingle() || !sub.isSingle()) return null;
 
         CompareResult result = new CompareResult();
@@ -266,19 +247,30 @@ public class Constraints extends Evaluator {
             }
         }
 
-        // Report results
-        if (verbose) {
-            comment("Checking class structure: " + sub.getFile());
-            result.forEach(r -> {
-                grading(r.getPoints(), r.comment(), () -> r.ok(), true);
-                if (r.violates()) {
-                    comment(sub.getFile(), r.getNode().getRange(), r.comment());
-                }
-            });
-            comment("");
-        }
         return result;
     }
+
+    /**
+     * Reports a CompareResult of a complex class compare to console.
+     * @param result Result of the class compare
+     * @param sub Selected class for the compare
+     * @since 0.2.2
+     */
+    public void report(CompareResult result, Selected<ClassOrInterfaceDeclaration> sub) {
+        reset();
+        comment("Checking class structure: " + sub.getFile());
+        result.forEach(r -> {
+            grading(r.getPoints(), r.comment(), () -> r.ok(), true);
+            if (r.violates()) {
+                reset();
+                comment(sub.getFile(), r.getNode().getRange(), r.comment());
+            }
+        });
+        reset();
+        comment("");
+        redirect();
+    }
+
 
     @SafeVarargs
     private static String normalize(ClassOrInterfaceDeclaration clazz, Tuple2<String, String>... renamings) {
