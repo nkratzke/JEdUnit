@@ -363,6 +363,7 @@ public class Evaluator {
             comment("");
             check.runInspections();
             check.runTests();
+            check.reset();
             comment(String.format("Finished: %d points", check.getPoints()));
         } catch (Exception ex) {
             comment("Severe error: " + ex);
