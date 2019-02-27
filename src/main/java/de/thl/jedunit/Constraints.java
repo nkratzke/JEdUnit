@@ -52,7 +52,6 @@ public class Constraints extends Evaluator {
 
     @Inspection(description="Inspect source files for suspect code")
     public void cheatDetection() {
-        reset();
         List<String> classes = Arrays.asList("Solution");
         List<String> calls   = Arrays.asList("System.exit", "Solution.");
 
@@ -76,20 +75,16 @@ public class Constraints extends Evaluator {
                    .exists()
             ));
         }
-        reset();
         comment("Everything fine");
-        redirect();
     }
 
     @Inspection(description="Inspect source files for coding violations")
     public void conventions() {
-        reset();
         boolean allfine = true;
         for (String file : Config.EVALUATED_FILES) {
 
             File f = new File(file);
             if (!f.exists()) {
-                reset();
                 comment("File not found: " + file); 
                 allfine &= false;
                 continue; 
@@ -172,9 +167,7 @@ public class Constraints extends Evaluator {
             }
         }
         
-        reset();
         if (allfine) comment("Everything fine");
-        redirect();
     }
     
     /**
@@ -260,18 +253,14 @@ public class Constraints extends Evaluator {
      * @since 0.2.2
      */
     public void report(CompareResult result, Selected<ClassOrInterfaceDeclaration> sub) {
-        reset();
         comment("Checking class structure: " + sub.getFile());
         result.forEach(r -> {
-            grading(r.getPoints(), r.comment(), () -> r.ok(), true);
+            grading(r.getPoints(), r.comment(), () -> r.ok());
             if (r.violates()) {
-                reset();
                 comment(sub.getFile(), r.getNode().getRange(), r.comment());
             }
         });
-        reset();
         comment("");
-        redirect();
     }
 
 

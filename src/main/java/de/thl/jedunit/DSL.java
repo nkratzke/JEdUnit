@@ -157,11 +157,11 @@ public class DSL {
      */
     public static void comment(String c) {
         if (c.contains("\n")) {
-            System.out.println("<|--");
-            System.out.println(c);
-            System.out.println("--|>");    
+            Evaluator.LOG.add("<|--");
+            Evaluator.LOG.add(c);
+            Evaluator.LOG.add("--|>");    
         } else {
-            System.out.println("Comment :=>>" + c);
+            Evaluator.LOG.add("Comment :=>>" + c);
         }
     }
 

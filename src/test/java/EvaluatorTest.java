@@ -47,26 +47,13 @@ class Solution {
 
 public class EvaluatorTest {
 
-    public ByteArrayOutputStream system = new ByteArrayOutputStream();
-    public final PrintStream redirected = System.out;
-
-    @Before public void tearUp() {
-        Evaluator.REALWORLD = false;
-        system = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(system));
-    }
-
-    @After public void tearDown() {
-        System.setOut(redirected);
-    }
-
     @Test
     public void testEvaluationProcess() {
+        Evaluator.clearReport();
         Constraints check = new TestChecks();
         check.runTests(); // process functional tests
         
-        String console = system.toString();
-        // redirected.println(console);
+        String console = Evaluator.report();
         
         assertTrue("Multiple line commenting", console.contains("<|--") && console.contains("--|>"));
         assertTrue("Single line commenting", console.contains("Comment :=>>"));

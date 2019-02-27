@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import io.vavr.Tuple2;
 
@@ -24,6 +25,11 @@ import io.vavr.Tuple2;
  * @author Nane Kratzke
  */
 public class Evaluator {
+
+    /**
+     * A log of all comments.
+     */
+    protected static List<String> LOG = new LinkedList<>();
 
     /**
      * The maximum points for a VPL assignment.
@@ -93,20 +99,7 @@ public class Evaluator {
      * @param check Condition to check (success)
      */
     public final void grading(int p, String comment, Supplier<Boolean> check) {
-        grading(p, comment, check, false);
-    }
-
-    /**
-     * Adds points for grading if a check is passed (wishful behavior).
-     * A comment is always printed whether the check was successfull or not.
-     * @param p Points to add (on success)
-     * @param comment Comment to show
-     * @param check Condition to check (success)
-     * @param trusted Executed in a trusted environment
-     */
-    public final void grading(int p, String comment, Supplier<Boolean> check, boolean trusted) {
         testcase++;
-        if (!trusted) reset();
         try {
             if (check.get()) {
                 results.add(t(p, p));
@@ -119,7 +112,6 @@ public class Evaluator {
             results.add(t(0, p));
             comment("Check " + testcase + ": [FAILED due to " + ex + "] " + comment + " (0 of " + p + " points)");
         }
-        if (!trusted) redirect();
     }
 
     /**
@@ -134,19 +126,15 @@ public class Evaluator {
      *         false, otherwise
      */
     public final boolean penalize(int penalty, String remark, Supplier<Boolean> violation) {
-        reset();
         try {
             if (!violation.get()) {
-                redirect();
                 return false;
             }
             this.percentage -= penalty / 100.0;
             comment(String.format("[FAILED] %s (-%d%% on total result)", remark, penalty));
-            redirect();
             return true;
         } catch (Exception ex) {
             comment("[FAILED due to " + ex + "] " + remark);
-            redirect();
             return true;
         }
     }
@@ -156,10 +144,8 @@ public class Evaluator {
      * In case the check is evaluated to true the evaluation is aborted immediately.
      */
     protected final void abortOn(String comment, Supplier<Boolean> violation) {
-        reset();
         try {
             if (!violation.get()) {
-                redirect();
                 return;
             }
             comment("Evaluation aborted! " + comment);
@@ -171,17 +157,14 @@ public class Evaluator {
         } catch (Exception ex) {
             comment("[FAILED due to " + ex + "] " + comment);
         }
-        redirect();
     }
 
     /**
      * Reports the current points to VPL via console output (truncated to [0, 100]).
      */
     public void grade() {
-        reset();
         comment(String.format("Current percentage: %.0f%%", this.percentage * 100));
-        System.out.println("Grade :=>> " + this.getPoints());
-        redirect();
+        Evaluator.LOG.add("Grade :=>> " + this.getPoints());
     }
 
     /**
@@ -190,11 +173,9 @@ public class Evaluator {
      * @param weight Weight to be considered for total sum
      */
     public void grade(double weight, List<Tuple2<Integer, Integer>> results) {
-        reset();
         if (results.isEmpty() || weight <= 0.0) {
             comment("No results or weight for this test");
             grade();
-            redirect();
             return;
         }
         int points = results.stream().map(d -> d._1).reduce(0, (a, b) -> a + b);
@@ -203,7 +184,6 @@ public class Evaluator {
         comment(String.format("Result for this test: %d of %d points (%.0f%%)", points, total, p));
         this.percentage += (weight * points) / total;
         grade();
-        redirect();
     }
 
     private List<Method> allMethodsOf(Class<?> clazz) {
@@ -226,23 +206,17 @@ public class Evaluator {
             .forEach(method -> {
                 try {
                     Test t = method.getAnnotation(Test.class);
-                    reset();
                     comment(String.format("- [%.2f%%]: ", t.weight() * 100) + t.description());
                     results.clear();
-                    // To prevent console injection attacks console output is redirected
-                    redirect();
                     method.invoke(this);
                     grade(t.weight(), results);
-                    reset();
                     comment("");
                 } catch (Exception ex) {
-                    reset();
                     comment("Test " + method.getName() + " failed completely." + ex);
                     grade();
                 }
                 results.clear();
             });    
-        redirect();
     }
 
     /**
@@ -258,20 +232,16 @@ public class Evaluator {
                 try {
                     results.clear();
                     Inspection i = method.getAnnotation(Inspection.class);
-                    reset();
                     comment("- " + i.description());
                     method.invoke(this);
                     grade();
-                    reset();
                     comment("");
                 } catch (Exception ex) {
-                    reset();
                     comment("Inspection " + method.getName() + " failed completely." + ex);
                     grade();
                 }
                 results.clear();
             });
-        redirect();
     }
 
     /**
@@ -285,7 +255,6 @@ public class Evaluator {
      */
     public final void checkstyle() {
         try {
-            reset();
             comment("- Checkstyle");
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
@@ -295,31 +264,25 @@ public class Evaluator {
                     if (Config.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
 
                     String msg = result.substring(result.indexOf(file));
-                    reset();
                     comment(msg);
                     this.percentage -= Config.CHECKSTYLE_PENALTY / 100.0;
                 }
             }
             in.close();
             if (this.percentage >= 0) {
-                reset();
                 comment("Everything fine");
             }
             if (this.percentage < 0) {
                 String msg = String.format("[CHECKSTYLE] Found violations (%d%%)", (int)(this.percentage * 100));
-                reset();
                 comment(msg);
             }
             grade();
         } catch (Exception ex) {
-            reset();
             comment("You are so lucky! We had problems processing the checkstyle.log.");
             comment("This was due to: " + ex);
             grade();
         }
-        reset();
         comment("");
-        redirect();
     }
 
     /**
@@ -327,16 +290,8 @@ public class Evaluator {
      * Used to isolate the evaluation output from the submitted logic output to prevent injection attacks.
      * @since 0.2.1
      */
-    public void initStdOutRedirection() throws Exception {
+    public void redirectStdOut() throws Exception {
         redirected = new PrintStream(Config.STD_OUT_REDIRECTION);
-    }
-
-    /**
-     * Redirects stdout to a file to isolate evaluation logic console output
-     * from possibly tainted submission logic output.
-     * @since 0.2.1
-     */
-    protected void redirect() {
         System.setOut(redirected);
     }
 
@@ -344,8 +299,23 @@ public class Evaluator {
      * Resets stdout to "normal" console stream used by the evaluation logic output.
      * @since 0.2.1
      */
-    protected void reset() {
+    protected void resetStdOut() {
         System.setOut(stdout);
+    }
+
+    /**
+     * Generates an evaluation report for VPL from all collected logs.
+     * @return report (VPL-format)
+     */
+    public static String report() {
+        return Evaluator.LOG.stream().collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Resets the report. Only useful for testing.
+     */
+    public static void clearReport() {
+        Evaluator.LOG.clear();
     }
 
     /**
@@ -353,20 +323,29 @@ public class Evaluator {
      * @param args command line options (not evaluated)
      */
     public static final void main(String[] args) {
+        Constraints check = null;
         try {
-            Constraints check = (Constraints)Class.forName("Checks").getDeclaredConstructor().newInstance();
-            check.initStdOutRedirection();
+            check = (Constraints)Class.forName("Checks").getDeclaredConstructor().newInstance();
+            check.configure();
+            check.redirectStdOut();
+        } catch (Exception ex) {
+            System.out.println("Severe error: " + ex);
+            System.exit(1);
+        }
+        
+        try {
             comment("JEdUnit " + Config.VERSION);
             comment("");
-            check.configure();
             if (Config.CHECKSTYLE) check.checkstyle();
             comment("");
             check.runInspections();
             check.runTests();
-            check.reset();
             comment(String.format("Finished: %d points", check.getPoints()));
         } catch (Exception ex) {
-            comment("Severe error: " + ex);
+            comment("Unexpected error: " + ex);
+        } finally {
+            check.resetStdOut();
+            System.out.println(Evaluator.report());
         }
     }
 }

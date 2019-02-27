@@ -16,10 +16,6 @@ import de.thl.jedunit.DSL;
 public class ConstraintsTest {
 
     @Test public void testConstraintProcessing() {
-        ByteArrayOutputStream redirect = new ByteArrayOutputStream();
-        PrintStream redirected = System.out;
-        System.setOut(new PrintStream(redirect));
-
         Constraints checks = new Constraints() {
             @Override
             public void configure() {
@@ -40,9 +36,8 @@ public class ConstraintsTest {
         checks.configure();
         checks.runInspections();
 
-        String console = redirect.toString();
-        System.setOut(redirected);
-        // System.out.println(console);
+        String console = Evaluator.report();
+
         assertFalse("Main method allowed", console.contains("Nightmare.java:13"));
         assertTrue("Method detection", console.contains("Nightmare.java:21:5: No methods"));
         assertTrue("Method detection", console.contains("Nightmare.java:25:5: No methods"));
@@ -76,10 +71,6 @@ public class ConstraintsTest {
 
     @Test 
     public void testNoConstraintProcessing() {
-        ByteArrayOutputStream redirect = new ByteArrayOutputStream();
-        PrintStream redirected = System.out;
-        System.setOut(new PrintStream(redirect));
-
         Constraints checks = new Constraints() {
             @Override
             public void configure() {
@@ -99,19 +90,13 @@ public class ConstraintsTest {
         checks.configure();
         checks.conventions();
 
-        String console = redirect.toString();
-        System.setOut(redirected);
-        System.out.println(console);
+        String console = Evaluator.report();
         assertTrue("No detections", console.trim().contains("Everything fine"));
     }
 
 
     @Test
-    public void testCheatDetectionProcessing() {
-        ByteArrayOutputStream redirect = new ByteArrayOutputStream();
-        PrintStream redirected = System.out;
-        System.setOut(new PrintStream(redirect));
-        
+    public void testCheatDetectionProcessing() {      
         Constraints check = new Constraints() {
             @Override
             public void configure() {
@@ -124,10 +109,7 @@ public class ConstraintsTest {
         check.configure();
         check.cheatDetection();
 
-        String console = redirect.toString();
-        System.setOut(redirected);
-        
-        // System.out.println(console);
+        String console = Evaluator.report();
 
         assertTrue("Cheat detection", console.contains("Evil.java:1:1: [CHEAT] Forbidden import"));
         assertTrue("Cheat detection", console.contains("Evil.java:2:1: [CHEAT] Forbidden import"));
