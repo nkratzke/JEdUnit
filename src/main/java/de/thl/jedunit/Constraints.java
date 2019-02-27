@@ -76,6 +76,7 @@ public class Constraints extends Evaluator {
                    .exists()
             ));
         }
+        reset();
         comment("Everything fine");
         redirect();
     }
@@ -88,6 +89,7 @@ public class Constraints extends Evaluator {
 
             File f = new File(file);
             if (!f.exists()) {
+                reset();
                 comment("File not found: " + file); 
                 allfine &= false;
                 continue; 
@@ -170,6 +172,7 @@ public class Constraints extends Evaluator {
             }
         }
         
+        reset();
         if (allfine) comment("Everything fine");
         redirect();
     }
