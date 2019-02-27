@@ -286,7 +286,7 @@ public class Constraints extends Evaluator {
             callable.isConstructorDeclaration() ? "constructor:" : "method:",
             normalize(callable.getModifiers()),
             rename(callable.getTypeParameters(), renamings),
-            rename(callable.getDeclarationAsString(false, false), renamings)
+            rename(callable.getDeclarationAsString(true, false, false), renamings)
         ));
     }
 
