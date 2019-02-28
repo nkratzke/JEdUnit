@@ -324,6 +324,7 @@ public class Evaluator {
      */
     public static final void main(String[] args) {
         Constraints check = null;
+        System.out.println("JEdUnit " + Config.VERSION);
         try {
             check = (Constraints)Class.forName("Checks").getDeclaredConstructor().newInstance();
             check.configure();
