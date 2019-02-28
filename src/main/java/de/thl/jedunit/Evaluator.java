@@ -152,6 +152,8 @@ public class Evaluator {
             this.percentage = 0;
             if (REALWORLD) {
                 grade();
+                resetStdOut();
+                System.out.println(report());
                 System.exit(1);
             }
         } catch (Exception ex) {
@@ -224,6 +226,7 @@ public class Evaluator {
      * Methods are executed according to their alphabetical order.
      */
     public final void runInspections() {
+        System.out.println("Runnning inspections");
         allMethodsOf(this.getClass())
             .stream()
             .filter(method -> method.isAnnotationPresent(Inspection.class))
@@ -232,11 +235,14 @@ public class Evaluator {
                 try {
                     results.clear();
                     Inspection i = method.getAnnotation(Inspection.class);
+                    System.out.println(i.description());
                     comment("- " + i.description());
                     method.invoke(this);
+                    System.out.println(Evaluator.LOG);
                     grade();
                     comment("");
                 } catch (Exception ex) {
+                    System.out.println("Inspection " + method.getName() + " failed completely." + ex);
                     comment("Inspection " + method.getName() + " failed completely." + ex);
                     grade();
                 }
@@ -333,7 +339,7 @@ public class Evaluator {
             System.out.println("Severe error: " + ex);
             System.exit(1);
         }
-        
+
         try {
             comment("JEdUnit " + Config.VERSION);
             comment("");

@@ -54,7 +54,7 @@ public class Constraints extends Evaluator {
     public void cheatDetection() {
         List<String> classes = Arrays.asList("Solution");
         List<String> calls   = Arrays.asList("System.exit", "Solution.");
-
+        
         for (String file : Config.EVALUATED_FILES) {
             abortOn("Possible cheat detected", () -> inspect(file, ast -> 
                 ast.select(ImportDeclaration.class)
