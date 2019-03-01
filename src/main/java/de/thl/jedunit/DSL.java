@@ -531,4 +531,20 @@ public class DSL {
         if (expected == null || actual == null) return expected == actual;
         return expected.toString().equals(actual.toString());
     }
+
+    /**
+     * Captures an Exception.
+     * @param code Code to be executed that is expected to raise an exception
+     * @return Returns the canonical name of the captured exception object.
+     *         <code>null</code> if no exception was thrown
+     * @since 0.2.3
+     */
+    public static <T> String captureException(Supplier<T> code) {
+        try {
+            code.get();
+            return null;
+        } catch(Exception ex) {
+            return ex.getClass().getCanonicalName();
+        }
+    }
 }
