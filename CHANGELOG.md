@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.2.3
+
+- Added captureException() to DSL to check for expected exceptions
+- Several bugfixes
+
 ## Version 0.2.2
 
 - Internal class compare optimizations
