@@ -1,0 +1,14 @@
+{
+    "penalty": 1,
+    "ignore": [
+        "[Javadoc", "Javadoc]", "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]",
+        "[FinalParameters]", "[AvoidInlineConditionals]", "[RegexpSingleline]",
+        "[NeedBraces]", "[RedundantModifier]", "[DesignForExtension]"
+    ],
+    "special": [
+        {
+            "penalty": 5,
+            "checks": ["[Indention]"]
+        }  
+    ]
+}
