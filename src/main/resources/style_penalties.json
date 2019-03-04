@@ -3,12 +3,13 @@
     "ignore": [
         "[Javadoc", "Javadoc]", "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]",
         "[FinalParameters]", "[AvoidInlineConditionals]", "[RegexpSingleline]",
-        "[NeedBraces]", "[RedundantModifier]", "[DesignForExtension]"
+        "[NeedBraces]", "[RedundantModifier]", "[DesignForExtension]", "[WhitespaceAfter]",
+        "[ParenPad]"
     ],
     "special": [
         {
             "penalty": 5,
-            "checks": ["[Indention]"]
+            "checks": ["[Indentation]"]
         }  
     ]
 }

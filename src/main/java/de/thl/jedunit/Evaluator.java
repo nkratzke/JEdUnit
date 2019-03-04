@@ -280,14 +280,14 @@ public class Evaluator {
                     if (!result.contains(file)) continue;
                     if (ignores.stream().anyMatch(ignore -> result.contains(ignore))) continue;
                     int penalty = checkstyle.getInt("penalty");
-                    String msg = result.substring(result.indexOf(file));
-                    comment(msg);
 
                     for (Object o : checkstyle.getJSONArray("special")) {
                         if (((JSONObject)o).getJSONArray("checks").toList().stream().map(c -> (String)c).anyMatch(c -> result.contains(c)))
                             penalty = ((JSONObject)o).getInt("penalty");
                     }
 
+                    String msg = result.substring(result.indexOf(file));
+                    comment(String.format("%s (-%d%%)", msg, penalty));
                     this.percentage -= penalty / 100.0;
                 }
             }
