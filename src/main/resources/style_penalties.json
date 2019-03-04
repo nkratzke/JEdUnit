@@ -4,7 +4,7 @@
         "[Javadoc", "Javadoc]", "[NewlineAtEndOfFile]", "[HideUtilityClassConstructor]",
         "[FinalParameters]", "[AvoidInlineConditionals]", "[RegexpSingleline]",
         "[NeedBraces]", "[RedundantModifier]", "[DesignForExtension]", "[WhitespaceAfter]",
-        "[ParenPad]"
+        "[ParenPad]", "[VisibilityModifier]", "[MagicNumber]"
     ],
     "special": [
         {
