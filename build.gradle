@@ -21,6 +21,7 @@ dependencies {
     api 'com.github.javaparser:javaparser-core:3.7.+'
     api 'com.github.mifmif:generex:1.0.+'
     api 'io.vavr:vavr:0.9.+'
+    api 'org.json:json:20180813'
     testImplementation 'junit:junit:4.12'
 }
 

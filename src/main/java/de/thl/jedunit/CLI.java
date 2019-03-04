@@ -9,6 +9,7 @@ public class CLI {
 
     public static final String[] RESOURCES = {
         "style_checks.xml",
+        "style_penalties.json",
         "vpl_evaluate.sh",
         "vpl_run.sh",
         "clean.sh",

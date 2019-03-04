@@ -3,6 +3,7 @@
 ## Version 0.2.3
 
 - Added captureException() to DSL to check for expected exceptions
+- Configurable checkstyle penalties (style_penalties.json)
 - Several bugfixes
 
 ## Version 0.2.2

@@ -7,12 +7,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 import io.vavr.Tuple2;
 
@@ -262,16 +267,28 @@ public class Evaluator {
     public final void checkstyle() {
         try {
             comment("- Checkstyle");
+
+            String json = Files.lines(Paths.get("style_penalties.json")).collect(Collectors.joining("\n"));
+            JSONObject checkstyle = new JSONObject(json);
+            List<String> ignores = new LinkedList<>();
+            for (Object ignore : checkstyle.getJSONArray("ignore")) ignores.add((String)ignore);
+
             Scanner in = new Scanner(new File("checkstyle.log"));
             while (in.hasNextLine()) {
                 String result = in.nextLine();
                 for (String file : Config.EVALUATED_FILES) {
                     if (!result.contains(file)) continue;
-                    if (Config.CHECKSTYLE_IGNORES.stream().anyMatch(ignore -> result.contains(ignore))) continue;
-
+                    if (ignores.stream().anyMatch(ignore -> result.contains(ignore))) continue;
+                    int penalty = checkstyle.getInt("penalty");
                     String msg = result.substring(result.indexOf(file));
                     comment(msg);
-                    this.percentage -= Config.CHECKSTYLE_PENALTY / 100.0;
+
+                    for (Object o : checkstyle.getJSONArray("special")) {
+                        if (((JSONObject)o).getJSONArray("checks").toList().stream().map(c -> (String)c).anyMatch(c -> result.contains(c)))
+                            penalty = ((JSONObject)o).getInt("penalty");
+                    }
+
+                    this.percentage -= penalty / 100.0;
                 }
             }
             in.close();
