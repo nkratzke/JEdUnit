@@ -230,9 +230,14 @@ public class DSL {
         Map<String, String> r = new TreeMap<>();
         for (K k : m.keySet()) {
             V v = m.get(k);
-            String ks = k instanceof String ? repr(k.toString()) : k.toString();
-            String vs = v instanceof String ? repr(v.toString()) : v.toString();
-            r.put(ks, vs);
+            if (v == null) {
+                String ks = k instanceof String ? repr(k.toString()) : k.toString();
+                r.put(ks, "null");
+            } else {
+                String ks = k instanceof String ? repr(k.toString()) : k.toString();
+                String vs = v instanceof String ? repr(v.toString()) : v.toString();
+                r.put(ks, vs);    
+            }
         }
         return r.toString();
     }
@@ -247,8 +252,12 @@ public class DSL {
         if (list == null) return "null";
         java.util.List<String> r = new LinkedList<>();
         for (T t : list) {
-            String v = t instanceof String ? repr(t.toString()) : t.toString();
-            r.add(v);
+            if (t == null) {
+                r.add("null"); 
+            } else {
+                String v = t instanceof String ? repr(t.toString()) : t.toString();
+                r.add(v);    
+            }
         }
         return r.toString();
     }
