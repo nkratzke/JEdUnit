@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.function.Supplier;
 
@@ -158,14 +157,18 @@ public class DSLTest extends Constraints {
     }
 
     @Test public void testArrayRepr() {
-        String[] strings =  { "", " ", "Hello World" };
+        String[] strings =  { "", " ", "Hello World", null };
         char[] chars = { ' ', '\t', 'x' };
         int[] ints = { 1, 2, 3 };
         boolean[] empty = {};
 
-        assertEquals(String.format("[%s, %s, %s]", repr(""), repr(" "), repr("Hello World")), repr(strings));
+        System.out.println("Tester: " + repr(chars));
+
+        String nul = null;
+        assertEquals(String.format("[%s, %s, %s, %s]", repr(""), repr(" "), repr("Hello World"), repr(nul)), repr(strings));
         assertEquals(String.format("[%d, %d, %d]", 1, 2, 3), repr(ints));
         assertEquals("[]", repr(empty));
+        // assertEquals(repr(chars))
     }
 
     @Test public void testListRepr() {

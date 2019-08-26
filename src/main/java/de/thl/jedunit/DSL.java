@@ -199,12 +199,18 @@ public class DSL {
         return o.toString();
     }
 
+    public static String repr(Object[] os) {
+        List<String> reps = new LinkedList<>();
+        for (Object o : os) reps.add(repr(o));
+        return reps.toString();
+    }
+
     private static List<Byte> to_l(byte[] data) { List<Byte> l = new LinkedList<>(); for (byte d : data) l.add(d); return l;}
     private static List<Short> to_l(short[] data) { List<Short> l = new LinkedList<>(); for (short d : data) l.add(d); return l;}
     private static List<Integer> to_l(int[] data) { List<Integer> l = new LinkedList<>(); for (int d : data) l.add(d); return l;}
     private static List<Long> to_l(long[] data) { List<Long> l = new LinkedList<>(); for (long d : data) l.add(d); return l;}
     private static List<Boolean> to_l(boolean[] data) { List<Boolean> l = new LinkedList<>(); for (boolean d : data) l.add(d); return l;}
-    private static List<Character> to_l(char[] data) { List<Character> l = new LinkedList<>(); for (char d : data) l.add(d); return l;}
+    private static List<Character> to_l(char[] data) { List<Character> l = new LinkedList<>(); for (char d : data) l.add((Character)d); return l;}
     private static List<Float> to_l(float[] data) { List<Float> l = new LinkedList<>(); for (float d : data) l.add(d); return l;}
     private static List<Double> to_l(double[] data) { List<Double> l = new LinkedList<>(); for (double d : data) l.add(d); return l;}
 
@@ -216,7 +222,7 @@ public class DSL {
     public static String repr(char[] data) { return repr(to_l(data)); }
     public static String repr(float[] data) { return repr(to_l(data)); }
     public static String repr(double[] data) { return repr(to_l(data)); }
-    public static <T> String repr(T[] data) { return repr(Stream.of(data).collect(Collectors.toList())); }
+    // public static String repr(Object[] data) { return repr(Stream.of(data).collect(Collectors.toList())); }
 
     /**
      * Makes typical non-printable characters explicit.
@@ -248,37 +254,20 @@ public class DSL {
     public static <K, V> String repr(Map<K, V> m) {
         if (m == null) return "null";
         Map<String, String> r = new TreeMap<>();
-        for (K k : m.keySet()) {
-            V v = m.get(k);
-            if (v == null) {
-                String ks = k instanceof String ? repr(k.toString()) : k.toString();
-                r.put(ks, "null");
-            } else {
-                String ks = k instanceof String ? repr(k.toString()) : k.toString();
-                String vs = v instanceof String ? repr(v.toString()) : v.toString();
-                r.put(ks, vs);    
-            }
-        }
+        for (K k : m.keySet()) r.put(repr(k), repr(m.get(k)));
         return r.toString();
     }
 
     /**
      * Creates a normalized string representation of a list.
-     * Non-printable chers in Strings are indicated.
+     * Non-printable characters in Strings and characters are indicated.
      * @param l ist
      * @return normalized representation of the List
      */
     public static <T> String repr(java.util.List<T> list) {
         if (list == null) return "null";
         java.util.List<String> r = new LinkedList<>();
-        for (T t : list) {
-            if (t == null) {
-                r.add("null"); 
-            } else {
-                String v = t instanceof String ? repr(t.toString()) : t.toString();
-                r.add(v);    
-            }
-        }
+        for (T t : list) r.add(repr(t));
         return r.toString();
     }
 
