@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.function.Supplier;
 
@@ -154,6 +155,17 @@ public class DSLTest extends Constraints {
         assertEquals("'\u21b9'", repr('\t'));
         assertEquals("'\u23ce'", repr('\n'));
         assertEquals("null", repr("test".length() > "test".length() ? "test" : null));
+    }
+
+    @Test public void testArrayRepr() {
+        String[] strings =  { "", " ", "Hello World" };
+        char[] chars = { ' ', '\t', 'x' };
+        int[] ints = { 1, 2, 3 };
+        boolean[] empty = {};
+
+        assertEquals(String.format("[%s, %s, %s]", repr(""), repr(" "), repr("Hello World")), repr(strings));
+        assertEquals(String.format("[%d, %d, %d]", 1, 2, 3), repr(ints));
+        assertEquals("[]", repr(empty));
     }
 
     @Test public void testListRepr() {

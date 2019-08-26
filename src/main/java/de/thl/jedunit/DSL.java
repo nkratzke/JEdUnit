@@ -2,6 +2,7 @@ package de.thl.jedunit;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -197,6 +198,25 @@ public class DSL {
         if (o instanceof Map) return repr((Map)o);
         return o.toString();
     }
+
+    private static List<Byte> to_l(byte[] data) { List<Byte> l = new LinkedList<>(); for (byte d : data) l.add(d); return l;}
+    private static List<Short> to_l(short[] data) { List<Short> l = new LinkedList<>(); for (short d : data) l.add(d); return l;}
+    private static List<Integer> to_l(int[] data) { List<Integer> l = new LinkedList<>(); for (int d : data) l.add(d); return l;}
+    private static List<Long> to_l(long[] data) { List<Long> l = new LinkedList<>(); for (long d : data) l.add(d); return l;}
+    private static List<Boolean> to_l(boolean[] data) { List<Boolean> l = new LinkedList<>(); for (boolean d : data) l.add(d); return l;}
+    private static List<Character> to_l(char[] data) { List<Character> l = new LinkedList<>(); for (char d : data) l.add(d); return l;}
+    private static List<Float> to_l(float[] data) { List<Float> l = new LinkedList<>(); for (float d : data) l.add(d); return l;}
+    private static List<Double> to_l(double[] data) { List<Double> l = new LinkedList<>(); for (double d : data) l.add(d); return l;}
+
+    public static String repr(byte[] data) { return repr(to_l(data)); }
+    public static String repr(short[] data) { return repr(to_l(data)); }
+    public static String repr(int[] data) { return repr(to_l(data)); }
+    public static String repr(long[] data) { return repr(to_l(data)); }
+    public static String repr(boolean[] data) { return repr(to_l(data)); }
+    public static String repr(char[] data) { return repr(to_l(data)); }
+    public static String repr(float[] data) { return repr(to_l(data)); }
+    public static String repr(double[] data) { return repr(to_l(data)); }
+    public static <T> String repr(T[] data) { return repr(Stream.of(data).collect(Collectors.toList())); }
 
     /**
      * Makes typical non-printable characters explicit.

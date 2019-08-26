@@ -4,6 +4,7 @@
 
 - Added captureException() to DSL to check for expected exceptions
 - Configurable checkstyle penalties (style_penalties.json)
+- Added string representation of arrays
 - Several bugfixes
 
 ## Version 0.2.2
