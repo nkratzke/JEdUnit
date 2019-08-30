@@ -22,6 +22,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
@@ -109,6 +110,31 @@ public class DSL {
      * Abbreviation to select blocks.
      */
     public final static Class<BlockStmt> BLOCK = BlockStmt.class;
+
+    /**
+     * Abbreviation to select String literals.
+     */
+    public final static Class<StringLiteralExpr> STRING_LITERAL = StringLiteralExpr.class;
+
+    /**
+     * Abbreviation to select integer literals (covers byte and short literals as well)
+     */
+    public final static Class<IntegerLiteralExpr> INT_LITERAL = IntegerLiteralExpr.class;
+
+    /**
+     * Abbreviation to select long literals.
+     */
+    public final static Class<LongLiteralExpr> LONG_LITERAL = LongLiteralExpr.class;
+
+    /**
+     * Abbreviation to select floating point literals (covers double and float).
+     */
+    public final static Class<DoubleLiteralExpr> FLOAT_LITERAL = DoubleLiteralExpr.class;
+
+    /**
+     * Abbreviation to select char literals.
+     */
+    public final static Class<CharLiteralExpr> CHAR_LITERAL = CharLiteralExpr.class;
 
     /**
      * Abbreviation to select if statements.
