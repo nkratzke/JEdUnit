@@ -122,7 +122,7 @@ public class DSL {
     public final static Class<IntegerLiteralExpr> INT_LITERAL = IntegerLiteralExpr.class;
 
     /**
-     * Abbreviation to select long literals.
+     * Abbreviation to select long integer literals.
      */
     public final static Class<LongLiteralExpr> LONG_LITERAL = LongLiteralExpr.class;
 
@@ -135,6 +135,16 @@ public class DSL {
      * Abbreviation to select char literals.
      */
     public final static Class<CharLiteralExpr> CHAR_LITERAL = CharLiteralExpr.class;
+
+    /**
+     * Abbreviation to select boolean literals.
+     */
+    public final static Class<BooleanLiteralExpr> BOOL_LITERAL = BooleanLiteralExpr.class;
+
+    /**
+     * Abbreviation to select null literals.
+     */
+    public final static Class<NullLiteralExpr> NULL_LITERAL = NullLiteralExpr.class;
 
     /**
      * Abbreviation to select if statements.
