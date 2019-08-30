@@ -228,6 +228,17 @@ public class DSL {
     @SuppressWarnings("unchecked")
     public static String repr(Object o) {
         if (o == null) return "null";
+
+        if (o instanceof byte[]) return (repr((byte[])o));
+        if (o instanceof short[]) return (repr((short[])o));
+        if (o instanceof int[]) return (repr((int[])o));        
+        if (o instanceof long[]) return (repr((long[])o));
+        if (o instanceof double[]) return (repr((double[])o));
+        if (o instanceof float[]) return (repr((float[])o));
+        if (o instanceof char[]) return (repr((char[])o));      
+        if (o instanceof boolean[]) return (repr((boolean[])o));      
+        if (o instanceof Object[]) return (repr((Object[])o));        
+
         if (o instanceof String) return repr((String)o);
         if (o instanceof Character) return repr((char)o);
         if (o instanceof List) return repr((List)o);
@@ -235,30 +246,19 @@ public class DSL {
         return o.toString();
     }
 
-    public static String repr(Object[] os) {
-        List<String> reps = new LinkedList<>();
-        for (Object o : os) reps.add(repr(o));
-        return reps.toString();
+    public static String repr(byte[] data) { return Arrays.toString(data); }
+    public static String repr(short[] data) { return Arrays.toString(data); }
+    public static String repr(int[] data) { return Arrays.toString(data); }
+    public static String repr(long[] data) { return Arrays.toString(data); }
+    public static String repr(boolean[] data) { return Arrays.toString(data); }
+    public static String repr(char[] data) {
+        List<Character> l = new LinkedList<>(); 
+        for (char d : data) l.add((Character)d);
+        return repr(l); 
     }
-
-    private static List<Byte> to_l(byte[] data) { List<Byte> l = new LinkedList<>(); for (byte d : data) l.add(d); return l;}
-    private static List<Short> to_l(short[] data) { List<Short> l = new LinkedList<>(); for (short d : data) l.add(d); return l;}
-    private static List<Integer> to_l(int[] data) { List<Integer> l = new LinkedList<>(); for (int d : data) l.add(d); return l;}
-    private static List<Long> to_l(long[] data) { List<Long> l = new LinkedList<>(); for (long d : data) l.add(d); return l;}
-    private static List<Boolean> to_l(boolean[] data) { List<Boolean> l = new LinkedList<>(); for (boolean d : data) l.add(d); return l;}
-    private static List<Character> to_l(char[] data) { List<Character> l = new LinkedList<>(); for (char d : data) l.add((Character)d); return l;}
-    private static List<Float> to_l(float[] data) { List<Float> l = new LinkedList<>(); for (float d : data) l.add(d); return l;}
-    private static List<Double> to_l(double[] data) { List<Double> l = new LinkedList<>(); for (double d : data) l.add(d); return l;}
-
-    public static String repr(byte[] data) { return repr(to_l(data)); }
-    public static String repr(short[] data) { return repr(to_l(data)); }
-    public static String repr(int[] data) { return repr(to_l(data)); }
-    public static String repr(long[] data) { return repr(to_l(data)); }
-    public static String repr(boolean[] data) { return repr(to_l(data)); }
-    public static String repr(char[] data) { return repr(to_l(data)); }
-    public static String repr(float[] data) { return repr(to_l(data)); }
-    public static String repr(double[] data) { return repr(to_l(data)); }
-    // public static String repr(Object[] data) { return repr(Stream.of(data).collect(Collectors.toList())); }
+    public static String repr(float[] data) { return Arrays.toString(data); } 
+    public static String repr(double[] data) { return Arrays.toString(data); }
+    public static String repr(Object[] data) { return repr(Stream.of(data).collect(Collectors.toList())); }
 
     /**
      * Makes typical non-printable characters explicit.
@@ -571,7 +571,7 @@ public class DSL {
         if (expected == null || actual == null) return expected == actual;
         Map<K, V> e = new TreeMap<>(expected);
         Map<K, V> a = new TreeMap<>(actual);
-        return e.toString().equals(a.toString());
+        return repr(e).equals(repr(a));
     }
 
     /**
@@ -583,7 +583,7 @@ public class DSL {
      */
     public static <T> boolean assertEquals(T expected, T actual) {
         if (expected == null || actual == null) return expected == actual;
-        return expected.toString().equals(actual.toString());
+        return repr(expected).equals(repr(actual));
     }
 
     /**

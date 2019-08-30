@@ -279,6 +279,113 @@ public class DSLTest extends Constraints {
         assertTrue(DSL.assertEquals(null, null));
     }
 
+    @Test public void testAssertEqualsArrays() {
+        byte[] bytes = { 1, 2, 3 };
+        byte[] equal_bytes = { 1, 2, 3 };
+        byte[] empty_bytes = { };
+
+        short[] shorts = { 1, 2, 3 };
+        short[] equal_shorts = { 1, 2, 3 };
+        short[] empty_shorts = { };
+
+        int[] ints = { 1, 2, 3 };
+        int[] equal_ints = { 1, 2, 3 };
+        int[] empty_ints = { };
+        
+        long[] longs = { 1, 2, 3 };
+        long[] equal_longs = { 1, 2, 3 };
+        long[] empty_longs = { };
+
+        float[] floats = { 1.0f, 2.0f, 3.0f };
+        float[] equal_floats = { 1.0f, 2.0f, 3.0f };
+        float[] empty_floats = { };
+
+        double[] doubles = { 1.0d, 2.0d, 3.0d };
+        double[] equal_doubles = { 1.0d, 2.0d, 3.d };
+        double[] empty_doubles = { };
+
+        char[] chars = { '1', '2', '3' };
+        char[] equal_chars = { '1', '2', '3' };
+        char[] empty_chars = {};
+
+        boolean[] bools = { false, true };
+        boolean[] equal_bools = { false, true };
+        boolean[] empty_bools = { };
+
+        String[] strings = { "1", "2", "3" };
+        String[] equal_strings = { "1", "2", "3" };
+        String[] empty_strings = { };
+
+        assertTrue(DSL.assertEquals(bytes, equal_bytes));
+        assertFalse(DSL.assertEquals(bytes, empty_bytes));
+        assertTrue(DSL.assertEquals(bytes, ints));
+        assertFalse(DSL.assertEquals(bytes, chars));
+        assertFalse(DSL.assertEquals(bytes, strings));
+        assertFalse(DSL.assertEquals(bytes, doubles));
+
+        assertTrue(DSL.assertEquals(shorts, equal_shorts));
+        assertFalse(DSL.assertEquals(shorts, empty_shorts));
+        assertTrue(DSL.assertEquals(shorts, longs));
+        assertFalse(DSL.assertEquals(shorts, chars));
+        assertFalse(DSL.assertEquals(shorts, strings));
+        assertFalse(DSL.assertEquals(shorts, floats));
+
+        assertTrue(DSL.assertEquals(ints, equal_ints));
+        assertFalse(DSL.assertEquals(ints, empty_ints));
+        assertTrue(DSL.assertEquals(ints, shorts));
+        assertFalse(DSL.assertEquals(ints, chars));
+        assertFalse(DSL.assertEquals(ints, strings));
+        assertFalse(DSL.assertEquals(ints, floats));
+
+        assertTrue(DSL.assertEquals(longs, equal_longs));
+        assertFalse(DSL.assertEquals(longs, empty_longs));
+        assertTrue(DSL.assertEquals(longs, shorts));
+        assertFalse(DSL.assertEquals(longs, chars));
+        assertFalse(DSL.assertEquals(longs, strings));
+        assertFalse(DSL.assertEquals(longs, floats));
+
+        assertTrue(DSL.assertEquals(doubles, equal_doubles));
+        assertFalse(DSL.assertEquals(doubles, empty_doubles));
+
+        assertTrue(DSL.assertEquals(doubles, floats));
+        assertFalse(DSL.assertEquals(doubles, chars));
+        assertFalse(DSL.assertEquals(doubles, strings));
+        assertFalse(DSL.assertEquals(doubles, ints));
+
+        assertTrue(DSL.assertEquals(floats, equal_floats));
+        assertFalse(DSL.assertEquals(floats, empty_floats));
+        assertTrue(DSL.assertEquals(floats, doubles));
+        assertFalse(DSL.assertEquals(floats, chars));
+        assertFalse(DSL.assertEquals(floats, strings));
+        assertFalse(DSL.assertEquals(floats, bytes));
+
+        assertTrue(DSL.assertEquals(chars, equal_chars));
+        assertFalse(DSL.assertEquals(chars, empty_chars));
+        assertTrue(DSL.assertEquals(chars, chars));
+        assertFalse(DSL.assertEquals(chars, strings));
+        assertFalse(DSL.assertEquals(chars, bytes));
+
+        assertTrue(DSL.assertEquals(bools, equal_bools));
+        assertFalse(DSL.assertEquals(bools, empty_bools));
+        assertTrue(DSL.assertEquals(equal_bools, bools));
+        assertFalse(DSL.assertEquals(bools, bytes));
+
+        assertTrue(DSL.assertEquals(strings, equal_strings));
+        assertFalse(DSL.assertEquals(strings, empty_strings));
+        assertFalse(DSL.assertEquals(strings, chars));
+        assertFalse(DSL.assertEquals(strings, bytes));
+        assertFalse(DSL.assertEquals(strings, floats));
+
+        assertTrue(DSL.assertEquals(empty_strings, empty_floats));
+        assertTrue(DSL.assertEquals(empty_chars, empty_ints));
+        assertTrue(DSL.assertEquals(empty_floats, empty_strings));
+        assertTrue(DSL.assertEquals(empty_bools, empty_doubles));
+        assertTrue(DSL.assertEquals(empty_ints, empty_doubles));
+        assertTrue(DSL.assertEquals(empty_longs, empty_strings));
+        assertTrue(DSL.assertEquals(empty_shorts, empty_chars));
+        assertTrue(DSL.assertEquals(empty_bytes, empty_bools));
+    }
+
     @Test public void testAssertEqualsMap() {
         Map<String, Integer> a = new HashMap<>();
         Map<String, Integer> b = new TreeMap<>();
