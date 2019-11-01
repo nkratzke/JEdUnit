@@ -51,7 +51,7 @@ public class TestSeries<T> {
                         String failedMsg = String.format("%s %s", expectedMsg, actual.apply(d));
                         this.evaluator.grading(p, failedMsg, () -> success);
                     }
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     String comment = String.format("%s but failed with exception: %s", expectedMsg, ex);
                     this.evaluator.grading(p, comment, () -> false);
                 }
