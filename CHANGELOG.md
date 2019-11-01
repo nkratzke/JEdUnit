@@ -2,6 +2,7 @@
 
 ## Version 0.2.3x
 
+- Endless loop detection (via runtime timeouts for submission logic)
 - Added string representation of arrays
 - Improvements in array comparisons (assertEquals())
 - Several bugfixes

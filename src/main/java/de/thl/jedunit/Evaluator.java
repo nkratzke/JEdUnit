@@ -370,6 +370,7 @@ public class Evaluator {
         } finally {
             check.resetStdOut();
             System.out.println(Evaluator.report());
+            System.exit(0);
         }
     }
 }

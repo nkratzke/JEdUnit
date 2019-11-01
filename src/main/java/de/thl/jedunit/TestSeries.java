@@ -44,7 +44,7 @@ public class TestSeries<T> {
                 String expectedMsg = expected.apply(d);
                 int p = points.apply(d);
                 try {
-                    boolean success = matches.test(d);
+                    boolean success = Run.withTimeout(() -> matches.test(d), Config.TIMEOUT);
                     if (success) {
                         this.evaluator.grading(p, expectedMsg, () -> success);
                     } else {

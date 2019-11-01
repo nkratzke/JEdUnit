@@ -15,7 +15,7 @@ public class Config {
     /**
      * Version of JEdUnit (Semantic Versioning).
      */
-    public final static String VERSION = "0.2.3g"; 
+    public final static String VERSION = "0.2.3h"; 
 
     /**
      * Set of file names that shall be considered by checkstyle and evaluation.
@@ -28,6 +28,13 @@ public class Config {
      * This is used to avoid injection attacks. 
      */
     public static String STD_OUT_REDIRECTION = "console.log";
+
+    /**
+     * Default timeout in seconds for a test case. Evey test case that
+     * takes longer than this specified timeout is assumed to be
+     * due to an endless loop.
+     */
+    public static int TIMEOUT = 1;
 
     /**
      * Option to evaluate the checkstyle log.
